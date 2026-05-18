@@ -1,0 +1,3 @@
+D:\UsefulTools\CMake\bin\cmake.exe -E rm -f CMakeFiles\algomotion.dir/objects.a
+D:\UsefulTools\MingW_w64\bin\ar.exe qc CMakeFiles\algomotion.dir/objects.a @CMakeFiles\algomotion.dir\objects1.rsp
+D:\UsefulTools\MingW_w64\bin\c++.exe -L. -Wl,--whole-archive CMakeFiles\algomotion.dir/objects.a -Wl,--no-whole-archive -o algomotion.exe -Wl,--out-implib,libalgomotion.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\algomotion.dir\linkLibs.rsp

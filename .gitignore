@@ -1,0 +1,7 @@
+task.md
+requirements.md
+obj/
+algomotion
+algomotion.exe
+*.o
+*.out

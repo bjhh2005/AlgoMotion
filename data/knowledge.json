@@ -1,0 +1,19 @@
+{
+  "_note": "此文件为知识数据库的外部 JSON 表示。当前版本数据在 KnowledgeDB.cpp 中硬编码，此文件作为后续从文件加载的参考格式。",
+  "items": [
+    {
+      "id": "linked_list",
+      "name": "链表 (Linked List)",
+      "category": "linear",
+      "description": "链表是一种线性数据结构，由一系列节点组成，每个节点包含数据域和指向下一个节点的指针。支持 O(1) 头插/头删，O(n) 随机访问。",
+      "related": ["array", "stack", "queue", "doubly_linked_list"],
+      "complexity": {
+        "头插": "O(1)",
+        "尾插": "O(n)",
+        "删除": "O(n)",
+        "查找": "O(n)",
+        "空间": "O(n)"
+      }
+    }
+  ]
+}

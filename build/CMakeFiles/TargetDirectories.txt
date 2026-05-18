@@ -1,0 +1,3 @@
+D:/Commands/C++/大作业/AlgoMotion/build/CMakeFiles/algomotion.dir
+D:/Commands/C++/大作业/AlgoMotion/build/CMakeFiles/edit_cache.dir
+D:/Commands/C++/大作业/AlgoMotion/build/CMakeFiles/rebuild_cache.dir
