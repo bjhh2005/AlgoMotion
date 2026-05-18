@@ -1,12 +1,9 @@
 # AlgoMotion Makefile
-# 依赖: g++ (C++11) 以上
-# 如需使用 jsoncpp，取消注释 JSONCPP 相关行并将 JsonWriter.h 替换为 <json/json.h>
+# 依赖: g++ (C++17) 以上 + jsoncpp
 
 CXX      = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -Iinclude
-# JSONCPP_INC = -Iexternal/jsoncpp/include
-# JSONCPP_LIB = -Lexternal/jsoncpp/lib -ljsoncpp
-LDFLAGS  =
+CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude -Iexternal/json/include
+LDFLAGS  = -Lexternal/json/lib -ljsoncpp
 TARGET   = algomotion
 
 SRCDIR   = src

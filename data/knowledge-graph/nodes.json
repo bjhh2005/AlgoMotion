@@ -1,0 +1,267 @@
+[
+  {
+    "id": "data-structure",
+    "name": "数据结构",
+    "category": "root",
+    "description": "研究数据的逻辑结构、存储结构及其操作的课程核心。",
+    "difficulty": 1,
+    "tags": ["总览"]
+  },
+  {
+    "id": "set",
+    "name": "集合",
+    "category": "basic",
+    "description": "由互不相同的数据元素组成的结构，元素之间通常没有线性或层次关系。",
+    "difficulty": 1,
+    "tags": ["基础结构"]
+  },
+  {
+    "id": "linear-list",
+    "name": "线性表",
+    "category": "linear",
+    "description": "由有限个数据元素组成的线性序列，除首尾外每个元素都有唯一前驱和后继。",
+    "difficulty": 2,
+    "tags": ["顺序表", "链表"]
+  },
+  {
+    "id": "stack",
+    "name": "栈",
+    "category": "linear",
+    "description": "只允许在一端进行插入和删除的线性表，具有后进先出特性。",
+    "difficulty": 2,
+    "tags": ["LIFO", "递归", "表达式求值"]
+  },
+  {
+    "id": "queue",
+    "name": "队列",
+    "category": "linear",
+    "description": "只允许一端入队、另一端出队的线性表，具有先进先出特性。",
+    "difficulty": 2,
+    "tags": ["FIFO", "BFS"]
+  },
+  {
+    "id": "string",
+    "name": "串",
+    "category": "linear",
+    "description": "由零个或多个字符组成的有限序列。",
+    "difficulty": 2,
+    "tags": ["模式匹配", "KMP"]
+  },
+  {
+    "id": "array",
+    "name": "数组",
+    "category": "linear",
+    "description": "按维度组织、通过下标访问的连续存储结构。",
+    "difficulty": 2,
+    "tags": ["随机访问", "矩阵"]
+  },
+  {
+    "id": "generalized-list",
+    "name": "广义表",
+    "category": "linear",
+    "description": "元素可以是原子或子表的递归数据结构。",
+    "difficulty": 3,
+    "tags": ["递归结构"]
+  },
+  {
+    "id": "tree",
+    "name": "树",
+    "category": "tree",
+    "description": "由节点和边组成的层次结构，常用于表达一对多关系。",
+    "difficulty": 3,
+    "tags": ["层次结构"]
+  },
+  {
+    "id": "binary-tree",
+    "name": "二叉树",
+    "category": "tree",
+    "description": "每个节点最多有两个孩子的树结构，是多种高级树结构的基础。",
+    "difficulty": 3,
+    "tags": ["遍历", "递归"]
+  },
+  {
+    "id": "avl-tree",
+    "name": "AVL 树",
+    "category": "tree",
+    "description": "通过旋转保持高度平衡的二叉搜索树。",
+    "difficulty": 4,
+    "tags": ["平衡树", "旋转"]
+  },
+  {
+    "id": "red-black-tree",
+    "name": "红黑树",
+    "category": "tree",
+    "description": "通过颜色约束保持近似平衡的二叉搜索树。",
+    "difficulty": 5,
+    "tags": ["平衡树", "旋转", "插入修复"]
+  },
+  {
+    "id": "b-tree",
+    "name": "B 树",
+    "category": "tree",
+    "description": "面向外存访问优化的多路平衡搜索树。",
+    "difficulty": 5,
+    "tags": ["多路查找", "数据库索引"]
+  },
+  {
+    "id": "b-plus-tree",
+    "name": "B+ 树",
+    "category": "tree",
+    "description": "数据主要存储在叶子节点并通过叶子链表支持范围查询的多路树。",
+    "difficulty": 5,
+    "tags": ["索引", "范围查询"]
+  },
+  {
+    "id": "graph",
+    "name": "图",
+    "category": "graph",
+    "description": "由顶点和边组成的非线性结构，适合描述多对多关系。",
+    "difficulty": 4,
+    "tags": ["顶点", "边"]
+  },
+  {
+    "id": "graph-storage",
+    "name": "图的存储",
+    "category": "graph",
+    "description": "常见方式包括邻接矩阵、邻接表、十字链表等。",
+    "difficulty": 4,
+    "tags": ["邻接矩阵", "邻接表"]
+  },
+  {
+    "id": "graph-traversal",
+    "name": "图的遍历",
+    "category": "graph",
+    "description": "通过 DFS 或 BFS 系统访问图中的顶点。",
+    "difficulty": 4,
+    "tags": ["DFS", "BFS"]
+  },
+  {
+    "id": "mst",
+    "name": "最小生成树",
+    "category": "graph",
+    "description": "在连通带权无向图中选择总权值最小的生成树。",
+    "difficulty": 4,
+    "tags": ["Prim", "Kruskal"]
+  },
+  {
+    "id": "shortest-path",
+    "name": "最短路径",
+    "category": "graph",
+    "description": "求图中顶点之间路径权值最小的路径。",
+    "difficulty": 4,
+    "tags": ["Dijkstra", "Floyd"]
+  },
+  {
+    "id": "search",
+    "name": "查找",
+    "category": "search",
+    "description": "在数据集合中确定给定关键字对应记录的过程。",
+    "difficulty": 3,
+    "tags": ["查找表"]
+  },
+  {
+    "id": "sequential-search",
+    "name": "顺序查找",
+    "category": "search",
+    "description": "从表的一端开始逐个比较关键字的查找方法。",
+    "difficulty": 2,
+    "tags": ["线性扫描"]
+  },
+  {
+    "id": "binary-search",
+    "name": "二分查找",
+    "category": "search",
+    "description": "在有序表中通过折半比较快速定位目标。",
+    "difficulty": 2,
+    "tags": ["有序表"]
+  },
+  {
+    "id": "hash-search",
+    "name": "哈希查找",
+    "category": "search",
+    "description": "通过散列函数将关键字映射到存储位置的查找方法。",
+    "difficulty": 3,
+    "tags": ["散列表", "冲突处理"]
+  },
+  {
+    "id": "tree-search",
+    "name": "树表查找",
+    "category": "search",
+    "description": "利用二叉搜索树或平衡树组织数据以提升查找效率。",
+    "difficulty": 4,
+    "tags": ["BST", "平衡树"]
+  },
+  {
+    "id": "sorting",
+    "name": "排序",
+    "category": "sorting",
+    "description": "按照关键字大小重新排列记录的过程。",
+    "difficulty": 3,
+    "tags": ["比较排序"]
+  },
+  {
+    "id": "bubble-sort",
+    "name": "冒泡排序",
+    "category": "sorting",
+    "description": "通过相邻元素比较和交换逐步将最大或最小元素移动到端部。",
+    "difficulty": 2,
+    "tags": ["稳定排序"]
+  },
+  {
+    "id": "selection-sort",
+    "name": "选择排序",
+    "category": "sorting",
+    "description": "每轮选择未排序区间的最小元素放到前端。",
+    "difficulty": 2,
+    "tags": ["不稳定排序"]
+  },
+  {
+    "id": "insertion-sort",
+    "name": "插入排序",
+    "category": "sorting",
+    "description": "将待排序元素插入到已有有序区间的合适位置。",
+    "difficulty": 2,
+    "tags": ["稳定排序"]
+  },
+  {
+    "id": "quick-sort",
+    "name": "快速排序",
+    "category": "sorting",
+    "description": "通过划分和递归实现平均效率较高的排序算法。",
+    "difficulty": 3,
+    "tags": ["分治", "递归"]
+  },
+  {
+    "id": "merge-sort",
+    "name": "归并排序",
+    "category": "sorting",
+    "description": "使用分治思想将序列拆分、排序后再合并。",
+    "difficulty": 3,
+    "tags": ["分治", "稳定排序"]
+  },
+  {
+    "id": "heap-sort",
+    "name": "堆排序",
+    "category": "sorting",
+    "description": "利用堆结构反复取出堆顶元素完成排序。",
+    "difficulty": 4,
+    "tags": ["堆", "选择排序"]
+  },
+  {
+    "id": "shell-sort",
+    "name": "希尔排序",
+    "category": "sorting",
+    "description": "按增量分组进行插入排序，逐步缩小增量。",
+    "difficulty": 3,
+    "tags": ["插入排序", "增量"]
+  },
+  {
+    "id": "recursion",
+    "name": "递归",
+    "category": "algorithm-thinking",
+    "description": "函数直接或间接调用自身的问题求解方式。",
+    "difficulty": 3,
+    "tags": ["调用栈", "分治"]
+  }
+]
+

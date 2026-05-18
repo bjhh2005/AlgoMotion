@@ -1,0 +1,51 @@
+[
+  {
+    "nodeId": "stack",
+    "definition": "栈是限定仅在表尾进行插入和删除操作的线性表，表尾称为栈顶。",
+    "properties": ["后进先出", "插入和删除都发生在栈顶", "常用于保存临时状态"],
+    "operationSteps": [
+      "入栈时先判断是否有可用空间，再把元素放入栈顶位置。",
+      "出栈时先判断栈是否为空，再返回栈顶元素并移动栈顶指针。",
+      "取栈顶元素时不改变栈内元素数量。"
+    ],
+    "complexity": {
+      "time": "入栈、出栈、取栈顶通常为 O(1)。",
+      "space": "顺序栈空间为 O(n)，链栈按节点动态申请空间。"
+    },
+    "commonMistakes": ["空栈时直接 pop/top", "数组实现中栈顶指针边界更新错误"],
+    "resourceLinks": []
+  },
+  {
+    "nodeId": "binary-search",
+    "definition": "二分查找是在有序表中通过不断缩小查找区间定位目标元素的方法。",
+    "properties": ["要求序列有序", "每次比较后排除一半区间", "适合顺序存储结构"],
+    "operationSteps": [
+      "设置左右边界 left 与 right。",
+      "计算中点 mid，比较 a[mid] 与目标值。",
+      "根据比较结果移动边界，直到找到目标或区间为空。"
+    ],
+    "complexity": {
+      "time": "最坏时间复杂度为 O(log n)。",
+      "space": "迭代实现空间复杂度为 O(1)。"
+    },
+    "commonMistakes": ["mid = (left + right) / 2 可能溢出", "边界更新导致死循环"],
+    "resourceLinks": []
+  },
+  {
+    "nodeId": "shortest-path",
+    "definition": "最短路径问题关注图中两个顶点或源点到其他顶点之间权值和最小的路径。",
+    "properties": ["Dijkstra 适合非负权图", "Floyd 可求多源最短路径", "松弛操作是核心"],
+    "operationSteps": [
+      "初始化源点距离为 0，其余顶点距离为无穷大。",
+      "选择当前未确定顶点中距离最小的顶点。",
+      "使用该顶点尝试更新相邻顶点距离。"
+    ],
+    "complexity": {
+      "time": "使用优先队列优化的 Dijkstra 通常为 O((V + E) log V)。",
+      "space": "需要存储图、距离数组和访问状态，空间复杂度为 O(V + E)。"
+    },
+    "commonMistakes": ["负权边错误使用 Dijkstra", "无穷大初始值过小", "松弛条件写反"],
+    "resourceLinks": []
+  }
+]
+

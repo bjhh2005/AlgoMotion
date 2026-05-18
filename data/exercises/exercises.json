@@ -1,0 +1,33 @@
+[
+  {
+    "id": "ex-stack-001",
+    "nodeId": "stack",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "栈的删除操作发生在哪一端？",
+    "options": ["队头", "队尾", "栈顶", "任意位置"],
+    "answer": "栈顶",
+    "ojRoute": "/oj/ex-stack-001",
+    "linkedNodeIds": ["stack", "linear-list"]
+  },
+  {
+    "id": "ex-binary-search-001",
+    "nodeId": "binary-search",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "二分查找要求待查找序列必须是 ______ 的。",
+    "answer": "有序",
+    "ojRoute": "/oj/ex-binary-search-001",
+    "linkedNodeIds": ["binary-search", "array"]
+  },
+  {
+    "id": "ex-dijkstra-001",
+    "nodeId": "shortest-path",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "实现 Dijkstra 算法并输出源点到各点的最短距离。",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-dijkstra-001",
+    "linkedNodeIds": ["shortest-path", "graph-storage", "graph-traversal"]
+  }
+]

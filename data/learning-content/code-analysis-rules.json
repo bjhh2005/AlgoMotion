@@ -1,0 +1,27 @@
+[
+  {
+    "id": "stack-empty-check",
+    "keywords": ["stack", "push", "pop", "top"],
+    "linkedNodes": ["stack"],
+    "suggestion": "检查栈空时 pop/top 的异常处理。"
+  },
+  {
+    "id": "queue-pointer-update",
+    "keywords": ["queue", "front", "rear"],
+    "linkedNodes": ["queue"],
+    "suggestion": "确认入队和出队指针更新是否一致。"
+  },
+  {
+    "id": "nested-loop-complexity",
+    "keywords": ["for", "for"],
+    "linkedNodes": ["sorting"],
+    "suggestion": "存在嵌套循环，注意时间复杂度是否达到题目要求。"
+  },
+  {
+    "id": "dijkstra-relaxation",
+    "keywords": ["dijkstra", "priority_queue", "dist"],
+    "linkedNodes": ["shortest-path", "graph-storage"],
+    "suggestion": "Dijkstra 需要正确处理无穷大初始化和松弛条件。"
+  }
+]
+

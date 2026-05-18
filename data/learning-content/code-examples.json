@@ -1,0 +1,21 @@
+[
+  {
+    "nodeId": "stack",
+    "language": "cpp",
+    "title": "标准库栈的安全访问",
+    "code": "#include <iostream>\n#include <stack>\nusing namespace std;\n\nint main() {\n    stack<int> s;\n    s.push(10);\n    s.push(20);\n    if (!s.empty()) {\n        cout << s.top() << endl;\n        s.pop();\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "binary-search",
+    "language": "cpp",
+    "title": "迭代二分查找",
+    "code": "int binarySearch(vector<int>& a, int target) {\n    int left = 0, right = (int)a.size() - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (a[mid] == target) return mid;\n        if (a[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}"
+  },
+  {
+    "nodeId": "shortest-path",
+    "language": "cpp",
+    "title": "Dijkstra 核心松弛模板",
+    "code": "priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;\ndist[source] = 0;\npq.push({0, source});\nwhile (!pq.empty()) {\n    auto [distance, u] = pq.top();\n    pq.pop();\n    if (distance != dist[u]) continue;\n    for (auto [v, weight] : graph[u]) {\n        if (dist[v] > dist[u] + weight) {\n            dist[v] = dist[u] + weight;\n            pq.push({dist[v], v});\n        }\n    }\n}"
+  }
+]
+

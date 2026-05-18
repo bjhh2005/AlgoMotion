@@ -1,0 +1,6 @@
+{
+  "defaultPath": ["linear-list", "stack", "queue", "binary-tree", "graph-storage"],
+  "weakPrerequisiteBoost": true,
+  "maxRecommendations": 5
+}
+
