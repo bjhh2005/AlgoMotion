@@ -202,7 +202,7 @@ CONTAINER_NAME = "global-judger"
 @app.post("/api/judge")
 def run_judge(req: JudgeRequest):
     run_id = str(uuid.uuid4())
-    work_dir = f"/workspace/{run_id}"
+    work_dir = f"/workspace/work/{run_id}"
 
     try:
         subprocess.run(["docker", "exec", CONTAINER_NAME, "mkdir", "-p", work_dir], check=True)
@@ -213,7 +213,7 @@ def run_judge(req: JudgeRequest):
         )
 
         result = subprocess.run(
-            ["docker", "exec", CONTAINER_NAME, "bash", "/workspace/judge.sh", 
+            ["docker", "exec", CONTAINER_NAME, "bash", "/workspace/judger/judge.sh", 
              run_id, req.problem_id, str(req.time_limit), str(req.mem_limit)],
             capture_output=True, text=True, encoding='utf-8'
         )

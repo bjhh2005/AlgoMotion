@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  judger:
+    build: .
+    container_name: global-judger
+    command: sleep infinity
+    volumes:
+      - ./tmp/judger/:/workspace/judger
+      - ./tmp/work/:/workspace/work
+      - ./data/:/workspace/data
