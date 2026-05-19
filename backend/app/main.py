@@ -6,7 +6,7 @@ import subprocess
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .schemas import ChatRequest, CodeAnalysisRequest, ProgressUpdate, JudgeRequest
+from .schemas import ChatRequest, CodeAnalysisRequest, ProgressUpdate, JudgeRequest, Select_CompleteRequest
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -260,8 +260,8 @@ def load_data():
     with open(EXERCISE_DIR / "exercises.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
-@app.get("/api/get_data/{id}")
-async def get_data(id: str):
+@app.get("/api/get_problem_data/{id}")
+async def get_problem(id: str):
     data_list = load_data()
     
     result = next((item for item in data_list if item["id"] == id), None)
@@ -296,3 +296,25 @@ async def get_data(id: str):
             }           
     else:
         return result
+    
+@app.post("/api/check_S&C_ans/{id}")
+def check(req: Select_CompleteRequest):
+    data_list = load_data()
+
+    result = next((item for item in data_list if item["id"] == req.problem_id), None)
+
+    if result is None:
+        return {
+            "id": "Error",
+            "details": "文件不存在"
+        }
+    
+    if result["type"] == "programming":
+        return {
+            "id": "Error",
+            "details": "题目并非是选填"
+        }
+    else:
+        return {
+            "status": result["answer"] == req.answer
+        }
