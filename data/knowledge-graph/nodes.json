@@ -16,12 +16,60 @@
     "tags": ["基础结构"]
   },
   {
+    "id": "union-find",
+    "name": "并查集",
+    "category": "basic",
+    "description": "用于维护不相交集合合并与查询的数据结构，常用于连通性判断。",
+    "difficulty": 3,
+    "tags": ["不相交集合", "路径压缩", "Kruskal"]
+  },
+  {
+    "id": "logical-structure",
+    "name": "逻辑结构",
+    "category": "basic",
+    "description": "从元素关系角度刻画数据组织方式，包括集合、线性、树形和图状结构。",
+    "difficulty": 1,
+    "tags": ["元素关系", "抽象模型"]
+  },
+  {
+    "id": "storage-structure",
+    "name": "存储结构",
+    "category": "basic",
+    "description": "研究数据在计算机中的表示方式，包括顺序存储、链式存储、索引和散列。",
+    "difficulty": 2,
+    "tags": ["顺序存储", "链式存储", "散列"]
+  },
+  {
+    "id": "algorithm-complexity",
+    "name": "算法复杂度",
+    "category": "basic",
+    "description": "用时间复杂度和空间复杂度评估算法随输入规模增长的资源消耗。",
+    "difficulty": 2,
+    "tags": ["时间复杂度", "空间复杂度", "大 O"]
+  },
+  {
     "id": "linear-list",
     "name": "线性表",
     "category": "linear",
     "description": "由有限个数据元素组成的线性序列，除首尾外每个元素都有唯一前驱和后继。",
     "difficulty": 2,
     "tags": ["顺序表", "链表"]
+  },
+  {
+    "id": "sequential-list",
+    "name": "顺序表",
+    "category": "linear",
+    "description": "使用连续存储单元依次存放线性表元素，支持按下标随机访问。",
+    "difficulty": 2,
+    "tags": ["连续存储", "随机访问", "插入删除"]
+  },
+  {
+    "id": "linked-list",
+    "name": "链表",
+    "category": "linear",
+    "description": "通过节点指针表示元素之间的线性关系，适合频繁插入和删除。",
+    "difficulty": 2,
+    "tags": ["链式存储", "指针", "单链表"]
   },
   {
     "id": "stack",
@@ -48,6 +96,14 @@
     "tags": ["模式匹配", "KMP"]
   },
   {
+    "id": "kmp",
+    "name": "KMP 模式匹配",
+    "category": "linear",
+    "description": "利用失配函数避免主串回退的高效字符串模式匹配算法。",
+    "difficulty": 4,
+    "tags": ["模式匹配", "next 数组", "字符串算法"]
+  },
+  {
     "id": "array",
     "name": "数组",
     "category": "linear",
@@ -72,12 +128,28 @@
     "tags": ["层次结构"]
   },
   {
+    "id": "tree-traversal",
+    "name": "树的遍历",
+    "category": "tree",
+    "description": "按先序、中序、后序或层序等策略系统访问树中节点。",
+    "difficulty": 3,
+    "tags": ["先序", "中序", "后序", "层序"]
+  },
+  {
     "id": "binary-tree",
     "name": "二叉树",
     "category": "tree",
     "description": "每个节点最多有两个孩子的树结构，是多种高级树结构的基础。",
     "difficulty": 3,
     "tags": ["遍历", "递归"]
+  },
+  {
+    "id": "binary-search-tree",
+    "name": "二叉搜索树",
+    "category": "tree",
+    "description": "满足左子树关键字小于根、右子树关键字大于根的二叉树。",
+    "difficulty": 3,
+    "tags": ["BST", "中序有序", "查找"]
   },
   {
     "id": "avl-tree",
@@ -94,6 +166,22 @@
     "description": "通过颜色约束保持近似平衡的二叉搜索树。",
     "difficulty": 5,
     "tags": ["平衡树", "旋转", "插入修复"]
+  },
+  {
+    "id": "heap",
+    "name": "堆",
+    "category": "tree",
+    "description": "满足堆序性质的完全二叉树，支持快速取得最大或最小元素。",
+    "difficulty": 3,
+    "tags": ["完全二叉树", "优先队列", "堆排序"]
+  },
+  {
+    "id": "huffman-tree",
+    "name": "哈夫曼树",
+    "category": "tree",
+    "description": "带权路径长度最小的二叉树，常用于构造最优前缀编码。",
+    "difficulty": 4,
+    "tags": ["最优二叉树", "前缀编码", "贪心"]
   },
   {
     "id": "b-tree",
@@ -136,6 +224,22 @@
     "tags": ["DFS", "BFS"]
   },
   {
+    "id": "topological-sort",
+    "name": "拓扑排序",
+    "category": "graph",
+    "description": "对有向无环图中的顶点进行线性排序，使每条边的起点都排在终点之前。",
+    "difficulty": 4,
+    "tags": ["DAG", "入度", "AOV 网"]
+  },
+  {
+    "id": "critical-path",
+    "name": "关键路径",
+    "category": "graph",
+    "description": "在带权有向无环图中确定影响工程最短完成时间的最长路径。",
+    "difficulty": 5,
+    "tags": ["AOE 网", "拓扑排序", "最早最迟时间"]
+  },
+  {
     "id": "mst",
     "name": "最小生成树",
     "category": "graph",
@@ -174,6 +278,14 @@
     "description": "在有序表中通过折半比较快速定位目标。",
     "difficulty": 2,
     "tags": ["有序表"]
+  },
+  {
+    "id": "block-search",
+    "name": "分块查找",
+    "category": "search",
+    "description": "将数据分块并建立索引，先定位块再在块内顺序查找。",
+    "difficulty": 3,
+    "tags": ["索引顺序表", "块内顺序"]
   },
   {
     "id": "hash-search",
@@ -256,12 +368,60 @@
     "tags": ["插入排序", "增量"]
   },
   {
+    "id": "counting-sort",
+    "name": "计数排序",
+    "category": "sorting",
+    "description": "统计有限值域内各关键字出现次数，再按计数结果回填有序序列。",
+    "difficulty": 3,
+    "tags": ["非比较排序", "整数排序", "稳定排序"]
+  },
+  {
+    "id": "radix-sort",
+    "name": "基数排序",
+    "category": "sorting",
+    "description": "按关键字各位依次分配和收集，实现多关键字或整数排序。",
+    "difficulty": 4,
+    "tags": ["非比较排序", "多关键字", "桶"]
+  },
+  {
+    "id": "algorithm-thinking",
+    "name": "算法思想",
+    "category": "algorithm-thinking",
+    "description": "抽象常见问题求解策略，为递归、分治、贪心和动态规划等方法建立联系。",
+    "difficulty": 2,
+    "tags": ["方法论", "问题分解"]
+  },
+  {
     "id": "recursion",
     "name": "递归",
     "category": "algorithm-thinking",
     "description": "函数直接或间接调用自身的问题求解方式。",
     "difficulty": 3,
     "tags": ["调用栈", "分治"]
+  },
+  {
+    "id": "divide-and-conquer",
+    "name": "分治",
+    "category": "algorithm-thinking",
+    "description": "将问题拆分为相互独立的子问题，分别求解后合并结果。",
+    "difficulty": 3,
+    "tags": ["递归", "快速排序", "归并排序"]
+  },
+  {
+    "id": "greedy",
+    "name": "贪心",
+    "category": "algorithm-thinking",
+    "description": "每一步选择当前看来最优的方案，并依赖局部最优导向全局最优。",
+    "difficulty": 4,
+    "tags": ["局部最优", "最小生成树", "哈夫曼树"]
+  },
+  {
+    "id": "dynamic-programming",
+    "name": "动态规划",
+    "category": "algorithm-thinking",
+    "description": "利用重叠子问题和最优子结构，通过状态转移保存阶段性结果。",
+    "difficulty": 5,
+    "tags": ["状态转移", "最优子结构", "记忆化"]
   }
 ]
 
