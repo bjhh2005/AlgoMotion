@@ -8,4 +8,4 @@ services:
     volumes:
       - ./tmp/judger/:/workspace/judger
       - ./tmp/work/:/workspace/work
-      - ./data/:/workspace/data
+      - ./../data/oj-data/:/workspace/data
