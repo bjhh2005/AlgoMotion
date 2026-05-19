@@ -168,6 +168,17 @@ uvicorn app.main:app --reload
 
 接口文档：`http://127.0.0.1:8000/docs`
 
+AI 问答使用兼容 OpenAI Chat Completions 的接口。启动后端前配置：
+
+```bash
+set AI_API_KEY=你的 API Key
+set AI_MODEL=你的模型名
+set AI_BASE_URL=https://api.openai.com/v1
+```
+
+也可以参考 `backend/.env.example`。如果未配置 API，问答会基于本地知识库给出兜底回答，前端仍可正常联通。
+后端会自动读取仓库根目录 `.env` 或 `backend/.env` 中的上述配置。
+
 ### C++ 核心
 
 ```bash
