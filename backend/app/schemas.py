@@ -49,3 +49,10 @@ class ChatRequest(BaseModel):
 class CodeAnalysisRequest(BaseModel):
     code: str
     problem: str | None = None
+
+class JudgeRequest(BaseModel):
+    submission_id: str
+    problem_id: str
+    code: str
+    time_limit: int
+    mem_limit: int
