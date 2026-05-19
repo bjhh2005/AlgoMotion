@@ -17,16 +17,48 @@ export interface KnowledgeEdge {
   label: string;
 }
 
+export interface ChoiceOption {
+  key: string;
+  text: string;
+}
+
+export interface FillBlank {
+  id: number;
+  answer: string;
+}
+
+export interface ProgrammingExample {
+  input: string;
+  output: string;
+  explanation?: string;
+}
+
 export interface Exercise {
   id: string;
   nodeId: string;
   type: "choice" | "fill" | "programming";
   difficulty: "basic" | "postgraduate" | "interview";
   title: string;
-  options?: string[];
   answer: string;
   ojRoute?: string;
+  /** OJ 判题数据目录 ID，如 1001，对应 data/oj-data/{id} */
+  ojProblemId?: string;
   linkedNodeIds?: string[];
+  /** @deprecated 旧版选择题选项，优先使用 choiceOptions */
+  options?: string[];
+  stem?: string;
+  choiceOptions?: ChoiceOption[];
+  choiceAnswer?: string;
+  analysis?: string;
+  fillStem?: string;
+  blanks?: FillBlank[];
+  description?: string;
+  examples?: ProgrammingExample[];
+  constraints?: string[];
+  hints?: string[];
+  starterCode?: string;
+  /** 编程题样例测例，用于控制台展示回退 */
+  ojSampleCases?: { input: string; expected: string }[];
 }
 
 export interface LearningMetrics {

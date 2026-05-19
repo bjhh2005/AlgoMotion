@@ -311,7 +311,7 @@ export function App() {
           </div>
           <div className="topbar-actions">
             <span><ShieldCheck size={16} /> {statusLabel[progress[selectedId]?.status ?? "not_started"]}</span>
-            <span><Code2 size={16} /> C++ 代码溯源</span>
+            <span><Code2 size={16} /> {page === "oj" ? "C++ 代码测评" : "C++ 代码溯源"}</span>
             <span className={`api-badge ${apiStatus}`} title={apiMessage}><Database size={16} /> {apiStatus === "connected" ? "FastAPI 已连接" : apiStatus === "checking" ? "连接中" : "本地/异常模式"}</span>
           </div>
         </header>

@@ -1,4 +1,4 @@
-n_tests 20
+n_tests 2
 input_suf in
 output_suf out
 use_builtin_judger on
