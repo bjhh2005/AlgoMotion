@@ -325,7 +325,6 @@ export function App() {
         {page === "analytics" && (
           <LearningAnalyticsPage
             nodes={nodes}
-            edges={edges}
             progress={progress}
             recommendations={recommendations}
             onSelect={openKnowledge}
