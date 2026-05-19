@@ -200,7 +200,7 @@ def analyze_code(payload: CodeAnalysisRequest):
 CONTAINER_NAME = "global-judger"
 
 @app.post("/api/judge")
-def judge(req: JudgeRequest):
+def run_sjudge(req: JudgeRequest):
     run_id = str(uuid.uuid4())
     work_dir = f"/workspace/{run_id}"
 
