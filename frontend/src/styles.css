@@ -572,6 +572,37 @@ pre {
   padding: 10px;
 }
 
+.option-grid button.active {
+  background: #dff2ef;
+  border-color: #1f8f84;
+  color: #155e5b;
+}
+
+.judge-result {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f5f8fb;
+  border: 1px solid #d3dde8;
+}
+
+.judge-result.accepted {
+  background: #ecf9f4;
+  border-color: #9fd9c8;
+}
+
+.judge-result.failed,
+.judge-result.compile-error {
+  background: #fff4f2;
+  border-color: #f0c4bc;
+}
+
+.judge-case-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: #47586d;
+}
+
 .ai-panel label {
   display: grid;
   gap: 8px;

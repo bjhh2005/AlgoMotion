@@ -1,6 +1,6 @@
 ## FastAPI 接口
 
-`GET  /api/judge`
+`POST /api/judge`
 
 ### 接口定义:
 ```py
