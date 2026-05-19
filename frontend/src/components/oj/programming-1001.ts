@@ -1,8 +1,16 @@
 import type { Exercise } from "../../types";
+import { normalizeCodeString } from "./code-editor-utils";
 
 /** OJ 1001：两整数求和（非高精度），对接 POST /api/judge problem_id=1001 */
-export const PROGRAMMING_1001_STARTER = `#include<iostream>
-int main(){int x, y;std::cin>>x>>y;std::cout<<x+y;return 0;}`;
+export const PROGRAMMING_1001_STARTER = normalizeCodeString(`#include <iostream>
+using namespace std;
+
+int main() {
+    int x, y;
+    cin >> x >> y;
+    cout << x + y;
+    return 0;
+}`);
 
 const programming1001Content: Omit<Exercise, "id" | "nodeId" | "linkedNodeIds"> = {
   type: "programming",

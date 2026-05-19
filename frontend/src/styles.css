@@ -1031,17 +1031,68 @@ pre {
 }
 
 .oj-code-editor-pane {
-  display: grid;
-  grid-template-rows: minmax(0, 1.2fr) minmax(180px, 0.8fr);
+  display: flex;
+  flex-direction: column;
   min-height: 0;
+  height: 100%;
   background: #182231;
+  overflow: hidden;
+}
+
+.oj-code-editor-pane.is-resizing {
+  cursor: row-resize;
+  user-select: none;
+}
+
+.oj-editor-slot {
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
+  overflow: hidden;
+}
+
+.oj-pane-resizer {
+  flex: 0 0 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #243247;
+  cursor: row-resize;
+  position: relative;
+  z-index: 2;
+  transition: background 0.15s;
+}
+
+.oj-pane-resizer::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 3px;
+  border-radius: 999px;
+  background: #4d6178;
+  opacity: 0.7;
+}
+
+.oj-pane-resizer:hover,
+.oj-code-editor-pane.is-resizing .oj-pane-resizer {
+  background: #2d3f56;
+}
+
+.oj-pane-resizer:hover::after,
+.oj-code-editor-pane.is-resizing .oj-pane-resizer::after {
+  background: #36a3a0;
+  opacity: 1;
 }
 
 .oj-editor {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border-bottom: 1px solid #33445d;
+  flex: 1;
+  height: 100%;
 }
 
 .oj-editor-bar {
@@ -1051,27 +1102,65 @@ pre {
   color: #c7d2e0;
   font-size: 0.78rem;
   border-bottom: 1px solid #33445d;
+  flex-shrink: 0;
 }
 
-.oj-editor-area {
+.oj-editor-body {
+  display: flex;
   flex: 1;
-  width: 100%;
-  border: 0;
-  outline: none;
-  resize: none;
-  background: #182231;
-  color: #e8eef6;
-  padding: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.oj-editor-gutter {
+  flex-shrink: 0;
+  width: 48px;
+  overflow: hidden;
+  background: #141c28;
+  border-right: 1px solid #33445d;
+  padding: 16px 0;
+  user-select: none;
+}
+
+.oj-editor-line-number {
+  height: 1.6em;
+  padding-right: 12px;
+  text-align: right;
+  color: #5c6b82;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.84rem;
   line-height: 1.6;
 }
 
+.oj-editor-area {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: #182231;
+  color: #e8eef6;
+  padding: 16px 16px 16px 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  tab-size: 4;
+  white-space: pre;
+  overflow: auto;
+}
+
+.oj-editor-area::placeholder {
+  color: #5c6b82;
+}
+
 .oj-console {
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 140px;
+  overflow: hidden;
   background: #fff;
+  border-top: 1px solid #33445d;
 }
 
 .oj-console-head {

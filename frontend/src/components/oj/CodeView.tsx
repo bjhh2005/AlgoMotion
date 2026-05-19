@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { Check, Clock, HardDrive, Play, Send, X } from "lucide-react";
 import { analyzeCode, normalizeJudgeResponse, submitJudge, type JudgeCaseDetail, type JudgeResponse } from "../../api";
 import type { CodeAnalysisRule, Exercise, KnowledgeContent, KnowledgeNode, ProgressRecord } from "../../types";
+import { CodeEditor } from "./CodeEditor";
+import { normalizeCodeString } from "./code-editor-utils";
 import { difficultyLabel, exerciseRoute, knowledgeName, resolveOjProblemId } from "./oj-utils";
+import { useVerticalPaneResize } from "./useVerticalPaneResize";
 
 interface Props {
   questions: Exercise[];
@@ -54,9 +57,9 @@ function enrichJudgeWithSamples(result: JudgeResponse, question: Exercise): Judg
       const sample = samples[index];
       return {
         ...detail,
-        input: detail.input || sample?.input || "",
-        expected: detail.expected || sample?.expected || "",
-        actual: detail.actual ?? ""
+        input: normalizeCodeString(detail.input || sample?.input || ""),
+        expected: normalizeCodeString(detail.expected || sample?.expected || ""),
+        actual: normalizeCodeString(detail.actual ?? "")
       };
     })
   };
@@ -74,7 +77,7 @@ function IoBlock({
   return (
     <div className={`oj-io-block oj-io-${tone ?? "neutral"}`}>
       <span>{title}</span>
-      <pre>{body || "（空）"}</pre>
+      <pre>{normalizeCodeString(body) || "（空）"}</pre>
     </div>
   );
 }
@@ -110,7 +113,7 @@ export function CodeView({
   onJudgeComplete
 }: Props) {
   const question = questions[0];
-  const [code, setCode] = useState(question?.starterCode ?? "");
+  const [code, setCode] = useState(() => normalizeCodeString(question?.starterCode ?? ""));
   const [descTab, setDescTab] = useState<DescTab>("desc");
   const [caseTab, setCaseTab] = useState(0);
   const [running, setRunning] = useState(false);
@@ -119,9 +122,10 @@ export function CodeView({
   const [analysisStatus, setAnalysisStatus] = useState("");
   const [apiLinkedNodeIds, setApiLinkedNodeIds] = useState<string[]>([]);
   const [showErrorBind, setShowErrorBind] = useState(false);
+  const { paneRef, editorRatio, consoleRatio, isResizing, onResizeStart } = useVerticalPaneResize();
 
   useEffect(() => {
-    setCode(question?.starterCode ?? "");
+    setCode(normalizeCodeString(question?.starterCode ?? ""));
     setJudgeResult(null);
     setSubmitStatus("");
     setAnalysisStatus("");
@@ -315,21 +319,22 @@ export function CodeView({
           )}
         </section>
 
-        <section className="oj-code-editor-pane">
-          <div className="oj-editor">
-            <div className="oj-editor-bar">
-              <span>C++</span>
-              <span className="muted">UTF-8 · Tab Size 4</span>
-            </div>
-            <textarea
-              value={code}
-              onChange={(event) => setCode(event.target.value)}
-              spellCheck={false}
-              className="oj-editor-area"
-            />
+        <section
+          ref={paneRef}
+          className={`oj-code-editor-pane ${isResizing ? "is-resizing" : ""}`}
+        >
+          <div className="oj-editor-slot" style={{ flex: `${editorRatio} 1 0` }}>
+            <CodeEditor value={code} onChange={setCode} language="C++" tabSize={4} />
           </div>
 
-          <div className="oj-console">
+          <button
+            type="button"
+            className="oj-pane-resizer"
+            aria-label="拖动调整控制台高度"
+            onMouseDown={onResizeStart}
+          />
+
+          <div className="oj-console" style={{ flex: `${consoleRatio} 1 0` }}>
             <div className="oj-console-head">
               <div className="oj-console-title">
                 <span>控制台</span>
