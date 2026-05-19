@@ -255,3 +255,20 @@ def run_judge(req: JudgeRequest):
 
     finally:
         subprocess.run(["docker", "exec", CONTAINER_NAME, "rm", "-rf", work_dir])
+
+def load_data():
+    with open(EXERCISE_DIR / "exercises.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+@app.get("/data/{id}")
+async def get_data(id: str):
+    data_list = load_data()
+    
+    for item in data_list:
+        if item.get("id") == id:
+            return item
+            
+    return {
+        "id": "Error",
+        "details": "文件不存在"
+    }
