@@ -2215,3 +2215,124 @@ pre {
     flex-direction: column;
   }
 }
+
+/* ============================================
+   API 状态提示样式
+   ============================================ */
+
+/* API 加载/错误状态横幅 */
+.api-status-banner {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.api-status-banner .loading {
+  color: #b45309;
+}
+
+.api-status-banner .error {
+  color: #dc2626;
+}
+
+/* 图表加载状态指示器 */
+.loading-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #dbeafe;
+  color: #2563eb;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 图表错误状态指示器 */
+.error-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  cursor: help;
+}
+
+/* API 数据加载中遮罩 */
+.chart-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.chart-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 默认数据提示 */
+.demo-data-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 图表容器相对定位（用于放置 demo badge） */
+.chart-container-with-badge {
+  position: relative;
+}
+
+/* API 不可用时的降级提示 */
+.fallback-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-top: 12px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.fallback-notice .icon {
+  font-size: 1rem;
+}
