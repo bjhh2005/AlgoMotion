@@ -7,6 +7,12 @@
 
 ## 运行
 
+需要安装docker
+```
+cd oj
+docker-compose up
+```
+
 ## FastAPI 接口
 
 `POST /api/judge`
