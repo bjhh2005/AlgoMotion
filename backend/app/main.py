@@ -1,10 +1,12 @@
 import json
 from pathlib import Path
-
+import json
+import uuid
+import subprocess
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .schemas import ChatRequest, CodeAnalysisRequest, ProgressUpdate
+from .schemas import ChatRequest, CodeAnalysisRequest, ProgressUpdate, JudgeRequest
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -192,3 +194,58 @@ def analyze_code(payload: CodeAnalysisRequest):
         "linkedNodes": list(dict.fromkeys(linked)),
         "suggestions": suggestions
     }
+
+
+
+CONTAINER_NAME = "global-judger"
+
+@app.post("/api/judge")
+def judge(req: JudgeRequest):
+    run_id = str(uuid.uuid4())
+    work_dir = f"/workspace/{run_id}"
+
+    try:
+        subprocess.run(["docker", "exec", CONTAINER_NAME, "mkdir", "-p", work_dir], check=True)
+
+        subprocess.run(
+            ["docker", "exec", "-i", CONTAINER_NAME, "bash", "-c", f"cat > {work_dir}/solution.cpp"],
+            input=req.code, text=True, encoding='utf-8', check=True
+        )
+
+        result = subprocess.run(
+            ["docker", "exec", CONTAINER_NAME, "bash", "/workspace/judge.sh", 
+             run_id, req.problem_id, str(req.time_limit), str(req.mem_limit)],
+            capture_output=True, text=True, encoding='utf-8'
+        )
+
+        try:
+            output_json = json.loads(result.stdout.strip())
+        except json.JSONDecodeError:
+            return {
+                "status": "System Error",
+                "total_cases": 0,
+                "passed_cases": 0,
+                "details": [],
+                "error_log": result.stderr
+            }
+
+        if output_json["status"] == "Compile Error":
+            log_res = subprocess.run(
+                ["docker", "exec", CONTAINER_NAME, "cat", f"{work_dir}/compile.log"],
+                capture_output=True, text=True
+            )
+            output_json["compile_log"] = log_res.stdout
+
+        return output_json
+
+    except Exception as e:
+        return {
+            "status": "Server Error",
+            "total_cases": 0,
+            "passed_cases": 0,
+            "details": [],
+            "error_log": str(e)
+        }
+
+    finally:
+        subprocess.run(["docker", "exec", CONTAINER_NAME, "rm", "-rf", work_dir])
