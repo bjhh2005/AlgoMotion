@@ -260,7 +260,7 @@ def load_data():
     with open(EXERCISE_DIR / "exercises.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
-@app.get("/data/{id}")
+@app.get("/api/get_data/{id}")
 async def get_data(id: str):
     data_list = load_data()
     
