@@ -264,11 +264,35 @@ def load_data():
 async def get_data(id: str):
     data_list = load_data()
     
-    for item in data_list:
-        if item.get("id") == id:
-            return item
-            
-    return {
-        "id": "Error",
-        "details": "文件不存在"
-    }
+    result = next((item for item in data_list if item["id"] == id), None)
+
+    if result is None:
+        return {
+            "id": "Error",
+            "details": "文件不存在"
+        }
+
+    if result["type"] == "programming":
+        path = Path(result["path"])
+        if path.exists() and path.is_file():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    md_content = f.read()
+                
+                full_data = result.copy()
+                full_data["content"] = md_content
+                
+                return full_data
+                
+            except Exception as e:
+                return {
+                    "id": "Error",
+                    "details": "题面不存在"
+                }
+        else:
+            return {
+                "id": "Error",
+                "details": "路径错误"
+            }           
+    else:
+        return result
