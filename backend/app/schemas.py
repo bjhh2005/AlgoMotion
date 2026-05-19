@@ -56,3 +56,7 @@ class JudgeRequest(BaseModel):
     code: str
     time_limit: int
     mem_limit: int
+
+class Select_CompleteRequest(BaseModel):
+    problem_id: str
+    answer: str
