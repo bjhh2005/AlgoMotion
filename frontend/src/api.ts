@@ -34,6 +34,26 @@ export interface CodeAnalysisResponse {
   suggestions: string[];
 }
 
+export interface JudgeCaseDetail {
+  status: string;
+  time: number;
+}
+
+export interface JudgeResponse {
+  status: string;
+  total_cases: number;
+  passed_cases: number;
+  details: JudgeCaseDetail[];
+}
+
+export interface JudgeRequestPayload {
+  submission_id: string;
+  problem_id: string;
+  code: string;
+  time_limit: number;
+  mem_limit: number;
+}
+
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
@@ -73,4 +93,15 @@ export function analyzeCode(code: string, problem?: string) {
     method: "POST",
     body: JSON.stringify({ code, problem })
   });
+}
+
+export function submitJudge(payload: JudgeRequestPayload) {
+  return requestJson<JudgeResponse>("/api/judge", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function fetchExercises() {
+  return requestJson<Exercise[]>("/api/exercises");
 }

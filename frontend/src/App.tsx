@@ -192,6 +192,51 @@ export function App() {
     setPage("oj");
   }
 
+  function handleJudgeComplete(nodeId: string, accepted: boolean) {
+    const previous = progress[nodeId];
+    const attempts = (previous?.metrics.attemptCount ?? 0) + 1;
+    const priorCorrect = (previous?.metrics.correctRate ?? 0) * (previous?.metrics.attemptCount ?? 0);
+    const correctRate = (priorCorrect + (accepted ? 1 : 0)) / attempts;
+    const errorCount = (previous?.metrics.errorCount ?? 0) + (accepted ? 0 : 1);
+    const status: ProgressStatus = accepted
+      ? correctRate >= 0.8
+        ? "mastered"
+        : "learning"
+      : correctRate < 0.4
+        ? "weak"
+        : previous?.status ?? "learning";
+    const score = statusScore[status];
+
+    const nextRecord: ProgressRecord = {
+      status,
+      score,
+      metrics: {
+        mastery: Math.max(previous?.metrics.mastery ?? 0, correctRate),
+        confidence: previous?.metrics.confidence ?? 0.5,
+        studyMinutes: previous?.metrics.studyMinutes ?? 0,
+        attemptCount: attempts,
+        correctRate,
+        errorCount,
+        streakDays: previous?.metrics.streakDays ?? 0,
+        lastActivityAt: new Date().toISOString(),
+        reviewDueAt: previous?.metrics.reviewDueAt
+      }
+    };
+
+    setProgress((current) => ({ ...current, [nodeId]: nextRecord }));
+    postProgress(nodeId, nextRecord)
+      .then(() => {
+        setApiStatus("connected");
+        setApiMessage(
+          `OJ 已同步：${currentNodeById[nodeId]?.name ?? nodeId}，${accepted ? "通过" : "未通过"}（正确率 ${Math.round(correctRate * 100)}%）`
+        );
+      })
+      .catch((error: Error) => {
+        setApiStatus("error");
+        setApiMessage(`OJ 结果已更新到前端，但同步后端失败：${error.message}`);
+      });
+  }
+
   const pageMeta = {
     knowledge: ["知识图谱", "知识图谱、状态跟踪与智能推荐闭环"],
     oj: ["OJ 练习", "练习题、提交入口与错因知识绑定"],
@@ -316,6 +361,7 @@ export function App() {
             selectedExerciseId={selectedExerciseId}
             onSelectExercise={setSelectedExerciseId}
             onOpenKnowledge={openKnowledge}
+            onJudgeComplete={handleJudgeComplete}
             nodeById={currentNodeById}
             contentByNodeId={currentContentByNodeId}
             analysisRules={analysisRules}
