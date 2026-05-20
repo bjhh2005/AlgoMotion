@@ -1,15 +1,16 @@
-import json
+﻿import json
 import os
 import re
 from pathlib import Path
+import subprocess
 from typing import Any
 import urllib.error
 import urllib.request
-
+import uuid
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .schemas import ChatRequest, CodeAnalysisRequest, ProgressUpdate
+from .schemas import ChatRequest, CodeAnalysisRequest, ProgressUpdate, JudgeRequest, Select_CompleteRequest
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,7 +22,12 @@ app = FastAPI(title="AlgoMotion API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ],
     allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
     allow_credentials=True,
     allow_methods=["*"],
@@ -563,6 +569,127 @@ def analyze_code(payload: CodeAnalysisRequest):
         "linkedNodes": linked,
         "suggestions": suggestions
     }
+
+
+CONTAINER_NAME = "global-judger"
+
+
+@app.post("/api/judge")
+def run_judge(req: JudgeRequest):
+    run_id = str(uuid.uuid4())
+    work_dir = f"/workspace/work/{run_id}"
+
+    try:
+        subprocess.run(["docker", "exec", CONTAINER_NAME, "mkdir", "-p", work_dir], check=True)
+
+        subprocess.run(
+            ["docker", "exec", "-i", CONTAINER_NAME, "bash", "-c", f"cat > {work_dir}/solution.cpp"],
+            input=req.code, text=True, encoding='utf-8', check=True
+        )
+
+        result = subprocess.run(
+            ["docker", "exec", CONTAINER_NAME, "bash", "/workspace/judger/judge.sh",
+             run_id, req.problem_id, str(req.time_limit), str(req.mem_limit)],
+            capture_output=True, text=True, encoding='utf-8'
+        )
+
+        try:
+            output_json = json.loads(result.stdout.strip())
+        except json.JSONDecodeError:
+            return {
+                "status": "System Error",
+                "total_cases": 0,
+                "passed_cases": 0,
+                "details": [],
+                "error_log": result.stderr
+            }
+
+        if output_json["status"] == "Compile Error":
+            log_res = subprocess.run(
+                ["docker", "exec", CONTAINER_NAME, "cat", f"{work_dir}/compile.log"],
+                capture_output=True, text=True
+            )
+            output_json["compile_log"] = log_res.stdout
+
+        return output_json
+
+    except Exception as e:
+        return {
+            "status": "Server Error",
+            "total_cases": 0,
+            "passed_cases": 0,
+            "details": [],
+            "error_log": str(e)
+        }
+
+    finally:
+        subprocess.run(["docker", "exec", CONTAINER_NAME, "rm", "-rf", work_dir])
+
+
+def load_data():
+    with open(EXERCISE_DIR / "exercises.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+@app.get("/api/get_problem_data/{id}")
+async def get_problem(id: str):
+    data_list = load_data()
+
+    result = next((item for item in data_list if item["id"] == id), None)
+
+    if result is None:
+        return {
+            "id": "Error",
+            "details": "文件不存在"
+        }
+
+    if result["type"] == "programming":
+        path = Path(result["path"])
+        if path.exists() and path.is_file():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    md_content = f.read()
+
+                full_data = result.copy()
+                full_data["content"] = md_content
+
+                return full_data
+
+            except Exception as e:
+                return {
+                    "id": "Error",
+                    "details": "题面不存在"
+                }
+        else:
+            return {
+                "id": "Error",
+                "details": "路径错误"
+            }
+    else:
+        return result
+
+
+@app.post("/api/check_S&C_ans/{id}")
+def check(req: Select_CompleteRequest):
+    data_list = load_data()
+
+    result = next((item for item in data_list if item["id"] == req.problem_id), None)
+
+    if result is None:
+        return {
+            "id": "Error",
+            "details": "文件不存在"
+        }
+
+    if result["type"] == "programming":
+        return {
+            "id": "Error",
+            "details": "题目并非是选填"
+        }
+    else:
+        return {
+            "status": result["answer"] == req.answer
+        }
 
 
 from .routes.analytics import router as analytics_router

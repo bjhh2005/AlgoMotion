@@ -34,6 +34,59 @@ export interface CodeAnalysisResponse {
   suggestions: string[];
 }
 
+export interface JudgeCaseDetail {
+  status: string;
+  time: number;
+  input?: string;
+  expected?: string;
+  actual?: string;
+}
+
+export interface JudgeResponse {
+  status: string;
+  total_cases: number;
+  passed_cases: number;
+  details: JudgeCaseDetail[];
+  error_log?: string;
+  compile_log?: string;
+  message?: string;
+}
+
+export function normalizeJudgeResponse(raw: Partial<JudgeResponse> | null | undefined): JudgeResponse {
+  const details = Array.isArray(raw?.details)
+    ? raw!.details.map((item) => ({
+        status: item?.status ?? "Unknown",
+        time: Number(item?.time ?? 0) || 0,
+        input: item?.input ?? "",
+        expected: item?.expected ?? "",
+        actual: item?.actual ?? ""
+      }))
+    : [];
+
+  const passed_cases = Number(
+    raw?.passed_cases ?? details.filter((item) => item.status === "Accepted").length
+  );
+  const total_cases = Number(raw?.total_cases ?? details.length);
+
+  return {
+    status: raw?.status ?? "System Error",
+    total_cases,
+    passed_cases,
+    details,
+    error_log: raw?.error_log,
+    compile_log: raw?.compile_log,
+    message: raw?.message
+  };
+}
+
+export interface JudgeRequestPayload {
+  submission_id: string;
+  problem_id: string;
+  code: string;
+  time_limit: number;
+  mem_limit: number;
+}
+
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
@@ -73,6 +126,17 @@ export function analyzeCode(code: string, problem?: string) {
     method: "POST",
     body: JSON.stringify({ code, problem })
   });
+}
+
+export function submitJudge(payload: JudgeRequestPayload) {
+  return requestJson<JudgeResponse>("/api/judge", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function fetchExercises() {
+  return requestJson<Exercise[]>("/api/exercises");
 }
 
 // ============================================

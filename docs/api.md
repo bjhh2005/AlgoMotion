@@ -92,3 +92,41 @@ AI_BASE_URL=https://api.openai.com/v1
 
 返回关联知识点与建议。MVP 阶段使用规则识别，后续接入大模型。
 
+## OJ 判题
+
+`POST /api/judge`
+
+提交 OJ 时触发，请求体：
+
+```json
+{
+  "submission_id": "sub-1710000000000-abc123",
+  "problem_id": "ex-stack-001",
+  "code": "栈顶",
+  "time_limit": 2,
+  "mem_limit": 256
+}
+```
+
+返回：
+
+```json
+{
+  "status": "Accepted",
+  "total_cases": 1,
+  "passed_cases": 1,
+  "details": [
+    {
+      "status": "Accepted",
+      "time": 0.001
+    }
+  ]
+}
+```
+
+`status` 常见取值：`Accepted`、`Wrong Answer`、`Compile Error`。
+
+`GET /api/exercises`
+
+返回全部 OJ 练习题（与 `/api/bootstrap` 中的 `exercises` 字段一致）。
+

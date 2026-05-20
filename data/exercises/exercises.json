@@ -5,23 +5,57 @@
     "type": "choice",
     "difficulty": "basic",
     "title": "栈的删除操作发生在哪一端？",
-    "options": ["队头", "队尾", "栈顶", "任意位置"],
-    "answer": "栈顶",
+    "stem": "对于一个顺序栈 S，其 top 指针指向栈顶元素。下列关于栈的删除（pop）操作的描述，正确的是：",
+    "choiceOptions": [
+      { "key": "A", "text": "在栈底进行删除，时间复杂度 O(n)" },
+      { "key": "B", "text": "在栈顶进行删除，时间复杂度 O(1)" },
+      { "key": "C", "text": "在任意位置删除，时间复杂度 O(n)" },
+      { "key": "D", "text": "栈不支持删除操作" }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "栈是后进先出（LIFO）的线性结构，插入与删除均在栈顶进行。顺序栈通过 top 指针定位，pop 操作只需 top-- 并返回元素，时间复杂度 O(1)。",
     "ojRoute": "/oj/ex-stack-001",
     "linkedNodeIds": ["stack", "linear-list"]
+  },
+  {
+    "id": "ex-queue-002",
+    "nodeId": "queue",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "循环队列判空条件",
+    "stem": "采用 front、rear 双指针实现的循环队列（牺牲一个存储空间），队空的判断条件是：",
+    "choiceOptions": [
+      { "key": "A", "text": "front == rear" },
+      { "key": "B", "text": "(rear + 1) % MAXSIZE == front" },
+      { "key": "C", "text": "front == 0" },
+      { "key": "D", "text": "rear == MAXSIZE - 1" }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "循环队列中，front 指向队头元素，rear 指向队尾元素的下一个位置。队空：front == rear；队满：(rear+1)%MAXSIZE == front。",
+    "ojRoute": "/oj/ex-queue-002",
+    "linkedNodeIds": ["queue", "linear-list"]
   },
   {
     "id": "ex-binary-search-001",
     "nodeId": "binary-search",
     "type": "fill",
     "difficulty": "basic",
-    "title": "二分查找要求待查找序列必须是 ______ 的。",
-    "answer": "有序",
+    "title": "二分查找的前提条件",
+    "fillStem": "二分查找要求待查找序列必须是 {{1}} 的；在长度为 n 的有序表中进行二分查找，最坏情况下的时间复杂度为 {{2}} 。",
+    "blanks": [
+      { "id": 1, "answer": "有序" },
+      { "id": 2, "answer": "O(log n)" }
+    ],
+    "answer": "有序;O(log n)",
+    "analysis": "二分查找通过不断折半缩小区间，每次比较中间元素，前提是序列有序（升序或降序）。每次区间长度减半，因此最坏比较次数为 ⌈log₂(n+1)⌉，渐近复杂度 O(log n)。",
     "ojRoute": "/oj/ex-binary-search-001",
     "linkedNodeIds": ["binary-search", "array"]
   },
   {
     "id": "ex-dijkstra-001",
+    "ojProblemId": "1001",
     "nodeId": "shortest-path",
     "type": "programming",
     "difficulty": "interview",

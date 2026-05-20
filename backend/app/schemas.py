@@ -310,6 +310,21 @@ class CodeAnalysisRequest(BaseModel):
     problem: str | None = None
 
 
+class JudgeRequest(BaseModel):
+    """OJ 判题请求"""
+    submission_id: str
+    problem_id: str
+    code: str
+    time_limit: int
+    mem_limit: int
+
+
+class Select_CompleteRequest(BaseModel):
+    """选择题/填空题判定请求"""
+    problem_id: str
+    answer: str
+
+
 # ============================================
 # 掌握度计算相关模型
 # ============================================
