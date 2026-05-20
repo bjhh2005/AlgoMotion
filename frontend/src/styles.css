@@ -969,6 +969,85 @@ pre {
   margin: 0 0 12px;
 }
 
+.oj-problem-error {
+  margin: 0;
+  color: #b42318;
+  background: #fff5f3;
+  border: 1px solid #f0c4bc;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.oj-markdown {
+  color: #334155;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.oj-markdown h1,
+.oj-markdown h2,
+.oj-markdown h3 {
+  margin: 1.2em 0 0.6em;
+  color: #1f2a37;
+  line-height: 1.35;
+}
+
+.oj-markdown h1 {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+.oj-markdown h2 {
+  font-size: 1.05rem;
+}
+
+.oj-markdown h3 {
+  font-size: 0.98rem;
+}
+
+.oj-markdown p {
+  margin: 0.6em 0;
+}
+
+.oj-markdown ul,
+.oj-markdown ol {
+  margin: 0.6em 0;
+  padding-left: 1.4em;
+}
+
+.oj-markdown li {
+  margin: 0.25em 0;
+}
+
+.oj-markdown code {
+  background: #eef2f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+}
+
+.oj-markdown pre {
+  margin: 0.8em 0;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #dae2ed;
+  background: #f5f8fb;
+  overflow-x: auto;
+  color: #000;
+}
+
+.oj-markdown pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.85rem;
+  color: #000;
+}
+
+.oj-markdown strong {
+  color: #1f2a37;
+}
+
 .oj-example-block {
   margin-top: 16px;
 }

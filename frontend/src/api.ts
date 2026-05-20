@@ -138,3 +138,33 @@ export function submitJudge(payload: JudgeRequestPayload) {
 export function fetchExercises() {
   return requestJson<Exercise[]>("/api/exercises");
 }
+
+export interface ProblemDataPayload extends Exercise {
+  content?: string;
+  details?: string;
+}
+
+export function fetchProblemData(exerciseId: string) {
+  return requestJson<ProblemDataPayload>(`/api/get_problem_data/${exerciseId}`);
+}
+
+export interface SelectCompleteCheckPayload {
+  problem_id: string;
+  answer: string;
+}
+
+export interface SelectCompleteCheckResponse {
+  status?: boolean;
+  id?: "Error";
+  details?: string;
+}
+
+export function checkSelectCompleteAnswer(
+  exerciseId: string,
+  payload: SelectCompleteCheckPayload
+) {
+  return requestJson<SelectCompleteCheckResponse>(`/api/check_S&C_ans/${exerciseId}`, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}

@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import { Check, Clock, HardDrive, Play, Send, X } from "lucide-react";
-import { analyzeCode, normalizeJudgeResponse, submitJudge, type JudgeCaseDetail, type JudgeResponse } from "../../api";
+import {
+  analyzeCode,
+  fetchProblemData,
+  normalizeJudgeResponse,
+  submitJudge,
+  type JudgeCaseDetail,
+  type JudgeResponse
+} from "../../api";
+import { MarkdownContent } from "./MarkdownContent";
 import type { CodeAnalysisRule, Exercise, KnowledgeContent, KnowledgeNode, ProgressRecord } from "../../types";
 import { CodeEditor } from "./CodeEditor";
 import { normalizeCodeString } from "./code-editor-utils";
 import { difficultyLabel, exerciseRoute, knowledgeName, resolveOjProblemId } from "./oj-utils";
+import { parseSampleCasesFromMarkdown } from "./problem-markdown";
 import { useVerticalPaneResize } from "./useVerticalPaneResize";
 
 interface Props {
@@ -19,7 +28,7 @@ interface Props {
 const DEFAULT_TIME_LIMIT = 2;
 const DEFAULT_MEM_LIMIT = 256;
 
-type DescTab = "desc" | "hint" | "submit";
+type DescTab = "desc" | "submit";
 
 function createSubmissionId() {
   return `sub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -45,11 +54,10 @@ function formatMemory() {
   return "—";
 }
 
-function enrichJudgeWithSamples(result: JudgeResponse, question: Exercise): JudgeResponse {
-  const samples =
-    question.ojSampleCases ??
-    question.examples?.map((example) => ({ input: example.input, expected: example.output })) ??
-    [];
+function enrichJudgeWithSamples(
+  result: JudgeResponse,
+  samples: { input: string; expected: string }[]
+): JudgeResponse {
 
   return {
     ...result,
@@ -122,6 +130,9 @@ export function CodeView({
   const [analysisStatus, setAnalysisStatus] = useState("");
   const [apiLinkedNodeIds, setApiLinkedNodeIds] = useState<string[]>([]);
   const [showErrorBind, setShowErrorBind] = useState(false);
+  const [problemMarkdown, setProblemMarkdown] = useState("");
+  const [problemLoadStatus, setProblemLoadStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [problemLoadMessage, setProblemLoadMessage] = useState("");
   const { paneRef, editorRatio, consoleRatio, isResizing, onResizeStart } = useVerticalPaneResize();
 
   useEffect(() => {
@@ -134,6 +145,44 @@ export function CodeView({
     setShowErrorBind(false);
     setApiLinkedNodeIds([]);
   }, [question?.id, question?.starterCode]);
+
+  useEffect(() => {
+    if (!question?.id) return;
+
+    let cancelled = false;
+    setProblemLoadStatus("loading");
+    setProblemLoadMessage("");
+    setProblemMarkdown("");
+
+    fetchProblemData(question.id)
+      .then((payload) => {
+        if (cancelled) return;
+        if (payload.id === "Error") {
+          setProblemLoadStatus("error");
+          setProblemLoadMessage(payload.details ?? "题面加载失败");
+          return;
+        }
+        if (payload.content) {
+          setProblemMarkdown(payload.content);
+          if (payload.starterCode) {
+            setCode(normalizeCodeString(payload.starterCode));
+          }
+          setProblemLoadStatus("ok");
+          return;
+        }
+        setProblemLoadStatus("error");
+        setProblemLoadMessage("未返回题面 Markdown 内容");
+      })
+      .catch((error: Error) => {
+        if (cancelled) return;
+        setProblemLoadStatus("error");
+        setProblemLoadMessage(error.message);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [question?.id]);
 
   if (!question) {
     return <p className="oj-empty">暂无编程题</p>;
@@ -179,7 +228,8 @@ export function CodeView({
       mem_limit: DEFAULT_MEM_LIMIT
     })
       .then((raw) => {
-        const result = enrichJudgeWithSamples(normalizeJudgeResponse(raw), question);
+        const samples = parseSampleCasesFromMarkdown(problemMarkdown);
+        const result = enrichJudgeWithSamples(normalizeJudgeResponse(raw), samples);
         setJudgeResult(result);
         setCaseTab(0);
 
@@ -251,9 +301,6 @@ export function CodeView({
             <button type="button" className={descTab === "desc" ? "active" : ""} onClick={() => setDescTab("desc")}>
               题目描述
             </button>
-            <button type="button" className={descTab === "hint" ? "active" : ""} onClick={() => setDescTab("hint")}>
-              提示
-            </button>
             <button type="button" className={descTab === "submit" ? "active" : ""} onClick={() => setDescTab("submit")}>
               提交记录
             </button>
@@ -261,23 +308,14 @@ export function CodeView({
 
           {descTab === "desc" && (
             <div className="oj-desc-body">
-              <h3>{question.title}</h3>
-              {question.description && <p className="oj-desc-text">{question.description}</p>}
-              {question.examples?.map((example, index) => (
-                <div key={index} className="oj-example-block">
-                  <div className="oj-example-title">示例 {index + 1}：</div>
-                  <pre>{`输入: ${example.input}\n输出: ${example.output}${example.explanation ? `\n解释: ${example.explanation}` : ""}`}</pre>
-                </div>
-              ))}
-              {question.constraints && question.constraints.length > 0 && (
-                <div>
-                  <div className="oj-example-title">约束条件：</div>
-                  <ul className="oj-constraints">
-                    {question.constraints.map((item) => (
-                      <li key={item}><code>{item}</code></li>
-                    ))}
-                  </ul>
-                </div>
+              {problemLoadStatus === "loading" && (
+                <p className="muted">正在加载题面…</p>
+              )}
+              {problemLoadStatus === "error" && (
+                <p className="oj-problem-error">{problemLoadMessage || "题面加载失败"}</p>
+              )}
+              {problemLoadStatus === "ok" && (
+                <MarkdownContent markdown={problemMarkdown} />
               )}
               {knowledgeTags.length > 0 && (
                 <div className="oj-knowledge-card">
@@ -301,17 +339,6 @@ export function CodeView({
                 </div>
               )}
             </div>
-          )}
-
-          {descTab === "hint" && (
-            <ul className="oj-hint-list">
-              {(question.hints ?? []).map((hint) => (
-                <li key={hint}>{hint}</li>
-              ))}
-              {(question.hints ?? []).length === 0 && (
-                <li className="muted">暂无提示，可查看知识点详情中的代码模板。</li>
-              )}
-            </ul>
           )}
 
           {descTab === "submit" && (

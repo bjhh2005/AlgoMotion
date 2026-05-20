@@ -273,7 +273,7 @@ async def get_problem(id: str):
         }
 
     if result["type"] == "programming":
-        path = Path(result["path"])
+        path = ROOT / result["path"] if not Path(result["path"]).is_absolute() else Path(result["path"])
         if path.exists() and path.is_file():
             try:
                 with open(path, "r", encoding="utf-8") as f:
