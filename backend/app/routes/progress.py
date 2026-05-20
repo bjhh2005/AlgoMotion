@@ -25,20 +25,20 @@ router = APIRouter(prefix="/api/progress", tags=["学习进度"])
 
 
 def get_progress_store():
-    """获取进度存储（延迟导入）"""
-    from ..main import progress_store
+    """获取进度存储"""
+    from ..storage import progress_store
     return progress_store
 
 
 def persist_progress_record(node_id: str, record: dict):
-    """持久化单个知识点进度（延迟导入）"""
-    from ..main import set_progress_record
+    """持久化单个知识点进度"""
+    from ..storage import set_progress_record
     return set_progress_record(node_id, record)
 
 
 def get_nodes_data():
     """获取知识点数据"""
-    from ..main import nodes
+    from ..storage import nodes
     return nodes()
 
 

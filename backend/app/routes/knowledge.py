@@ -11,14 +11,14 @@ router = APIRouter(prefix="/api/knowledge", tags=["知识图谱"])
 
 
 def get_nodes_data():
-    """获取知识点数据（延迟导入避免循环依赖）"""
-    from ..main import nodes
+    """获取知识点数据"""
+    from ..storage import nodes
     return nodes()
 
 
 def get_edges_data():
     """获取边数据"""
-    from ..main import edges
+    from ..storage import edges
     return edges()
 
 
@@ -72,7 +72,7 @@ async def get_node_detail(node_id: str):
     if not validate_node_id(node_id):
         raise HTTPException(status_code=400, detail="Invalid node ID format")
     
-    from ..main import contents, code_examples, exercises
+    from ..storage import contents, code_examples, exercises
     
     node = next((item for item in get_nodes_data() if item.get("id") == node_id), None)
     if not node:
