@@ -1,164 +1,21 @@
 # AlgoMotion
 
-《数据结构》智慧学习平台。当前仓库已经包含 C++ 数据结构核心、FastAPI 数据接口、React 前端和 JSON 知识数据层，目标是形成“知识图谱 -> 学习追踪 -> OJ 练习 -> AI 辅助分析”的闭环。
+《数据结构》智慧学习平台。项目目标是形成“知识图谱 -> OJ 练习 -> 学习追踪 -> AI 辅助分析”的学习闭环。
 
-## 当前已完成
+当前仓库包含四部分：
 
-- C++ 核心：抽象数据结构接口、线性表、链表、二叉树、图、基础算法、知识库和统一 Manager JSON API。
-- 知识图谱：33 个数据结构知识节点、45 条关系边，支持层级包含、前置知识、相关、应用、错因来源等关系类型。
-- 前端主界面：侧边栏一级入口包括知识库、OJ 练习、学习追踪、AI 辅助问答。
-- 知识库页面：支持图谱/目录切换、搜索、知识点详情、C++ 示例、关联知识点、学习状态标记。
-- 学习追踪页面：使用专业指标记录学习情况，包括掌握度、自信度、学习时长、OJ 尝试次数、正确率、错因数量、连续学习天数和复习时间。
-- OJ 练习页面：练习题已经从知识详情中独立出来，支持从知识点跳转到 OJ 页面，并预留提交区。
-- 错因分析绑定：OJ 与 AI 代码分析都通过 `nodeId` 绑定知识库，可把错题、代码问题和常见错误映射到知识点。
-- AI 辅助问答：已作为侧边栏一级分支，不再放在页面底部；当前使用规则和占位回复，后续可接大模型。
-- 前后端基础联通：前端启动时优先请求 FastAPI `/api/bootstrap`，学习状态更新会 POST 到后端，AI/OJ 代码分析会调用后端分析接口。
-- 数据校验脚本：可校验节点、边、题目、内容、代码示例、分析规则是否引用了不存在的知识点。
+- C++ 数据结构核心：链表、树、图、算法等基础实现与演示入口。
+- FastAPI 后端：读取 JSON 数据、提供知识库/OJ/学习追踪/AI 接口。
+- React 前端：知识库、OJ 练习、学习追踪、AI 问答四个主页面。
+- JSON 数据层：知识图谱、讲解内容、示例代码、题库、演示进度和分析规则。
 
-## 项目结构
+## 快速复现
 
-```txt
-AlgoMotion/
-├── include/                         # C++ 头文件
-├── src/                             # C++ 实现与 Manager 演示入口
-├── external/json/                   # jsoncpp 头文件和静态库
-├── backend/                         # FastAPI 接口层
-│   └── app/
-├── frontend/                        # React + TypeScript + Vite 前端
-│   └── src/
-│       ├── components/              # 图谱、目录、知识详情、OJ、学习追踪、AI 页面
-│       ├── App.tsx                  # 主导航和页面切换
-│       ├── data.ts                  # JSON 数据聚合入口
-│       └── types.ts                 # 前端共享类型
-├── data/
-│   ├── knowledge-graph/             # 知识节点与关系边
-│   ├── learning-content/            # 讲解、代码示例、进度、推荐、分析规则
-│   ├── exercises/                   # OJ 题库
-│   └── knowledge.json               # C++ 知识库参考数据
-├── docs/                            # 架构、API、图谱数据规范、协作计划
-└── scripts/                         # 数据校验脚本
-```
+推荐分别开两个终端：一个跑后端，一个跑前端。
 
-## 功能模块
+### 1. 启动后端
 
-### 1. C++ 数据结构核心
-
-位置：`include/`、`src/`
-
-- `DataStructure`：统一抽象基类。
-- `LinearStructure`：线性结构中间抽象层。
-- `LinkedList`、`BinaryTree`、`Graph`：当前已实现的数据结构示例。
-- `Algorithm`：基础算法工具。
-- `KnowledgeDB`：C++ 侧知识点数据库。
-- `DirectoryBuilder`：树状/图状目录构建。
-- `Manager`：统一 JSON API 入口，提供目录、知识点详情、可视化数据、学习报告、AI 占位接口。
-
-### 2. FastAPI 数据接口
-
-位置：`backend/app/main.py`、`backend/app/schemas.py`
-
-已提供接口：
-
-- `GET /api/bootstrap`
-- `GET /api/health`
-- `GET /api/knowledge/nodes`
-- `GET /api/knowledge/edges`
-- `GET /api/knowledge/graph`
-- `GET /api/knowledge/{node_id}`
-- `GET /api/progress/me`
-- `POST /api/progress/update`
-- `GET /api/recommendations/me`
-- `POST /api/ai/chat`
-- `POST /api/ai/code-analysis`
-- `GET /api/exercises`
-- `POST /api/judge`（OJ 提交判题，详见 `oj/README.md`）
-
-MVP 阶段接口直接读取 `data/` 下 JSON 文件，学习进度启动时从 `initial-progress.json` 初始化，更新后持久化到 `data/learning-content/progress.json`，后续可替换为数据库。
-
-### 3. React 前端
-
-位置：`frontend/src/`
-
-- `App.tsx`：主布局、侧边栏一级导航、页面切换、当前知识点和练习题状态。
-- `GraphView.tsx`：SVG 知识图谱。
-- `DirectoryView.tsx`：知识目录树。
-- `KnowledgeDetail.tsx`：知识点详情、状态标记、练习题跳转。
-- `ExerciseOjPage.tsx`：OJ 练习页、提交区、错因分析、知识点绑定。
-- `LearningAnalyticsPage.tsx`：学习追踪指标面板、薄弱点、推荐路径。
-- `AiPanel.tsx`：AI 问答和 C++ 代码分析占位。
-
-### 4. JSON 数据层
-
-位置：`data/`
-
-- `knowledge-graph/nodes.json`：知识点节点。
-- `knowledge-graph/edges.json`：知识点关系。
-- `learning-content/knowledge-content.json`：定义、性质、操作步骤、复杂度、常见错误。
-- `learning-content/code-examples.json`：C++ 示例代码。
-- `learning-content/initial-progress.json`：演示用学习记录。
-- `learning-content/code-analysis-rules.json`：代码分析规则与知识点映射。
-- `learning-content/recommendation-seeds.json`：推荐路径种子。
-- `exercises/exercises.json`：OJ 练习题。
-
-## 数据模型重点
-
-学习状态分两层：
-
-```txt
-status: not_started | learning | mastered | weak
-score: 0-100
-metrics: 专业学习追踪参数
-```
-
-`metrics` 当前包括：
-
-- `mastery`：掌握度
-- `confidence`：自评置信度
-- `studyMinutes`：有效学习时长
-- `attemptCount`：OJ 尝试次数
-- `correctRate`：练习正确率
-- `errorCount`：错因数量
-- `streakDays`：连续学习天数
-- `lastActivityAt`：最近学习时间
-- `reviewDueAt`：下次复习时间
-
-知识本体关系兼容层：
-
-```txt
-KnowledgeEdge -> OntologyRelation
-subjectId + predicate + objectId + source + evidence
-```
-
-这样后续可以把人工知识图谱、OJ 错题关系、AI 分析结果统一接入同一套知识本体。
-
-## 运行方式
-
-### 前端
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-默认地址：`http://127.0.0.1:5173`
-
-前端会优先连接 `http://127.0.0.1:8000` 的 FastAPI 后端。若后端未启动，页面顶部会显示“本地/异常模式”，并回退到本地 JSON mock 数据；若连接成功，会显示“FastAPI 已连接”。
-
-### 前端构建检查
-
-```bash
-cd frontend
-npm run build
-```
-
-### 数据校验
-
-```bash
-python scripts/validate_data.py
-```
-
-### FastAPI 后端
+环境建议：Python 3.10+。
 
 ```bash
 cd backend
@@ -166,22 +23,259 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-默认地址：`http://127.0.0.1:8000`
+后端默认地址：
 
-接口文档：`http://127.0.0.1:8000/docs`
-
-AI 问答使用兼容 OpenAI Chat Completions 的接口。启动后端前配置：
-
-```bash
-set AI_API_KEY=你的 API Key
-set AI_MODEL=你的模型名
-set AI_BASE_URL=https://api.openai.com/v1
+```txt
+http://127.0.0.1:8000
 ```
 
-也可以参考 `backend/.env.example`。如果未配置 API，问答会基于本地知识库给出兜底回答，前端仍可正常联通。
-后端会自动读取仓库根目录 `.env` 或 `backend/.env` 中的上述配置。
+接口文档：
 
-### C++ 核心
+```txt
+http://127.0.0.1:8000/docs
+```
+
+健康检查：
+
+```bash
+curl http://127.0.0.1:8000/api/health
+```
+
+Windows PowerShell 也可以用：
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/api/health
+```
+
+### 2. 启动前端
+
+环境建议：Node.js 20+。
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+前端默认地址：
+
+```txt
+http://127.0.0.1:5173
+```
+
+前端会优先连接 `http://127.0.0.1:8000`。如果后端正常启动，页面顶部会显示“FastAPI 已连接”；如果后端没开，会进入本地 JSON 兜底模式。
+
+### 3. 一键验收常用命令
+
+在仓库根目录运行：
+
+```bash
+python scripts/validate_data.py
+```
+
+后端语法检查：
+
+```bash
+python -m compileall backend/app
+```
+
+前端构建检查：
+
+```bash
+cd frontend
+npm run build
+```
+
+## 后端结构
+
+后端入口已经拆薄，`backend/app/main.py` 只负责创建 FastAPI app、配置 CORS、注册路由。协作开发时优先按模块找文件，不要把新功能继续塞回 `main.py`。
+
+```txt
+backend/app/
+├── main.py                 # FastAPI app 装配入口
+├── config.py               # 项目路径、.env 加载
+├── storage.py              # JSON 读取、学习进度持久化
+├── schemas.py              # Pydantic 请求/响应模型
+├── validators.py           # 参数校验
+├── mastery.py              # 掌握度、遗忘曲线、复习时间计算
+├── services/
+│   ├── knowledge.py        # 知识点检索、相关节点、AI 上下文拼装
+│   └── ai.py               # AI 调用、兜底回答、代码分析
+└── routes/
+    ├── core.py             # /api/health、/api/bootstrap、/api/exercises
+    ├── legacy.py           # 前端当前依赖的旧格式接口
+    ├── knowledge.py        # 新版知识图谱接口
+    ├── progress.py         # 学习进度接口
+    ├── analytics.py        # 高级学习分析接口
+    ├── recommendations.py  # 推荐接口
+    ├── ai.py               # AI 问答和代码分析入口
+    └── oj.py               # OJ 判题和题目读取
+```
+
+建议分工：
+
+- 知识库功能：`routes/knowledge.py`、`services/knowledge.py`、`data/knowledge-graph/`、`data/learning-content/`
+- OJ 功能：`routes/oj.py`、`data/exercises/`、`oj/`
+- 学习追踪：`routes/progress.py`、`routes/analytics.py`、`mastery.py`、`storage.py`
+- AI 问答：`routes/ai.py`、`services/ai.py`、`data/learning-content/code-analysis-rules.json`
+- 前端页面：`frontend/src/App.tsx` 和 `frontend/src/components/`
+
+## 前端结构
+
+```txt
+frontend/src/
+├── App.tsx                         # 主布局、页面切换、前后端联动
+├── api.ts                          # 后端请求封装
+├── data.ts                         # 本地 JSON 兜底数据聚合
+├── types.ts                        # 前端共享类型
+├── styles.css                      # 全局样式
+└── components/
+    ├── GraphView.tsx               # 知识图谱
+    ├── DirectoryView.tsx           # 知识目录
+    ├── KnowledgeDetail.tsx         # 知识点详情
+    ├── ExerciseOjPage.tsx          # OJ 页面
+    ├── LearningAnalyticsPage.tsx   # 学习追踪页
+    ├── AiPanel.tsx                 # AI 问答页
+    └── oj/                         # OJ 子组件
+```
+
+前端启动时调用 `/api/bootstrap` 拉取首屏数据。状态修改、OJ 判题、AI 问答会继续调用后端接口。
+
+## 数据文件
+
+```txt
+data/
+├── knowledge-graph/
+│   ├── nodes.json                  # 知识点节点
+│   └── edges.json                  # 知识点关系边
+├── learning-content/
+│   ├── knowledge-content.json      # 知识点讲解
+│   ├── code-examples.json          # C++ 示例代码
+│   ├── initial-progress.json       # 首次启动用演示进度
+│   ├── recommendation-seeds.json   # 推荐路径默认配置
+│   └── code-analysis-rules.json    # 代码分析规则
+├── exercises/
+│   └── exercises.json              # OJ 题库索引
+└── oj-data/                        # 编程题测试数据
+```
+
+学习进度持久化说明：
+
+- 后端首次启动时，如果没有 `data/learning-content/progress.json`，会读取 `initial-progress.json`。
+- 用户更新学习状态后，会写入 `data/learning-content/progress.json`。
+- `progress.json` 是运行期个人数据，已在 `.gitignore` 中忽略。
+- 如需重置演示数据，停止后端后删除 `data/learning-content/progress.json`，再重启后端。
+
+修改数据后务必运行：
+
+```bash
+python scripts/validate_data.py
+```
+
+这个脚本会检查节点、边、题目、内容、代码示例、分析规则是否引用了不存在的知识点。
+
+## 主要接口
+
+基础接口：
+
+- `GET /api/health`
+- `GET /api/bootstrap`
+- `GET /api/exercises`
+
+知识库旧格式接口，前端当前仍在使用：
+
+- `GET /api/knowledge/nodes`
+- `GET /api/knowledge/edges`
+- `GET /api/knowledge/graph`
+- `GET /api/knowledge/{node_id}`
+
+学习进度：
+
+- `GET /api/progress/me`
+- `POST /api/progress/update`
+- `GET /api/progress`
+- `POST /api/progress/{node_id}`
+- `POST /api/progress/submit`
+- `GET /api/progress/analysis/{node_id}`
+
+学习分析：
+
+- `GET /api/analytics/report`
+- `GET /api/analytics/weak`
+- `GET /api/analytics/trend`
+- `GET /api/analytics/cognitive/{node_id}`
+
+AI：
+
+- `POST /api/ai/chat`
+- `POST /api/ai/code-analysis`
+
+OJ：
+
+- `POST /api/judge`
+- `GET /api/get_problem_data/{id}`
+- `POST /api/check_S&C_ans/{id}`
+
+推荐：
+
+- `GET /api/recommendations/me`
+- `GET /api/recommendations`
+
+## AI 配置
+
+AI 问答使用兼容 OpenAI Chat Completions 的接口。没有配置 API 时，后端会基于本地知识库给出兜底回答，前端仍可正常使用。
+
+可以在仓库根目录 `.env` 或 `backend/.env` 中配置：
+
+```txt
+AI_API_KEY=你的 API Key
+AI_MODEL=你的模型名
+AI_BASE_URL=https://api.openai.com/v1
+```
+
+也可以使用环境变量：
+
+```bash
+export AI_API_KEY=你的 API Key
+export AI_MODEL=你的模型名
+export AI_BASE_URL=https://api.openai.com/v1
+```
+
+Windows PowerShell：
+
+```powershell
+$env:AI_API_KEY="你的 API Key"
+$env:AI_MODEL="你的模型名"
+$env:AI_BASE_URL="https://api.openai.com/v1"
+```
+
+更多示例见 `backend/.env.example`。
+
+## OJ 判题说明
+
+`POST /api/judge` 默认调用 Docker 容器 `global-judger`。如果只复现知识库、学习追踪、AI 页面，可以不启动 OJ 容器；OJ 编程题真实判题会失败或返回服务错误，但前端其他功能不受影响。
+
+需要真实判题时参考：
+
+```txt
+oj/README.md
+```
+
+当前题库入口：
+
+```txt
+data/exercises/exercises.json
+```
+
+编程题测试数据：
+
+```txt
+data/oj-data/
+```
+
+## C++ 核心
+
+C++ 部分当前是独立演示/核心能力层，尚未作为 Web 后端主链路的一部分。
 
 ```bash
 mkdir build
@@ -191,27 +285,49 @@ cmake --build .
 ./algomotion
 ```
 
-也可以参考根目录 `Makefile`，但当前 CMake 路径已经配置 jsoncpp，更适合现有代码。
+如果不是负责 C++ 核心模块，可以先不用构建这部分。
 
-## 近期优先级
+## 协作开发路线
 
-1. 统一前端是否直接读 JSON，还是切到 FastAPI 接口读取。
-2. 为 OJ 页面补真实提交状态：未提交、通过、错误、查看解析。
-3. 把 `attemptCount`、`correctRate`、`errorCount` 从 OJ 操作反向写入学习追踪。
-4. 扩充知识内容和题库，优先覆盖栈、队列、树、图、查找、排序主线。
-5. 把 AI 占位规则升级为“题目 + 代码 + 知识点”的结构化分析结果。
+当前重点方向：
 
-## 前后端联通验收清单
+1. 知识库：把图谱展示升级为“章节层级视图 + 图结构关系”，补路径指导、搜索定位、示例代码和知识点题目。
+2. OJ：重整题库目录，支持按题号和章节检索，补相关题推荐和基础题库。
+3. 学习追踪：准备更完整的演示学生数据，完善高级分析展示，增加报告导出。
+4. AI 问答：升级为多轮对话，支持上传材料生成 quiz/知识卡片，生成可跳转知识点卡片，形成“发现问题 -> 讲解 -> 练习 -> 推荐”的闭环。
 
-| 功能 | 当前程度 | 验收方式 |
-|------|----------|----------|
-| 启动数据联通 | 已完成基础联通，前端通过 `/api/bootstrap` 拉取节点、边、内容、题库、进度、规则和推荐配置 | 先启动 FastAPI，再启动前端，页面顶部显示“FastAPI 已连接” |
-| 本地兜底 | 已完成，后端没开时前端仍可用本地 JSON mock | 关闭后端刷新前端，页面顶部显示“本地/异常模式” |
-| 学习状态同步 | 已完成 POST，点击知识点详情里的学习状态按钮会调用 `/api/progress/update` | 点击“已掌握/学习中/需巩固”，顶部提示“FastAPI 已同步” |
-| 知识库页面 | 已接后端启动数据，图谱、目录、详情、练习题入口可用 | 搜索知识点、切换图谱/目录、点击节点查看详情 |
-| OJ 页面 | 已接后端题库与判题接口，提交调用 `/api/judge`，未通过时自动触发 `/api/ai/code-analysis` | 进入 OJ，填写答案或代码后点击“提交 OJ”，查看判题结果与错因绑定 |
-| AI 页面 | 已接后端问答和代码分析接口 | 点击“发送问题”或“分析代码”，查看后端返回内容 |
-| 学习追踪页面 | 已使用后端进度数据初始化，推荐仍由前端基于图谱规则计算 | 查看学习追踪页的掌握度、时长、尝试次数、薄弱点 |
-| 真实 OJ 判题 | 已完成 MVP：`POST /api/judge` 返回测例状态；编程题仍为规则模拟，未接真实沙箱 | 提交编程题代码，查看 `Accepted` / `Wrong Answer` 与各测例耗时 |
-| C++ 接入 Web | 未完成，C++ 当前仍是独立 demo/核心能力层 | 后续可由 Python 调用 C++ 程序或抽成服务 |
+开发建议：
 
+- 新功能尽量放到对应 `routes/` 或 `services/` 文件，不要扩张 `main.py`。
+- 修改数据文件后跑 `python scripts/validate_data.py`。
+- 修改前端后跑 `npm run build`。
+- 修改后端后跑 `python -m compileall backend/app`。
+- 保持旧接口兼容，除非同步修改 `frontend/src/api.ts` 和调用方。
+
+## 常见问题
+
+### 前端显示“本地/异常模式”
+
+通常是后端没有启动，或后端端口不是 `8000`。先访问：
+
+```txt
+http://127.0.0.1:8000/api/health
+```
+
+### 修改学习状态后想恢复初始演示数据
+
+停止后端，删除：
+
+```txt
+data/learning-content/progress.json
+```
+
+然后重启后端。
+
+### AI 没有调用外部模型
+
+检查 `.env` 或环境变量中是否配置了 `AI_API_KEY` 和 `AI_MODEL`。没配置时是正常兜底模式。
+
+### OJ 编程题判题失败
+
+检查 Docker 和 `global-judger` 容器是否启动。只看知识库、学习追踪、AI 页面时可以先忽略。
