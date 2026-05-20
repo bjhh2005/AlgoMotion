@@ -29,13 +29,13 @@ export function CognitiveRadarChart({ cognitiveMastery, nodeName, width = 320, h
     },
     bloomWeightedMastery: 0.52,
     questionAttemptStats: {
-      remember: { total: 20, correct: 17, avgTimeSpent: 15, "guess嫌疑率": 0.1 },
-      understand: { total: 15, correct: 11, avgTimeSpent: 28, "guess嫌疑率": 0.15 },
-      apply: { total: 12, correct: 7, avgTimeSpent: 45, "guess嫌疑率": 0.25 },
-      analyze: { total: 8, correct: 4, avgTimeSpent: 60, "guess嫌疑率": 0.3 },
-      evaluate: { total: 5, correct: 2, avgTimeSpent: 75, "guess嫌疑率": 0.35 },
-      create: { total: 3, correct: 1, avgTimeSpent: 90, "guess嫌疑率": 0.4 },
-    } as any,
+      remember: { total: 20, correct: 17, avgTimeSpent: 15, guessRate: 0.1 },
+      understand: { total: 15, correct: 11, avgTimeSpent: 28, guessRate: 0.15 },
+      apply: { total: 12, correct: 7, avgTimeSpent: 45, guessRate: 0.25 },
+      analyze: { total: 8, correct: 4, avgTimeSpent: 60, guessRate: 0.3 },
+      evaluate: { total: 5, correct: 2, avgTimeSpent: 75, guessRate: 0.35 },
+      create: { total: 3, correct: 1, avgTimeSpent: 90, guessRate: 0.4 },
+    },
   };
 
   // 根据是否有数据决定使用哪个
@@ -249,8 +249,8 @@ export function CognitiveRadarChart({ cognitiveMastery, nodeName, width = 320, h
                     </td>
                     <td>{stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0}%</td>
                     <td>{stats.avgTimeSpent > 0 ? `${Math.round(stats.avgTimeSpent)}s` : "-"}</td>
-                    <td className={(stats as any).guessRate > 0.3 ? "warning" : ""}>
-                      {Math.round((stats as any).guessRate * 100)}%
+                    <td className={stats.guessRate > 0.3 ? "warning" : ""}>
+                      {Math.round(stats.guessRate * 100)}%
                     </td>
                   </tr>
                 );

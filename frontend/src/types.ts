@@ -162,7 +162,7 @@ export interface CognitiveMastery {
     total: number;
     correct: number;
     avgTimeSpent: number; // 秒
-    guess嫌疑率: number; // 0-1，答题时间异常短的比率
+    guessRate: number; // 0-1，答题时间异常短的比率
   }>;
   bloomWeightedMastery: number; // 布鲁姆加权综合掌握度
 }

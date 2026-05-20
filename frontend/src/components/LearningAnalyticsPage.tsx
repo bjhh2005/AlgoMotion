@@ -67,7 +67,7 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
     const mastery = record?.metrics.mastery ?? Math.random() * 0.5 + 0.3;
 
     const levelMastery: Record<CognitiveLevel, number> = {} as Record<CognitiveLevel, number>;
-    const questionAttemptStats: Record<string, { total: number; correct: number; avgTimeSpent: number; guessRate: number }> = {};
+    const questionAttemptStats: CognitiveMastery["questionAttemptStats"] = {} as CognitiveMastery["questionAttemptStats"];
 
     cognitiveLevels.forEach((level, idx) => {
       const levelFactor = 1 - idx * 0.12;
@@ -90,11 +90,11 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
     );
 
     cognitiveMastery[node.id] = {
-      node_id: node.id,
-      level_mastery: levelMastery,
-      question_attempt_stats: questionAttemptStats,
-      bloom_weighted_mastery: bloomWeightedMastery,
-    } as unknown as CognitiveMastery;
+      nodeId: node.id,
+      levelMastery,
+      questionAttemptStats,
+      bloomWeightedMastery,
+    };
   });
 
   // 生成知识传播分析数据
@@ -107,18 +107,18 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
       .filter((n) => n.id !== weakNode.id && Math.random() > 0.6)
       .slice(0, Math.floor(Math.random() * 4) + 1)
       .map((n) => ({
-        node_id: n.id,
-        propagation_strength: Math.random() * 0.5 + 0.3,
-        path_type: (["prerequisite", "used_in", "related"] as const)[Math.floor(Math.random() * 3)],
-        root_cause: Math.random() > 0.7,
+        nodeId: n.id,
+        propagationStrength: Math.random() * 0.5 + 0.3,
+        pathType: (["prerequisite", "used_in", "related"] as const)[Math.floor(Math.random() * 3)],
+        rootCause: Math.random() > 0.7,
       }));
 
     return {
-      source_node_id: weakNode.id,
-      affected_nodes: affectedNodes,
-      weakness_severity: Math.random() * 0.5 + 0.4,
-      downstream_risk: (["low", "medium", "high", "critical"] as const)[Math.floor(Math.random() * 4)],
-    } as unknown as PropagationAnalysis;
+      sourceNodeId: weakNode.id,
+      affectedNodes,
+      weaknessSeverity: Math.random() * 0.5 + 0.4,
+      downstreamRisk: (["low", "medium", "high", "critical"] as const)[Math.floor(Math.random() * 4)],
+    };
   });
 
   // 生成行为分析数据
@@ -128,16 +128,16 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
     const hasAttempts = record && record.metrics.attemptCount > 0;
 
     behaviorAnalyses[node.id] = {
-      node_id: node.id,
-      average_time_per_question: hasAttempts ? Math.random() * 60 + 15 : Math.random() * 30 + 10,
-      time_variance: Math.random() * 200,
-      rush_rate: hasAttempts ? Math.random() * 0.4 : Math.random() * 0.2,
-      hesitation_rate: Math.random() * 0.3,
-      guess_rate: hasAttempts ? Math.random() * 0.25 : Math.random() * 0.15,
+      nodeId: node.id,
+      averageTimePerQuestion: hasAttempts ? Math.random() * 60 + 15 : Math.random() * 30 + 10,
+      timeVariance: Math.random() * 200,
+      rushRate: hasAttempts ? Math.random() * 0.4 : Math.random() * 0.2,
+      hesitationRate: Math.random() * 0.3,
+      guessRate: hasAttempts ? Math.random() * 0.25 : Math.random() * 0.15,
       consistency: hasAttempts ? Math.random() * 0.4 + 0.6 : Math.random() * 0.3 + 0.5,
-      suspicious_flag: Math.random() > 0.9,
-      suspicious_reason: Math.random() > 0.9 ? "答题时间异常，可能存在蒙猜行为" : undefined,
-    } as unknown as BehaviorAnalysis;
+      suspiciousFlag: Math.random() > 0.9,
+      suspiciousReason: Math.random() > 0.9 ? "答题时间异常，可能存在蒙猜行为" : undefined,
+    };
   });
 
   // 生成题目区分度数据
@@ -200,7 +200,7 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
           : category === "dormant"
           ? ["需要更多学习投入", "激活学习动力"]
           : [],
-    } as unknown as InvestmentEffectivenessAnalysis;
+    };
   });
 
   // 生成动机指数
@@ -212,7 +212,7 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
     intrinsicMotivationScore: Math.random() * 40 + 60,
     effortEffectivenessRatio: Math.random() * 0.5 + 0.5,
     fakeEffortSuspicion: Math.random() * 0.3,
-  } as unknown as MotivationIndex;
+  };
 
   return {
     cognitiveMastery,
@@ -231,38 +231,48 @@ function transformComprehensiveReport(report: ComprehensiveReport) {
       Object.entries(report.cognitive_mastery).map(([nodeId, data]) => [
         nodeId,
         {
-          node_id: data.node_id,
-          level_mastery: data.level_mastery,
-          question_attempt_stats: data.question_attempt_stats,
-          bloom_weighted_mastery: data.bloom_weighted_mastery,
-        } as unknown as CognitiveMastery,
+          nodeId: data.node_id,
+          levelMastery: data.level_mastery as CognitiveMastery["levelMastery"],
+          questionAttemptStats: Object.fromEntries(
+            Object.entries(data.question_attempt_stats).map(([level, stats]) => [
+              level,
+              {
+                total: stats.total,
+                correct: stats.correct,
+                avgTimeSpent: stats.avg_time_spent,
+                guessRate: stats.guess_rate,
+              },
+            ])
+          ) as CognitiveMastery["questionAttemptStats"],
+          bloomWeightedMastery: data.bloom_weighted_mastery,
+        },
       ])
     ),
     propagationAnalyses: report.propagation_analyses.map((p) => ({
-      source_node_id: p.source_node_id,
-      affected_nodes: p.affected_nodes.map((n) => ({
-        node_id: n.node_id,
-        propagation_strength: n.propagation_strength,
-        path_type: n.path_type,
-        root_cause: n.root_cause,
+      sourceNodeId: p.source_node_id,
+      affectedNodes: p.affected_nodes.map((n) => ({
+        nodeId: n.node_id,
+        propagationStrength: n.propagation_strength,
+        pathType: n.path_type as PropagationAnalysis["affectedNodes"][number]["pathType"],
+        rootCause: n.root_cause,
       })),
-      weakness_severity: p.weakness_severity,
-      downstream_risk: p.downstream_risk,
-    })) as unknown as PropagationAnalysis[],
+      weaknessSeverity: p.weakness_severity,
+      downstreamRisk: p.downstream_risk as PropagationAnalysis["downstreamRisk"],
+    })),
     behaviorAnalyses: Object.fromEntries(
       Object.entries(report.behavior_analyses).map(([nodeId, data]) => [
         nodeId,
         {
-          node_id: data.node_id,
-          average_time_per_question: data.average_time_per_question,
-          time_variance: data.time_variance,
-          rush_rate: data.rush_rate,
-          hesitation_rate: data.hesitation_rate,
-          guess_rate: data.guess_rate,
+          nodeId: data.node_id,
+          averageTimePerQuestion: data.average_time_per_question,
+          timeVariance: data.time_variance,
+          rushRate: data.rush_rate,
+          hesitationRate: data.hesitation_rate,
+          guessRate: data.guess_rate,
           consistency: data.consistency,
-          suspicious_flag: data.suspicious_flag,
-          suspicious_reason: data.suspicious_reason,
-        } as unknown as BehaviorAnalysis,
+          suspiciousFlag: data.suspicious_flag,
+          suspiciousReason: data.suspicious_reason,
+        },
       ])
     ),
     questionDiscriminations: [],
@@ -275,7 +285,7 @@ function transformComprehensiveReport(report: ComprehensiveReport) {
       intrinsicMotivationScore: report.motivation_index.intrinsic_motivation_score,
       effortEffectivenessRatio: report.motivation_index.effort_effectiveness_ratio,
       fakeEffortSuspicion: report.motivation_index.fake_effort_suspicion,
-    } as unknown as MotivationIndex,
+    },
   };
 }
 
