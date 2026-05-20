@@ -423,7 +423,7 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
               <div className="metric-grid metric-grid-wide">
                 <div><strong>{mastered}</strong><span>已掌握节点</span></div>
                 <div><strong>{learning}</strong><span>学习中节点</span></div>
-                <div><strong>{weak}</strong><span>薄弱节点</span></div>
+                <div><strong>{weakCount}</strong><span>薄弱节点</span></div>
                 <div><strong>{totalMinutes}</strong><span>有效学习分钟</span></div>
                 <div><strong>{attempts}</strong><span>OJ 尝试次数</span></div>
                 <div><strong>{errors}</strong><span>累计错因数</span></div>

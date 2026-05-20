@@ -55,7 +55,7 @@ export function AdvancedAnalyticsDashboard({
   }, [activeDimension, nodes, cognitiveMastery, selectedNodeId, onSelectNode]);
   
   // 计算综合评分
-  const overallScores = {
+  const baseScores = {
     knowledgeStructure: Math.round(
       (propagationAnalyses.length > 0
         ? 1 - propagationAnalyses.reduce((sum, p) => sum + p.weaknessSeverity, 0) / propagationAnalyses.length
@@ -71,13 +71,16 @@ export function AdvancedAnalyticsDashboard({
       ? Math.round(
           investmentEffectiveness.reduce((sum, a) => sum + a.efficiencyScore, 0) /
           investmentEffectiveness.length
-        )
+      )
       : 0,
   };
   
-  overallScores.composite = Math.round(
-    (overallScores.knowledgeStructure + overallScores.learningQuality + overallScores.cognitiveEngagement) / 3
-  );
+  const overallScores = {
+    ...baseScores,
+    composite: Math.round(
+      (baseScores.knowledgeStructure + baseScores.learningQuality + baseScores.cognitiveEngagement) / 3
+    ),
+  };
   
   const dimensionTabs = [
     { id: "structure" as const, label: "知识关联结构", icon: "🧠" },

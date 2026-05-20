@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import type { CognitiveLevel, CognitiveMastery, COGNITIVE_LEVELS } from "../types";
+import type { SVGProps } from "react";
+import type { CognitiveLevel, CognitiveMastery } from "../types";
 
 interface Props {
   cognitiveMastery: CognitiveMastery | null;
@@ -95,7 +96,8 @@ export function CognitiveRadarChart({ cognitiveMastery, nodeName, width = 320, h
       const labelRadius = maxRadius + 30;
       const x = centerX + labelRadius * Math.cos(angle);
       const y = centerY + labelRadius * Math.sin(angle);
-      const anchor = x < centerX - 10 ? "end" : x > centerX + 10 ? "start" : "middle";
+      const anchor: SVGProps<SVGTextElement>["textAnchor"] =
+        x < centerX - 10 ? "end" : x > centerX + 10 ? "start" : "middle";
       return { ...item, x, y, anchor };
     });
     
