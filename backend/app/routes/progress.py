@@ -30,6 +30,12 @@ def get_progress_store():
     return progress_store
 
 
+def persist_progress_record(node_id: str, record: dict):
+    """持久化单个知识点进度（延迟导入）"""
+    from ..main import set_progress_record
+    return set_progress_record(node_id, record)
+
+
 def get_nodes_data():
     """获取知识点数据"""
     from ..main import nodes
@@ -167,7 +173,7 @@ async def submit_exercises(
     )
     
     # 更新进度
-    progress[node_id] = {
+    progress_record = {
         "status": calculation.status,
         "score": submission.score,
         "metrics": {
@@ -185,6 +191,7 @@ async def submit_exercises(
         "reviewDueAt": calculation.review_due_at,
         "masteryAnalysis": calculation.mastery_breakdown
     }
+    persist_progress_record(node_id, progress_record)
     
     return success_response({
         "nodeId": node_id,
@@ -272,19 +279,17 @@ async def update_node_progress(node_id: str, payload: ProgressUpdate):
     if not any(n.get("id") == node_id for n in nodes):
         raise HTTPException(status_code=404, detail="Knowledge node not found")
     
-    progress = get_progress_store()
-    
     # 计算复习时间
     review_due = calculate_review_due(payload.status, payload.metrics.mastery)
     
     # 更新进度
-    progress[node_id] = {
+    persist_progress_record(node_id, {
         "status": payload.status,
         "score": payload.score,
         "metrics": payload.metrics.model_dump(),
         "lastStudiedAt": datetime.now().isoformat() + "Z",
         "reviewDueAt": review_due
-    }
+    })
     
     return success_response({
         "nodeId": node_id,

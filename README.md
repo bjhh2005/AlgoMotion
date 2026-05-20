@@ -73,7 +73,7 @@ AlgoMotion/
 - `GET /api/exercises`
 - `POST /api/judge`（OJ 提交判题，详见 `oj/README.md`）
 
-MVP 阶段接口直接读取 `data/` 下 JSON 文件，学习进度使用内存存储，后续可替换为数据库。
+MVP 阶段接口直接读取 `data/` 下 JSON 文件，学习进度启动时从 `initial-progress.json` 初始化，更新后持久化到 `data/learning-content/progress.json`，后续可替换为数据库。
 
 ### 3. React 前端
 

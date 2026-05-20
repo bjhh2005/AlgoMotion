@@ -1,6 +1,8 @@
 ﻿import json
 import os
 import re
+import tempfile
+import threading
 from pathlib import Path
 import subprocess
 from typing import Any
@@ -17,6 +19,8 @@ ROOT = Path(__file__).resolve().parents[2]
 GRAPH_DIR = ROOT / "data" / "knowledge-graph"
 EXERCISE_DIR = ROOT / "data" / "exercises"
 CONTENT_DIR = ROOT / "data" / "learning-content"
+INITIAL_PROGRESS_FILE = CONTENT_DIR / "initial-progress.json"
+PROGRESS_FILE = CONTENT_DIR / "progress.json"
 
 app = FastAPI(title="AlgoMotion API", version="0.1.0")
 
@@ -56,7 +60,41 @@ def read_json(path: Path):
         return json.load(file)
 
 
-progress_store: dict[str, dict] = read_json(CONTENT_DIR / "initial-progress.json")
+def write_json_atomic(path: Path, data: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "w",
+        encoding="utf-8",
+        dir=path.parent,
+        delete=False,
+        suffix=".tmp",
+    ) as file:
+        json.dump(data, file, ensure_ascii=False, indent=2)
+        file.write("\n")
+        temp_path = Path(file.name)
+
+    temp_path.replace(path)
+
+
+def load_progress_store() -> dict[str, dict]:
+    path = PROGRESS_FILE if PROGRESS_FILE.exists() else INITIAL_PROGRESS_FILE
+    return read_json(path)
+
+
+progress_store_lock = threading.RLock()
+progress_store: dict[str, dict] = load_progress_store()
+
+
+def save_progress_store() -> None:
+    with progress_store_lock:
+        write_json_atomic(PROGRESS_FILE, progress_store)
+
+
+def set_progress_record(node_id: str, record: dict) -> dict:
+    with progress_store_lock:
+        progress_store[node_id] = record
+        write_json_atomic(PROGRESS_FILE, progress_store)
+        return progress_store[node_id]
 
 
 def nodes():
@@ -439,8 +477,8 @@ def get_progress():
 
 @app.post("/api/progress/update")
 def update_progress(payload: ProgressUpdate):
-    progress_store[payload.nodeId] = payload.model_dump()
-    return {"ok": True, "progress": progress_store[payload.nodeId]}
+    record = set_progress_record(payload.nodeId, payload.model_dump())
+    return {"ok": True, "progress": record}
 
 
 @app.get("/api/recommendations/me")
