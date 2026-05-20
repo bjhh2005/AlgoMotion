@@ -563,3 +563,12 @@ def analyze_code(payload: CodeAnalysisRequest):
         "linkedNodes": linked,
         "suggestions": suggestions
     }
+
+
+from .routes.analytics import router as analytics_router
+from .routes.progress import router as progress_router
+from .routes.recommendations import router as recommendations_router
+
+app.include_router(analytics_router)
+app.include_router(progress_router)
+app.include_router(recommendations_router)
