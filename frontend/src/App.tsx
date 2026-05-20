@@ -31,6 +31,7 @@ import { KnowledgeDetail } from "./components/KnowledgeDetail";
 import { AiPanel } from "./components/AiPanel";
 import { ExerciseOjPage } from "./components/ExerciseOjPage";
 import { LearningAnalyticsPage } from "./components/LearningAnalyticsPage";
+import { ResizableSplitPane } from "./components/ResizableSplitPane";
 
 const statusScore: Record<ProgressStatus, number> = {
   not_started: 0,
@@ -318,41 +319,45 @@ export function App() {
         <p className={`api-message ${apiStatus}`}>{apiMessage}</p>
 
         {page === "knowledge" && (
-          <div className="main-grid">
-            <section className="visual-panel">
-              {view === "graph" ? (
-                <GraphView
-                  nodes={nodes}
-                  edges={edges}
-                  filteredIds={new Set(filteredNodes.map((node) => node.id))}
-                  selectedId={selectedId}
-                  progress={progress}
-                  onSelect={openKnowledge}
-                />
-              ) : (
-                <DirectoryView
-                  nodes={filteredNodes}
-                  edges={edges}
-                  selectedId={selectedId}
-                  progress={progress}
-                  onSelect={openKnowledge}
-                  expanded
-                />
-              )}
-            </section>
-
-            <KnowledgeDetail
-              node={selectedNode}
-              content={currentContentByNodeId[selectedId] ?? contentByNodeId[selectedId]}
-              codeExamples={currentExamplesByNodeId[selectedId] ?? []}
-              edges={edges}
-              exercises={exercises.filter((exercise) => exercise.nodeId === selectedId)}
-              progress={progress[selectedId]?.status ?? "not_started"}
-              onStatusChange={(status) => updateStatus(selectedId, status)}
-              onSelect={openKnowledge}
-              onOpenExercise={openExercise}
-            />
-          </div>
+          <ResizableSplitPane
+            className="main-grid"
+            left={
+              <section className="visual-panel">
+                {view === "graph" ? (
+                  <GraphView
+                    nodes={nodes}
+                    edges={edges}
+                    filteredIds={new Set(filteredNodes.map((node) => node.id))}
+                    selectedId={selectedId}
+                    progress={progress}
+                    onSelect={openKnowledge}
+                  />
+                ) : (
+                  <DirectoryView
+                    nodes={filteredNodes}
+                    edges={edges}
+                    selectedId={selectedId}
+                    progress={progress}
+                    onSelect={openKnowledge}
+                    expanded
+                  />
+                )}
+              </section>
+            }
+            right={
+              <KnowledgeDetail
+                node={selectedNode}
+                content={currentContentByNodeId[selectedId] ?? contentByNodeId[selectedId]}
+                codeExamples={currentExamplesByNodeId[selectedId] ?? []}
+                edges={edges}
+                exercises={exercises.filter((exercise) => exercise.nodeId === selectedId)}
+                progress={progress[selectedId]?.status ?? "not_started"}
+                onStatusChange={(status) => updateStatus(selectedId, status)}
+                onSelect={openKnowledge}
+                onOpenExercise={openExercise}
+              />
+            }
+          />
         )}
 
         {page === "oj" && (
