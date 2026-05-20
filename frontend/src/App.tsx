@@ -76,7 +76,7 @@ export function App() {
   const [exercises, setExercises] = useState<Exercise[]>(exerciseBank);
   const [analysisRules, setAnalysisRules] = useState<CodeAnalysisRule[]>(localAnalysisRules);
   const [recommendationsConfig, setRecommendationsConfig] = useState<RecommendationSeeds>(recommendationConfig);
-  const [selectedId, setSelectedId] = useState("stack");
+  const [selectedId, setSelectedId] = useState("data-structure");
   const [selectedExerciseId, setSelectedExerciseId] = useState(exerciseBank[0]?.id ?? "");
   const [page, setPage] = useState<AppPage>("knowledge");
   const [query, setQuery] = useState("");
