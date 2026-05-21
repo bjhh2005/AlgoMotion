@@ -123,6 +123,17 @@ export interface RecommendationSeeds {
   maxRecommendations: number;
 }
 
+export type RecommendationType = "next" | "weak" | "review" | "path";
+
+export interface RecommendationItem {
+  id: string;
+  name: string;
+  difficulty: number;
+  estimated_minutes?: number | null;
+  reason: string;
+  priority: number;
+}
+
 // ============================================
 // 维度一：知识关联结构 - 知识追踪与分析
 // ============================================
