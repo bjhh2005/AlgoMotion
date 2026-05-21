@@ -39,13 +39,3 @@ class ProgressUpdate(BaseModel):
     status: ProgressStatus
     score: int = Field(default=0, ge=0, le=100)
     metrics: LearningMetrics = Field(default_factory=LearningMetrics)
-
-
-class ChatRequest(BaseModel):
-    message: str
-    nodeId: str | None = None
-
-
-class CodeAnalysisRequest(BaseModel):
-    code: str
-    problem: str | None = None
