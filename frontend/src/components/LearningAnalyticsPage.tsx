@@ -19,6 +19,7 @@ import { LearningTrendChart } from "./LearningTrendChart";
 import { ProgressDistributionChart } from "./ProgressDistributionChart";
 import { EfficiencyGauge } from "./EfficiencyGauge";
 import {
+  downloadComprehensiveReport,
   fetchComprehensiveReport,
   fetchWeakKnowledge,
   type ComprehensiveReport,
@@ -299,6 +300,9 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  // 导出报告状态
+  const [exportingReport, setExportingReport] = useState(false);
+
   // 基础视图折叠状态
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     overview: false,      // 概览指标
@@ -364,6 +368,29 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
     return () => { cancelled = true; };
   }, [nodes.length, Object.keys(progress).length]);
 
+  const handleExportReport = async () => {
+    setExportingReport(true);
+    setApiError(null);
+
+    try {
+      const blob = await downloadComprehensiveReport();
+      const fileUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = `learning-analytics-report-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(fileUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "导出报告失败";
+      setApiError(message);
+      console.error("Export report failed:", err);
+    } finally {
+      setExportingReport(false);
+    }
+  };
+
   // 默认选中第一个节点
   useEffect(() => {
     if (nodes.length > 0 && selectedNodeId === null) {
@@ -413,6 +440,15 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
               onClick={() => setViewMode("advanced")}
             >
               高级分析
+            </button>
+          </div>
+          <div className="title-buttons">
+            <button
+              className="secondary-button"
+              onClick={handleExportReport}
+              disabled={exportingReport}
+            >
+              {exportingReport ? "导出中..." : "导出报告"}
             </button>
           </div>
           <strong>{averageMastery}%</strong>

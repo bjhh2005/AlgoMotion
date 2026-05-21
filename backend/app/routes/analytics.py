@@ -1,10 +1,12 @@
 """
 学习分析相关路由
 """
+import json
 import random
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import Response
 
 from ..schemas import (
     CognitiveMastery, QuestionAttemptStats,
@@ -207,17 +209,11 @@ async def get_weak_knowledge(
 # 综合学习报告
 # ============================================
 
-@router.get("/report", response_model=dict)
-async def get_comprehensive_report():
-    """
-    获取综合学习分析报告
-    
-    包含所有三个维度的分析数据
-    """
+def build_comprehensive_report():
     progress = get_progress_store()
     nodes = get_nodes_data()
     edges = get_edges_data()
-    
+
     # 统计概览
     status_counts: dict[ProgressStatus, int] = {
         "not_started": 0, "learning": 0, "mastered": 0, "weak": 0
@@ -340,3 +336,23 @@ async def get_comprehensive_report():
     )
     
     return success_response(report.model_dump())
+
+
+@router.get("/report/export")
+async def export_comprehensive_report():
+    """
+    导出综合学习分析报告
+
+    返回 JSON 报告文件，适合下载保存。
+    """
+    report = build_comprehensive_report()
+    filename = f"learning-analytics-report-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+    content = json.dumps(report.model_dump(), ensure_ascii=False, indent=2)
+
+    return Response(
+        content=content,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+    )

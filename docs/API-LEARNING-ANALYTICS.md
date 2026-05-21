@@ -258,6 +258,118 @@ interface QuestionAttemptStats {
 
 ---
 
+### 2.6 获取综合学习分析报告
+
+**接口**: `GET /api/analytics/report`
+
+**描述**: 获取当前用户的综合学习分析报告，包含以下维度：学习概览、认知掌握度、薄弱知识传播分析、行为分析、动机指数。
+
+**请求参数**: 无
+
+**返回格式**:
+```json
+{
+  "success": true,
+  "data": {
+    "student_id": "current_user",
+    "timestamp": "2026-05-21T14:00:00Z",
+    "overview": {
+      "total_nodes": 12,
+      "mastered": 4,
+      "learning": 5,
+      "weak": 3,
+      "not_started": 0,
+      "avg_mastery": 0.62,
+      "total_study_minutes": 395,
+      "total_attempts": 47,
+      "total_errors": 14
+    },
+    "cognitive_mastery": {
+      "stack": {
+        "node_id": "stack",
+        "level_mastery": {
+          "remember": 0.82,
+          "understand": 0.74,
+          "apply": 0.63,
+          "analyze": 0.52,
+          "evaluate": 0.42,
+          "create": 0.33
+        },
+        "question_attempt_stats": {
+          "remember": { "total": 8, "correct": 7, "avg_time_spent": 32, "guess_rate": 0.08 },
+          "understand": { "total": 7, "correct": 6, "avg_time_spent": 44, "guess_rate": 0.12 },
+          "apply": { "total": 9, "correct": 7, "avg_time_spent": 95, "guess_rate": 0.18 },
+          "analyze": { "total": 5, "correct": 3, "avg_time_spent": 150, "guess_rate": 0.22 },
+          "evaluate": { "total": 3, "correct": 2, "avg_time_spent": 200, "guess_rate": 0.28 },
+          "create": { "total": 2, "correct": 1, "avg_time_spent": 260, "guess_rate": 0.35 }
+        },
+        "bloom_weighted_mastery": 0.57
+      }
+    },
+    "propagation_analyses": [
+      {
+        "source_node_id": "queue",
+        "affected_nodes": [
+          { "node_id": "stack", "propagation_strength": 0.7, "path_type": "prerequisite", "root_cause": true }
+        ],
+        "weakness_severity": 0.68,
+        "downstream_risk": "high"
+      }
+    ],
+    "behavior_analyses": {
+      "stack": {
+        "node_id": "stack",
+        "average_time_per_question": 38.5,
+        "time_variance": 120.8,
+        "rush_rate": 0.18,
+        "hesitation_rate": 0.22,
+        "guess_rate": 0.15,
+        "consistency": 0.72,
+        "suspicious_flag": false,
+        "suspicious_reason": null
+      }
+    },
+    "motivation_index": {
+      "student_id": "current_user",
+      "consistency_score": 78.5,
+      "perseverance_index": 82.2,
+      "growth_mindset_score": 74.9,
+      "intrinsic_motivation_score": 69.1,
+      "effort_effectiveness_ratio": 0.86,
+      "fake_effort_suspicion": 0.12
+    }
+  }
+}
+```
+
+---
+
+### 2.7 导出综合学习分析报告
+
+**接口**: `GET /api/analytics/report/export`
+
+**描述**: 导出当前用户的综合学习分析报告，返回一个可下载的 JSON 文件。
+
+**请求参数**: 无
+
+**返回说明**:
+- 成功时返回 `application/json` 内容并带 `Content-Disposition: attachment` 下载头。
+- 文件名格式为 `learning-analytics-report-YYYYMMDD-HHMMSS.json`。
+
+**前端示例**:
+```ts
+const response = await fetch('/api/analytics/report/export');
+const blob = await response.blob();
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'learning-analytics-report.json';
+a.click();
+URL.revokeObjectURL(url);
+```
+
+---
+
 ### 2.6 获取知识点推荐
 
 **接口**: `GET /api/recommendations`

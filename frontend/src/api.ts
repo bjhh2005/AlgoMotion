@@ -270,6 +270,14 @@ export function fetchComprehensiveReport() {
   );
 }
 
+export async function downloadComprehensiveReport() {
+  const response = await fetch(`${API_BASE_URL}/api/analytics/report/export`);
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+  return response.blob();
+}
+
 // 掌握度详细分析
 export interface DecayInfo {
   base_decay_rate: number;
