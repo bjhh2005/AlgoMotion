@@ -22,19 +22,19 @@ router = APIRouter(prefix="/api/analytics", tags=["学习分析"])
 
 def get_nodes_data():
     """获取知识点数据"""
-    from ..main import nodes
+    from ..storage import nodes
     return nodes()
 
 
 def get_edges_data():
     """获取边数据"""
-    from ..main import edges
+    from ..storage import edges
     return edges()
 
 
 def get_progress_store():
     """获取进度存储"""
-    from ..main import progress_store
+    from ..storage import progress_store
     return progress_store
 
 
