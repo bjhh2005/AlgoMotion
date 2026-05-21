@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-kmp-001",
+    "ojProblemId": "kmp-001",
+    "nodeId": "kmp",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】KMP",
+    "path": "data/oj-data/kmp-001/problem.md",
+    "starterCode": "data/oj-data/kmp-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-kmp-001",
+    "linkedNodeIds": ["kmp"]
+  }
+]

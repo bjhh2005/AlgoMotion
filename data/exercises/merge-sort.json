@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-merge-sort-001",
+    "ojProblemId": "merge-sort-001",
+    "nodeId": "merge-sort",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "P1908 逆序对",
+    "path": "data/oj-data/merge-sort-001/problem.md",
+    "starterCode": "data/oj-data/merge-sort-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-merge-sort-001",
+    "linkedNodeIds": ["merge-sort"]
+  }
+]

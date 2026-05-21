@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-topological-sort-001",
+    "ojProblemId": "topological-sort-001",
+    "nodeId": "topological-sort",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "最大食物链计数",
+    "path": "data/oj-data/topological-sort-001/problem.md",
+    "starterCode": "data/oj-data/topological-sort-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-topological-sort-001",
+    "linkedNodeIds": ["topological-sort"]
+  }
+]

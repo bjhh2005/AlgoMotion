@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-stack-001",
+    "ojProblemId": "stack-001",
+    "nodeId": "stack",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[NOIP 2003 普及组] 栈",
+    "path": "data/oj-data/stack-001/problem.md",
+    "starterCode": "data/oj-data/stack-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-stack-001",
+    "linkedNodeIds": ["stack"]
+  }
+]

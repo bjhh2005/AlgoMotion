@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-red-black-tree-001",
+    "ojProblemId": "red-black-tree-001",
+    "nodeId": "red-black-tree",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[SDOI2008] 红黑树",
+    "path": "data/oj-data/red-black-tree-001/problem.md",
+    "starterCode": "data/oj-data/red-black-tree-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-red-black-tree-001",
+    "linkedNodeIds": ["red-black-tree"]
+  }
+]

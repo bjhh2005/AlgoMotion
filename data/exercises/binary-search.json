@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-binary-search-001",
+    "ojProblemId": "binary-search-001",
+    "nodeId": "binary-search",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【深基13.例1】查找",
+    "path": "data/oj-data/binary-search-001/problem.md",
+    "starterCode": "data/oj-data/binary-search-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-binary-search-001",
+    "linkedNodeIds": ["binary-search"]
+  }
+]

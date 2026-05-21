@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-huffman-tree-001",
+    "ojProblemId": "huffman-tree-001",
+    "nodeId": "huffman-tree",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[NOI2015] 荷马史诗",
+    "path": "data/oj-data/huffman-tree-001/problem.md",
+    "starterCode": "data/oj-data/huffman-tree-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-huffman-tree-001",
+    "linkedNodeIds": ["huffman-tree"]
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-queue-001",
+    "ojProblemId": "queue-001",
+    "nodeId": "queue",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】队列",
+    "path": "data/oj-data/queue-001/problem.md",
+    "starterCode": "data/oj-data/queue-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-queue-001",
+    "linkedNodeIds": ["queue"]
+  }
+]
