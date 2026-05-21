@@ -34,7 +34,7 @@ import { ExerciseOjPage } from "./components/ExerciseOjPage";
 import { LearningAnalyticsPage } from "./components/LearningAnalyticsPage";
 import { PathGuidePanel } from "./components/PathGuidePanel";
 import { ResizableSplitPane } from "./components/ResizableSplitPane";
-import { buildPathEdgeKeys, computeLocalPathItems, computeLocalRecommendations, searchKnowledgeNodes } from "./utils/pathGuide";
+import { computeLocalPathItems, computeLocalRecommendations, searchKnowledgeNodes } from "./utils/pathGuide";
 import { readStoredSplitRatio } from "./utils/splitLayout";
 
 const statusScore: Record<ProgressStatus, number> = {
@@ -89,17 +89,10 @@ export function App() {
   const [apiStatus, setApiStatus] = useState<ApiStatus>("checking");
   const [apiMessage, setApiMessage] = useState("正在连接 FastAPI");
   const [activePathStep, setActivePathStep] = useState<number | null>(null);
-  const [highlightedPathIds, setHighlightedPathIds] = useState<string[]>([]);
   const [focusRequest, setFocusRequest] = useState<{ nodeId: string; seq: number } | undefined>();
   const [recommendationItems, setRecommendationItems] = useState<RecommendationItem[]>([]);
   const [pathItems, setPathItems] = useState<RecommendationItem[]>([]);
   const [splitRatio, setSplitRatio] = useState(readStoredSplitRatio);
-
-  const pathNodeIds = useMemo(() => new Set(highlightedPathIds), [highlightedPathIds]);
-  const pathEdgeKeys = useMemo(
-    () => buildPathEdgeKeys(highlightedPathIds, edges),
-    [edges, highlightedPathIds]
-  );
 
   useEffect(() => {
     let active = true;
@@ -162,7 +155,6 @@ export function App() {
       ]);
       setRecommendationItems(nextItems);
       setPathItems(mainPathItems);
-      setHighlightedPathIds(mainPathItems.map((item) => item.id));
       setActivePathStep(() => {
         const index = mainPathItems.findIndex((item) => item.id === contextNodeId);
         return index >= 0 ? index : null;
@@ -173,7 +165,6 @@ export function App() {
       );
       const localPathItems = computeLocalPathItems(recommendationsConfig, currentNodeById, edges, contextNodeId);
       setPathItems(localPathItems);
-      setHighlightedPathIds(localPathItems.map((item) => item.id));
       setActivePathStep(() => {
         const index = localPathItems.findIndex((item) => item.id === contextNodeId);
         return index >= 0 ? index : null;
@@ -226,9 +217,7 @@ export function App() {
   }
 
   function handleSelectPathStep(stepIndex: number, nodeId: string) {
-    const segment = pathItems.slice(0, stepIndex + 1).map((item) => item.id);
     setActivePathStep(stepIndex);
-    setHighlightedPathIds(segment);
     locateKnowledge(nodeId);
   }
 
@@ -402,8 +391,6 @@ export function App() {
                       selectedId={selectedId}
                       progress={progress}
                       onSelect={openKnowledge}
-                      pathNodeIds={pathNodeIds}
-                      pathEdgeKeys={pathEdgeKeys}
                       focusRequest={focusRequest}
                     />
                   ) : (

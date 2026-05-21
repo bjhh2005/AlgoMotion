@@ -27,8 +27,6 @@ interface Props {
   selectedId: string;
   progress: ProgressMap;
   onSelect: (nodeId: string) => void;
-  pathNodeIds?: Set<string>;
-  pathEdgeKeys?: Set<string>;
   focusRequest?: { nodeId: string; seq: number };
 }
 
@@ -112,7 +110,6 @@ type GraphNodeData = {
   status: ProgressStatus;
   inSearch: boolean;
   related: boolean;
-  onPath: boolean;
   dimmed: boolean;
   level: GraphNodeLevel;
   viewMode: ViewMode;
@@ -124,7 +121,7 @@ type GraphFlowNode = Node<GraphNodeData, "knowledge">;
 type GraphFlowEdge = Edge<{ relation: KnowledgeEdge }>;
 
 function KnowledgeGraphNode({ data, selected }: NodeProps<GraphFlowNode>) {
-  const { node, status, inSearch, related, onPath, dimmed, level, viewMode, childCount } = data;
+  const { node, status, inSearch, related, dimmed, level, viewMode, childCount } = data;
   const dotSize = dotSizeByLevel[level];
   const dotBackground = statusColor[status];
   const dotBorder = statusRingColor[status];
@@ -144,14 +141,14 @@ function KnowledgeGraphNode({ data, selected }: NodeProps<GraphFlowNode>) {
     <div
       className={`graph-flow-node graph-flow-node-${level} graph-view-${viewMode} ${selected ? "active" : ""} ${
         related ? "related" : ""
-      } ${onPath ? "on-path" : ""} ${dimmed ? "dimmed" : ""}`}
+      } ${dimmed ? "dimmed" : ""}`}
       style={{ opacity, width: `${NODE_CONTAINER_WIDTH}px` }}
       role="button"
       tabIndex={-1}
     >
       <Handle type="target" position={Position.Top} className="graph-handle" />
       <span
-        className={`graph-node-dot graph-node-dot--${status} ${selected ? "is-selected" : ""} ${related ? "is-related" : ""} ${onPath ? "is-path" : ""}`}
+        className={`graph-node-dot graph-node-dot--${status} ${selected ? "is-selected" : ""} ${related ? "is-related" : ""}`}
         style={dotStyle}
         aria-hidden
       />
@@ -265,8 +262,6 @@ export function GraphView({
   selectedId,
   progress,
   onSelect,
-  pathNodeIds,
-  pathEdgeKeys,
   focusRequest
 }: Props) {
   return (
@@ -278,8 +273,6 @@ export function GraphView({
         selectedId={selectedId}
         progress={progress}
         onSelect={onSelect}
-        pathNodeIds={pathNodeIds}
-        pathEdgeKeys={pathEdgeKeys}
         focusRequest={focusRequest}
       />
     </ReactFlowProvider>
@@ -293,8 +286,6 @@ function GraphFlow({
   selectedId,
   progress,
   onSelect,
-  pathNodeIds,
-  pathEdgeKeys,
   focusRequest
 }: Props) {
   const [flowNodes, setFlowNodes, onNodesChange] = useNodesState<GraphFlowNode>([]);
@@ -349,9 +340,8 @@ function GraphFlow({
         };
         const selected = node.id === selectedId;
         const related = relatedNodeIds.has(node.id);
-        const onPath = pathNodeIds?.has(node.id) ?? false;
-        const visible = shouldShowNode(meta.level, viewMode, selected, related || onPath, primaryOnly);
-        const dimmed = Boolean(selectedId) && !selected && !related && !onPath;
+        const visible = shouldShowNode(meta.level, viewMode, selected, related, primaryOnly);
+        const dimmed = Boolean(selectedId) && !selected && !related;
         const offset = getNodeOffset(meta.level);
         const position = previousPositionById.get(node.id) ?? {
           x: node.x - offset.x,
@@ -369,7 +359,6 @@ function GraphFlow({
             status: progress[node.id]?.status ?? "not_started",
             inSearch: filteredIds.has(node.id),
             related,
-            onPath,
             dimmed,
             level: meta.level,
             viewMode,
@@ -379,7 +368,7 @@ function GraphFlow({
         };
       });
     });
-  }, [filteredIds, nodeMetaById, pathNodeIds, positioned, primaryOnly, progress, relatedNodeIds, selectedId, setFlowNodes, viewMode]);
+  }, [filteredIds, nodeMetaById, positioned, primaryOnly, progress, relatedNodeIds, selectedId, setFlowNodes, viewMode]);
 
   useEffect(() => {
     const nodeIds = new Set(nodes.map((node) => node.id));
@@ -391,7 +380,7 @@ function GraphFlow({
             meta?.level ?? "detail",
             viewMode,
             node.id === selectedId,
-            relatedNodeIds.has(node.id) || (pathNodeIds?.has(node.id) ?? false),
+            relatedNodeIds.has(node.id),
             primaryOnly
           );
         })
@@ -404,7 +393,6 @@ function GraphFlow({
         .map((edge) => {
           const edgeKey = `${edge.source}-${edge.target}-${edge.type}`;
           const highlighted = selectedId === edge.source || selectedId === edge.target;
-          const onPath = pathEdgeKeys?.has(edgeKey) ?? false;
           const color = edgeColor[edge.type];
           const inSearch = filteredIds.has(edge.source) || filteredIds.has(edge.target);
           const sourceVisible = visibleNodeIds.has(edge.source);
@@ -418,21 +406,21 @@ function GraphFlow({
             target: edge.target,
             type: "straight",
             label: showLabel ? edge.label : "",
-            hidden: !sourceVisible || !targetVisible || (viewMode === "overview" && !overviewEdge && !highlighted && !onPath),
-            animated: highlighted || onPath,
+            hidden: !sourceVisible || !targetVisible || (viewMode === "overview" && !overviewEdge && !highlighted),
+            animated: highlighted,
             data: { relation: edge },
-            markerEnd: highlighted || onPath
+            markerEnd: highlighted
               ? {
                   type: MarkerType.ArrowClosed,
-                  color: onPath ? "#36a3a0" : color,
+                  color,
                   width: 14,
                   height: 14
                 }
               : undefined,
             style: {
-              stroke: onPath ? "#36a3a0" : highlighted ? color : "#94a3b8",
-              strokeWidth: onPath ? 2.8 : highlighted ? 2.4 : 1,
-              opacity: highlighted || onPath
+              stroke: highlighted ? color : "#94a3b8",
+              strokeWidth: highlighted ? 2.4 : 1,
+              opacity: highlighted
                 ? 1
                 : selectedId
                 ? 0.1
@@ -450,15 +438,14 @@ function GraphFlow({
           };
         })
     );
-  }, [edges, filteredIds, nodeMetaById, nodes, pathEdgeKeys, pathNodeIds, primaryOnly, relatedNodeIds, selectedId, setFlowEdges, viewMode]);
+  }, [edges, filteredIds, nodeMetaById, nodes, primaryOnly, relatedNodeIds, selectedId, setFlowEdges, viewMode]);
 
   useEffect(() => {
     if (!selectedId) return;
 
-    const focusIds = new Set<string>([selectedId, ...Array.from(relatedNodeIds)]);
-    pathNodeIds?.forEach((id) => focusIds.add(id));
-
-    const focusNodes = Array.from(focusIds).map((id) => ({ id }));
+    const focusNodes = Array.from(new Set<string>([selectedId, ...Array.from(relatedNodeIds)])).map((id) => ({
+      id
+    }));
     const frame = window.requestAnimationFrame(() => {
       fitView({
         nodes: focusNodes,
@@ -470,15 +457,12 @@ function GraphFlow({
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [fitView, pathNodeIds, relatedNodeIds, selectedId]);
+  }, [fitView, relatedNodeIds, selectedId]);
 
   useEffect(() => {
     if (!focusRequest?.nodeId) return;
 
-    const focusIds = new Set<string>([focusRequest.nodeId]);
-    pathNodeIds?.forEach((id) => focusIds.add(id));
-
-    const focusNodes = Array.from(focusIds).map((id) => ({ id }));
+    const focusNodes = [{ id: focusRequest.nodeId }];
     const frame = window.requestAnimationFrame(() => {
       fitView({
         nodes: focusNodes,
@@ -490,7 +474,7 @@ function GraphFlow({
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [fitView, focusRequest, pathNodeIds]);
+  }, [fitView, focusRequest]);
 
   const handleNodeClick = useCallback(
     (_event: MouseEvent, node: GraphFlowNode) => {

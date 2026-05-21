@@ -1083,19 +1083,6 @@ body.is-resizing-split * {
     0 0 0 3px color-mix(in srgb, var(--node-accent) 18%, transparent);
 }
 
-.graph-node-dot.is-path:not(.is-selected) {
-  border-color: #36a3a0;
-  box-shadow:
-    0 3px 12px rgba(54, 163, 160, 0.24),
-    0 0 0 2px rgba(54, 163, 160, 0.18);
-}
-
-.graph-flow-node.on-path:not(.active) .graph-node-label {
-  opacity: 1 !important;
-  background: rgba(223, 242, 239, 0.94);
-  box-shadow: 0 1px 4px rgba(54, 163, 160, 0.12);
-}
-
 .graph-flow-node-root .graph-node-dot,
 .graph-flow-node-overview .graph-node-dot {
   border-width: 2.5px;
