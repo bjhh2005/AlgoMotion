@@ -30,6 +30,15 @@ const DEFAULT_MEM_LIMIT = 256;
 
 type DescTab = "desc" | "submit";
 
+interface SubmissionRecord {
+  id: string;
+  submittedAt: string;
+  status: string;
+  passedCases: number;
+  totalCases: number;
+  message: string;
+}
+
 function createSubmissionId() {
   return `sub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -48,6 +57,14 @@ function formatTime(time: number) {
   const value = Number(time) || 0;
   if (value < 1) return `${(value * 1000).toFixed(1)} ms`;
   return `${value.toFixed(3)} s`;
+}
+
+function formatRecordTime(value: string) {
+  return new Intl.DateTimeFormat("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  }).format(new Date(value));
 }
 
 function formatMemory() {
@@ -133,6 +150,7 @@ export function CodeView({
   const [problemMarkdown, setProblemMarkdown] = useState("");
   const [problemLoadStatus, setProblemLoadStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [problemLoadMessage, setProblemLoadMessage] = useState("");
+  const [submissionRecords, setSubmissionRecords] = useState<SubmissionRecord[]>([]);
   const { paneRef, editorRatio, consoleRatio, isResizing, onResizeStart } = useVerticalPaneResize();
 
   useEffect(() => {
@@ -144,6 +162,10 @@ export function CodeView({
     setDescTab("desc");
     setShowErrorBind(false);
     setApiLinkedNodeIds([]);
+    setSubmissionRecords([]);
+    setProblemMarkdown("");
+    setProblemLoadStatus("idle");
+    setProblemLoadMessage("");
   }, [question?.id, question?.starterCode]);
 
   useEffect(() => {
@@ -220,8 +242,10 @@ export function CodeView({
     setAnalysisStatus("");
     setSubmitStatus(isSubmit ? "正在提交评测…" : "正在运行样例…");
 
+    const submissionId = createSubmissionId();
+
     submitJudge({
-      submission_id: createSubmissionId(),
+      submission_id: submissionId,
       problem_id: resolveOjProblemId(question),
       code: trimmed,
       time_limit: DEFAULT_TIME_LIMIT,
@@ -234,6 +258,7 @@ export function CodeView({
         setCaseTab(0);
 
         const accepted = result.status === "Accepted";
+        const recordMessage = result.message ?? `${result.status} ${result.passed_cases}/${result.total_cases}`;
         setSubmitStatus(
           result.message
             ? result.message
@@ -243,6 +268,17 @@ export function CodeView({
         );
 
         if (isSubmit) {
+          setSubmissionRecords((current) => [
+            {
+              id: submissionId,
+              submittedAt: new Date().toISOString(),
+              status: result.status,
+              passedCases: result.passed_cases,
+              totalCases: result.total_cases,
+              message: recordMessage
+            },
+            ...current
+          ].slice(0, 10));
           try {
             onJudgeComplete?.(question.nodeId, accepted);
           } catch {
@@ -265,6 +301,19 @@ export function CodeView({
           error_log: error.message
         });
         setJudgeResult(fallback);
+        if (isSubmit) {
+          setSubmissionRecords((current) => [
+            {
+              id: submissionId,
+              submittedAt: new Date().toISOString(),
+              status: "Request Error",
+              passedCases: 0,
+              totalCases: 0,
+              message: error.message
+            },
+            ...current
+          ].slice(0, 10));
+        }
         setSubmitStatus(`请求失败：${error.message}`);
       })
       .finally(() => setRunning(false));
@@ -341,9 +390,21 @@ export function CodeView({
             </div>
           )}
 
-          {descTab === "submit" && (
+          {descTab === "submit" && (submissionRecords.length > 0 ? (
+            <div className="record-list">
+              {submissionRecords.map((record) => (
+                <button key={record.id} type="button" onClick={() => setSubmitStatus(record.message)}>
+                  <span>{formatRecordTime(record.submittedAt)}</span>
+                  <em>{record.message}</em>
+                  <b className={`oj-verdict ${judgeStatusClass(record.status)}`}>
+                    {record.status} {record.passedCases}/{record.totalCases}
+                  </b>
+                </button>
+              ))}
+            </div>
+          ) : (
             <p className="muted">暂无提交记录，完成提交后将在此展示历史结果。</p>
-          )}
+          ))}
         </section>
 
         <section

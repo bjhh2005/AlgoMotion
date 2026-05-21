@@ -68,6 +68,17 @@
 }
 ```
 
+后端会将问题、当前知识点、相关知识图谱节点、讲解内容、复杂度、常见错误和示例代码拼成课程上下文，再调用兼容 OpenAI Chat Completions 的大模型接口。需要配置环境变量：
+
+```bash
+AI_API_KEY=你的 API Key
+AI_MODEL=你的模型名
+AI_BASE_URL=https://api.openai.com/v1
+```
+
+如果供应商直接提供完整 Chat Completions 地址，也可设置 `AI_CHAT_COMPLETIONS_URL`。未配置 API 时接口返回本地知识库兜底回答。
+后端会自动读取仓库根目录 `.env` 或 `backend/.env`，也支持系统环境变量。
+
 `POST /api/ai/code-analysis`
 
 请求体：

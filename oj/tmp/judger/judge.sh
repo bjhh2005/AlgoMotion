@@ -57,6 +57,26 @@ OVERALL_STATUS="Accepted"
 
 CHECKER="$CHECKER_PATH/$use_builtin_checker"
 
+json_file_string() {
+    local file_path="$1"
+    if [ ! -f "$file_path" ]; then
+        printf '""'
+        return
+    fi
+    awk '
+        BEGIN { printf "\"" }
+        {
+            gsub(/\\/, "\\\\")
+            gsub(/"/, "\\\"")
+            gsub(/\r/, "\\r")
+            gsub(/\t/, "\\t")
+            if (NR > 1) printf "\\n"
+            printf "%s", $0
+        }
+        END { printf "\"" }
+    ' "$file_path"
+}
+
 mapfile -t IN_FILES < <(find "$DATA_DIR" -maxdepth 1 -name "*.$input_suf" -printf "%f\n" | sort | head -n "$n_tests")
 
 for in_file_name in "${IN_FILES[@]}"; do
@@ -102,7 +122,10 @@ for in_file_name in "${IN_FILES[@]}"; do
         fi
     fi
 
-    ITEM="{\"status\": \"$CASE_STATUS\", \"time\": $duration}"
+    INPUT_JSON=$(json_file_string "$in_path")
+    EXPECTED_JSON=$(json_file_string "$out_path")
+    ACTUAL_JSON=$(json_file_string "temp.out")
+    ITEM="{\"status\": \"$CASE_STATUS\", \"time\": $duration, \"input\": $INPUT_JSON, \"expected\": $EXPECTED_JSON, \"actual\": $ACTUAL_JSON}"
     if [ -z "$DETAILS_JSON" ]; then
         DETAILS_JSON="$ITEM"
     else

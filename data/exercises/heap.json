@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-heap-001",
+    "ojProblemId": "heap-001",
+    "nodeId": "heap",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】堆",
+    "path": "data/oj-data/heap-001/problem.md",
+    "starterCode": "data/oj-data/heap-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-heap-001",
+    "linkedNodeIds": ["heap"]
+  }
+]
