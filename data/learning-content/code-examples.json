@@ -1,21 +1,320 @@
 [
   {
+    "nodeId": "data-structure",
+    "language": "cpp",
+    "title": "用结构体组织学生记录",
+    "code": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n\nstruct Student {\n    string id;\n    string name;\n    int score;\n};\n\nint main() {\n    vector<Student> students = {{\"S01\", \"Alice\", 92}, {\"S02\", \"Bob\", 85}};\n    for (const auto& student : students) {\n        cout << student.id << \" \" << student.name << \" \" << student.score << '\\n';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "set",
+    "language": "cpp",
+    "title": "集合去重与成员判断",
+    "code": "#include <iostream>\n#include <set>\nusing namespace std;\n\nint main() {\n    set<int> values = {3, 1, 3, 2};\n    values.insert(4);\n\n    if (values.count(3)) {\n        cout << \"3 exists\\n\";\n    }\n    for (int value : values) {\n        cout << value << ' ';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "union-find",
+    "language": "cpp",
+    "title": "并查集路径压缩模板",
+    "code": "#include <vector>\nusing namespace std;\n\nclass UnionFind {\n    vector<int> parent, rank;\n\npublic:\n    explicit UnionFind(int n) : parent(n), rank(n, 0) {\n        for (int i = 0; i < n; ++i) parent[i] = i;\n    }\n\n    int find(int x) {\n        if (parent[x] != x) parent[x] = find(parent[x]);\n        return parent[x];\n    }\n\n    bool unite(int a, int b) {\n        int ra = find(a), rb = find(b);\n        if (ra == rb) return false;\n        if (rank[ra] < rank[rb]) swap(ra, rb);\n        parent[rb] = ra;\n        if (rank[ra] == rank[rb]) ++rank[ra];\n        return true;\n    }\n};"
+  },
+  {
+    "nodeId": "logical-structure",
+    "language": "cpp",
+    "title": "同一逻辑关系的邻接表表达",
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    int n = 4;\n    vector<vector<int>> graph(n);\n    graph[0].push_back(1);\n    graph[0].push_back(2);\n    graph[2].push_back(3);\n\n    for (int u = 0; u < n; ++u) {\n        cout << u << \":\";\n        for (int v : graph[u]) cout << ' ' << v;\n        cout << '\\n';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "storage-structure",
+    "language": "cpp",
+    "title": "顺序存储与链式存储对比",
+    "code": "#include <iostream>\n#include <list>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> sequential = {1, 2, 3};\n    list<int> linked = {1, 2, 3};\n\n    cout << sequential[1] << '\\n';\n    auto it = linked.begin();\n    ++it;\n    linked.insert(it, 99);\n\n    for (int value : linked) cout << value << ' ';\n    return 0;\n}"
+  },
+  {
+    "nodeId": "algorithm-complexity",
+    "language": "cpp",
+    "title": "线性扫描与嵌套循环",
+    "code": "#include <vector>\nusing namespace std;\n\nint sumLinear(const vector<int>& a) {\n    int sum = 0;\n    for (int x : a) sum += x;\n    return sum;\n}\n\nint countPairs(const vector<int>& a) {\n    int count = 0;\n    for (int i = 0; i < (int)a.size(); ++i) {\n        for (int j = i + 1; j < (int)a.size(); ++j) {\n            if (a[i] < a[j]) ++count;\n        }\n    }\n    return count;\n}"
+  },
+  {
+    "nodeId": "linear-list",
+    "language": "cpp",
+    "title": "线性表基本插入删除",
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> list = {10, 20, 40};\n    list.insert(list.begin() + 2, 30);\n    list.erase(list.begin());\n\n    for (int value : list) {\n        cout << value << ' ';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "sequential-list",
+    "language": "cpp",
+    "title": "顺序表插入元素",
+    "code": "#include <vector>\nusing namespace std;\n\nbool insertAt(vector<int>& a, int pos, int value) {\n    if (pos < 0 || pos > (int)a.size()) return false;\n    a.push_back(0);\n    for (int i = (int)a.size() - 1; i > pos; --i) {\n        a[i] = a[i - 1];\n    }\n    a[pos] = value;\n    return true;\n}"
+  },
+  {
+    "nodeId": "linked-list",
+    "language": "cpp",
+    "title": "单链表头插法",
+    "code": "struct Node {\n    int value;\n    Node* next;\n    Node(int v, Node* n = nullptr) : value(v), next(n) {}\n};\n\nvoid pushFront(Node*& head, int value) {\n    head = new Node(value, head);\n}\n\nvoid clear(Node*& head) {\n    while (head) {\n        Node* next = head->next;\n        delete head;\n        head = next;\n    }\n}"
+  },
+  {
     "nodeId": "stack",
     "language": "cpp",
     "title": "标准库栈的安全访问",
     "code": "#include <iostream>\n#include <stack>\nusing namespace std;\n\nint main() {\n    stack<int> s;\n    s.push(10);\n    s.push(20);\n    if (!s.empty()) {\n        cout << s.top() << endl;\n        s.pop();\n    }\n    return 0;\n}"
   },
   {
-    "nodeId": "binary-search",
+    "nodeId": "queue",
     "language": "cpp",
-    "title": "迭代二分查找",
-    "code": "int binarySearch(vector<int>& a, int target) {\n    int left = 0, right = (int)a.size() - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (a[mid] == target) return mid;\n        if (a[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}"
+    "title": "队列模拟任务处理",
+    "code": "#include <iostream>\n#include <queue>\n#include <string>\nusing namespace std;\n\nint main() {\n    queue<string> tasks;\n    tasks.push(\"read\");\n    tasks.push(\"practice\");\n    tasks.push(\"review\");\n\n    while (!tasks.empty()) {\n        cout << tasks.front() << '\\n';\n        tasks.pop();\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "string",
+    "language": "cpp",
+    "title": "字符串查找与截取",
+    "code": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string text = \"data structure\";\n    size_t pos = text.find(\"struct\");\n    if (pos != string::npos) {\n        cout << text.substr(pos, 6) << '\\n';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "kmp",
+    "language": "cpp",
+    "title": "KMP 前缀函数匹配",
+    "code": "#include <string>\n#include <vector>\nusing namespace std;\n\nvector<int> prefixFunction(const string& p) {\n    vector<int> pi(p.size());\n    for (int i = 1; i < (int)p.size(); ++i) {\n        int j = pi[i - 1];\n        while (j > 0 && p[i] != p[j]) j = pi[j - 1];\n        if (p[i] == p[j]) ++j;\n        pi[i] = j;\n    }\n    return pi;\n}\n\nint kmpSearch(const string& text, const string& pattern) {\n    if (pattern.empty()) return 0;\n    vector<int> pi = prefixFunction(pattern);\n    int j = 0;\n    for (int i = 0; i < (int)text.size(); ++i) {\n        while (j > 0 && text[i] != pattern[j]) j = pi[j - 1];\n        if (text[i] == pattern[j]) ++j;\n        if (j == (int)pattern.size()) return i - j + 1;\n    }\n    return -1;\n}"
+  },
+  {
+    "nodeId": "array",
+    "language": "cpp",
+    "title": "二维数组行优先遍历",
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}};\n    for (int i = 0; i < (int)matrix.size(); ++i) {\n        for (int j = 0; j < (int)matrix[i].size(); ++j) {\n            cout << matrix[i][j] << ' ';\n        }\n        cout << '\\n';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "generalized-list",
+    "language": "cpp",
+    "title": "递归计算嵌套表深度",
+    "code": "#include <algorithm>\n#include <vector>\nusing namespace std;\n\nstruct GList {\n    bool atom;\n    int value;\n    vector<GList> children;\n};\n\nint depth(const GList& node) {\n    if (node.atom) return 0;\n    int best = 1;\n    for (const auto& child : node.children) {\n        best = max(best, 1 + depth(child));\n    }\n    return best;\n}"
+  },
+  {
+    "nodeId": "tree",
+    "language": "cpp",
+    "title": "通用树的孩子表示法",
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<vector<int>> children(5);\n    children[0] = {1, 2};\n    children[1] = {3, 4};\n\n    for (int parent = 0; parent < 5; ++parent) {\n        cout << parent << \":\";\n        for (int child : children[parent]) cout << ' ' << child;\n        cout << '\\n';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "tree-traversal",
+    "language": "cpp",
+    "title": "二叉树先序遍历",
+    "code": "#include <iostream>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left;\n    TreeNode* right;\n};\n\nvoid preorder(TreeNode* root) {\n    if (!root) return;\n    cout << root->val << ' ';\n    preorder(root->left);\n    preorder(root->right);\n}"
+  },
+  {
+    "nodeId": "binary-tree",
+    "language": "cpp",
+    "title": "计算二叉树高度",
+    "code": "#include <algorithm>\nusing namespace std;\n\nstruct TreeNode {\n    int val;\n    TreeNode* left;\n    TreeNode* right;\n};\n\nint height(TreeNode* root) {\n    if (!root) return 0;\n    return 1 + max(height(root->left), height(root->right));\n}"
+  },
+  {
+    "nodeId": "binary-search-tree",
+    "language": "cpp",
+    "title": "二叉搜索树插入与查找",
+    "code": "struct Node {\n    int key;\n    Node* left = nullptr;\n    Node* right = nullptr;\n    explicit Node(int k) : key(k) {}\n};\n\nNode* insert(Node* root, int key) {\n    if (!root) return new Node(key);\n    if (key < root->key) root->left = insert(root->left, key);\n    else if (key > root->key) root->right = insert(root->right, key);\n    return root;\n}\n\nbool contains(Node* root, int key) {\n    if (!root) return false;\n    if (key == root->key) return true;\n    return key < root->key ? contains(root->left, key) : contains(root->right, key);\n}"
+  },
+  {
+    "nodeId": "avl-tree",
+    "language": "cpp",
+    "title": "AVL 右旋核心代码",
+    "code": "#include <algorithm>\nusing namespace std;\n\nstruct Node {\n    int key;\n    int height = 1;\n    Node* left = nullptr;\n    Node* right = nullptr;\n};\n\nint h(Node* node) { return node ? node->height : 0; }\n\nNode* rotateRight(Node* y) {\n    Node* x = y->left;\n    Node* t2 = x->right;\n    x->right = y;\n    y->left = t2;\n    y->height = max(h(y->left), h(y->right)) + 1;\n    x->height = max(h(x->left), h(x->right)) + 1;\n    return x;\n}"
+  },
+  {
+    "nodeId": "red-black-tree",
+    "language": "cpp",
+    "title": "红黑树节点颜色定义",
+    "code": "enum class Color { Red, Black };\n\nstruct RBNode {\n    int key;\n    Color color = Color::Red;\n    RBNode* parent = nullptr;\n    RBNode* left = nullptr;\n    RBNode* right = nullptr;\n};\n\nbool isRed(RBNode* node) {\n    return node != nullptr && node->color == Color::Red;\n}\n\nvoid paintRootBlack(RBNode* root) {\n    if (root) root->color = Color::Black;\n}"
+  },
+  {
+    "nodeId": "heap",
+    "language": "cpp",
+    "title": "最小堆优先队列",
+    "code": "#include <iostream>\n#include <queue>\n#include <vector>\nusing namespace std;\n\nint main() {\n    priority_queue<int, vector<int>, greater<int>> minHeap;\n    for (int x : {5, 1, 4, 2}) minHeap.push(x);\n\n    while (!minHeap.empty()) {\n        cout << minHeap.top() << ' ';\n        minHeap.pop();\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "huffman-tree",
+    "language": "cpp",
+    "title": "哈夫曼树合并代价",
+    "code": "#include <queue>\n#include <vector>\nusing namespace std;\n\nint huffmanCost(const vector<int>& weights) {\n    priority_queue<int, vector<int>, greater<int>> pq(weights.begin(), weights.end());\n    int cost = 0;\n    while (pq.size() > 1) {\n        int a = pq.top(); pq.pop();\n        int b = pq.top(); pq.pop();\n        cost += a + b;\n        pq.push(a + b);\n    }\n    return cost;\n}"
+  },
+  {
+    "nodeId": "b-tree",
+    "language": "cpp",
+    "title": "B 树节点查找位置",
+    "code": "#include <vector>\nusing namespace std;\n\nstruct BTreeNode {\n    vector<int> keys;\n    vector<BTreeNode*> child;\n    bool leaf = true;\n};\n\nint lowerBoundKey(const BTreeNode* node, int key) {\n    int i = 0;\n    while (i < (int)node->keys.size() && node->keys[i] < key) {\n        ++i;\n    }\n    return i;\n}"
+  },
+  {
+    "nodeId": "b-plus-tree",
+    "language": "cpp",
+    "title": "B+ 树叶子链表范围扫描",
+    "code": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nstruct Leaf {\n    vector<int> keys;\n    Leaf* next = nullptr;\n};\n\nvoid rangeScan(Leaf* leaf, int left, int right) {\n    for (Leaf* cur = leaf; cur; cur = cur->next) {\n        for (int key : cur->keys) {\n            if (key > right) return;\n            if (key >= left) cout << key << ' ';\n        }\n    }\n}"
+  },
+  {
+    "nodeId": "graph",
+    "language": "cpp",
+    "title": "无向图加边",
+    "code": "#include <vector>\nusing namespace std;\n\nclass Graph {\n    vector<vector<int>> adj;\n\npublic:\n    explicit Graph(int n) : adj(n) {}\n\n    void addEdge(int u, int v) {\n        adj[u].push_back(v);\n        adj[v].push_back(u);\n    }\n};"
+  },
+  {
+    "nodeId": "graph-storage",
+    "language": "cpp",
+    "title": "邻接表存储带权图",
+    "code": "#include <utility>\n#include <vector>\nusing namespace std;\n\nint n = 5;\nvector<vector<pair<int, int>>> graph(n);\n\nvoid addDirectedEdge(int from, int to, int weight) {\n    graph[from].push_back({to, weight});\n}"
+  },
+  {
+    "nodeId": "graph-traversal",
+    "language": "cpp",
+    "title": "BFS 图遍历",
+    "code": "#include <iostream>\n#include <queue>\n#include <vector>\nusing namespace std;\n\nvoid bfs(const vector<vector<int>>& graph, int start) {\n    vector<bool> visited(graph.size(), false);\n    queue<int> q;\n    visited[start] = true;\n    q.push(start);\n\n    while (!q.empty()) {\n        int u = q.front(); q.pop();\n        cout << u << ' ';\n        for (int v : graph[u]) {\n            if (!visited[v]) {\n                visited[v] = true;\n                q.push(v);\n            }\n        }\n    }\n}"
+  },
+  {
+    "nodeId": "topological-sort",
+    "language": "cpp",
+    "title": "Kahn 拓扑排序",
+    "code": "#include <queue>\n#include <vector>\nusing namespace std;\n\nvector<int> topoSort(const vector<vector<int>>& graph) {\n    int n = graph.size();\n    vector<int> indegree(n), order;\n    for (int u = 0; u < n; ++u) {\n        for (int v : graph[u]) ++indegree[v];\n    }\n\n    queue<int> q;\n    for (int i = 0; i < n; ++i) if (indegree[i] == 0) q.push(i);\n    while (!q.empty()) {\n        int u = q.front(); q.pop();\n        order.push_back(u);\n        for (int v : graph[u]) {\n            if (--indegree[v] == 0) q.push(v);\n        }\n    }\n    return order;\n}"
+  },
+  {
+    "nodeId": "critical-path",
+    "language": "cpp",
+    "title": "拓扑序计算最早发生时间",
+    "code": "#include <algorithm>\n#include <utility>\n#include <vector>\nusing namespace std;\n\nvector<int> earliestTime(const vector<vector<pair<int, int>>>& graph, const vector<int>& topo) {\n    vector<int> ve(graph.size(), 0);\n    for (int u : topo) {\n        for (auto [v, weight] : graph[u]) {\n            ve[v] = max(ve[v], ve[u] + weight);\n        }\n    }\n    return ve;\n}"
+  },
+  {
+    "nodeId": "mst",
+    "language": "cpp",
+    "title": "Kruskal 最小生成树",
+    "code": "#include <algorithm>\n#include <numeric>\n#include <vector>\nusing namespace std;\n\nstruct Edge { int u, v, w; };\n\nint kruskal(int n, vector<Edge> edges) {\n    vector<int> parent(n);\n    iota(parent.begin(), parent.end(), 0);\n    auto find = [&](auto&& self, int x) -> int {\n        return parent[x] == x ? x : parent[x] = self(self, parent[x]);\n    };\n\n    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) { return a.w < b.w; });\n    int cost = 0;\n    for (const auto& e : edges) {\n        int ru = find(find, e.u), rv = find(find, e.v);\n        if (ru != rv) {\n            parent[ru] = rv;\n            cost += e.w;\n        }\n    }\n    return cost;\n}"
   },
   {
     "nodeId": "shortest-path",
     "language": "cpp",
     "title": "Dijkstra 核心松弛模板",
-    "code": "priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;\ndist[source] = 0;\npq.push({0, source});\nwhile (!pq.empty()) {\n    auto [distance, u] = pq.top();\n    pq.pop();\n    if (distance != dist[u]) continue;\n    for (auto [v, weight] : graph[u]) {\n        if (dist[v] > dist[u] + weight) {\n            dist[v] = dist[u] + weight;\n            pq.push({dist[v], v});\n        }\n    }\n}"
+    "code": "#include <queue>\n#include <utility>\n#include <vector>\nusing namespace std;\n\nconst int INF = 1e9;\n\nvector<int> dijkstra(const vector<vector<pair<int, int>>>& graph, int source) {\n    vector<int> dist(graph.size(), INF);\n    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;\n    dist[source] = 0;\n    pq.push({0, source});\n\n    while (!pq.empty()) {\n        auto [distance, u] = pq.top();\n        pq.pop();\n        if (distance != dist[u]) continue;\n        for (auto [v, weight] : graph[u]) {\n            if (dist[v] > dist[u] + weight) {\n                dist[v] = dist[u] + weight;\n                pq.push({dist[v], v});\n            }\n        }\n    }\n    return dist;\n}"
+  },
+  {
+    "nodeId": "search",
+    "language": "cpp",
+    "title": "统一查找接口示例",
+    "code": "#include <vector>\nusing namespace std;\n\nint findIndex(const vector<int>& a, int target) {\n    for (int i = 0; i < (int)a.size(); ++i) {\n        if (a[i] == target) return i;\n    }\n    return -1;\n}"
+  },
+  {
+    "nodeId": "sequential-search",
+    "language": "cpp",
+    "title": "顺序查找",
+    "code": "#include <vector>\nusing namespace std;\n\nint sequentialSearch(const vector<int>& a, int target) {\n    for (int i = 0; i < (int)a.size(); ++i) {\n        if (a[i] == target) return i;\n    }\n    return -1;\n}"
+  },
+  {
+    "nodeId": "binary-search",
+    "language": "cpp",
+    "title": "迭代二分查找",
+    "code": "#include <vector>\nusing namespace std;\n\nint binarySearch(const vector<int>& a, int target) {\n    int left = 0, right = (int)a.size() - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (a[mid] == target) return mid;\n        if (a[mid] < target) left = mid + 1;\n        else right = mid - 1;\n    }\n    return -1;\n}"
+  },
+  {
+    "nodeId": "block-search",
+    "language": "cpp",
+    "title": "分块查找框架",
+    "code": "#include <vector>\nusing namespace std;\n\nstruct BlockIndex {\n    int maxKey;\n    int left;\n    int right;\n};\n\nint blockSearch(const vector<int>& a, const vector<BlockIndex>& index, int target) {\n    for (const auto& block : index) {\n        if (target <= block.maxKey) {\n            for (int i = block.left; i <= block.right; ++i) {\n                if (a[i] == target) return i;\n            }\n            return -1;\n        }\n    }\n    return -1;\n}"
+  },
+  {
+    "nodeId": "hash-search",
+    "language": "cpp",
+    "title": "unordered_map 哈希查找",
+    "code": "#include <iostream>\n#include <string>\n#include <unordered_map>\nusing namespace std;\n\nint main() {\n    unordered_map<string, int> score;\n    score[\"Alice\"] = 95;\n    score[\"Bob\"] = 87;\n\n    if (score.find(\"Alice\") != score.end()) {\n        cout << score[\"Alice\"] << '\\n';\n    }\n    return 0;\n}"
+  },
+  {
+    "nodeId": "tree-search",
+    "language": "cpp",
+    "title": "树表查找递归框架",
+    "code": "struct Node {\n    int key;\n    Node* left = nullptr;\n    Node* right = nullptr;\n};\n\nNode* searchTree(Node* root, int key) {\n    if (!root || root->key == key) return root;\n    if (key < root->key) return searchTree(root->left, key);\n    return searchTree(root->right, key);\n}"
+  },
+  {
+    "nodeId": "sorting",
+    "language": "cpp",
+    "title": "调用标准库排序",
+    "code": "#include <algorithm>\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> a = {5, 2, 4, 1, 3};\n    sort(a.begin(), a.end());\n    for (int x : a) cout << x << ' ';\n    return 0;\n}"
+  },
+  {
+    "nodeId": "bubble-sort",
+    "language": "cpp",
+    "title": "带提前结束的冒泡排序",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid bubbleSort(vector<int>& a) {\n    for (int i = 0; i < (int)a.size(); ++i) {\n        bool swapped = false;\n        for (int j = 0; j + 1 < (int)a.size() - i; ++j) {\n            if (a[j] > a[j + 1]) {\n                swap(a[j], a[j + 1]);\n                swapped = true;\n            }\n        }\n        if (!swapped) break;\n    }\n}"
+  },
+  {
+    "nodeId": "selection-sort",
+    "language": "cpp",
+    "title": "选择排序",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid selectionSort(vector<int>& a) {\n    for (int i = 0; i < (int)a.size(); ++i) {\n        int best = i;\n        for (int j = i + 1; j < (int)a.size(); ++j) {\n            if (a[j] < a[best]) best = j;\n        }\n        swap(a[i], a[best]);\n    }\n}"
+  },
+  {
+    "nodeId": "insertion-sort",
+    "language": "cpp",
+    "title": "插入排序",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid insertionSort(vector<int>& a) {\n    for (int i = 1; i < (int)a.size(); ++i) {\n        int value = a[i];\n        int j = i - 1;\n        while (j >= 0 && a[j] > value) {\n            a[j + 1] = a[j];\n            --j;\n        }\n        a[j + 1] = value;\n    }\n}"
+  },
+  {
+    "nodeId": "quick-sort",
+    "language": "cpp",
+    "title": "快速排序递归模板",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid quickSort(vector<int>& a, int left, int right) {\n    if (left >= right) return;\n    int i = left, j = right;\n    int pivot = a[left + (right - left) / 2];\n    while (i <= j) {\n        while (a[i] < pivot) ++i;\n        while (a[j] > pivot) --j;\n        if (i <= j) swap(a[i++], a[j--]);\n    }\n    quickSort(a, left, j);\n    quickSort(a, i, right);\n}"
+  },
+  {
+    "nodeId": "merge-sort",
+    "language": "cpp",
+    "title": "归并排序合并过程",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid mergeSort(vector<int>& a, int left, int right, vector<int>& temp) {\n    if (left >= right) return;\n    int mid = left + (right - left) / 2;\n    mergeSort(a, left, mid, temp);\n    mergeSort(a, mid + 1, right, temp);\n\n    int i = left, j = mid + 1, k = left;\n    while (i <= mid && j <= right) temp[k++] = a[i] <= a[j] ? a[i++] : a[j++];\n    while (i <= mid) temp[k++] = a[i++];\n    while (j <= right) temp[k++] = a[j++];\n    for (int p = left; p <= right; ++p) a[p] = temp[p];\n}"
+  },
+  {
+    "nodeId": "heap-sort",
+    "language": "cpp",
+    "title": "堆排序下滤",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid siftDown(vector<int>& a, int start, int end) {\n    int root = start;\n    while (root * 2 + 1 <= end) {\n        int child = root * 2 + 1;\n        if (child + 1 <= end && a[child] < a[child + 1]) ++child;\n        if (a[root] >= a[child]) return;\n        swap(a[root], a[child]);\n        root = child;\n    }\n}\n\nvoid heapSort(vector<int>& a) {\n    for (int i = (int)a.size() / 2 - 1; i >= 0; --i) siftDown(a, i, (int)a.size() - 1);\n    for (int end = (int)a.size() - 1; end > 0; --end) {\n        swap(a[0], a[end]);\n        siftDown(a, 0, end - 1);\n    }\n}"
+  },
+  {
+    "nodeId": "shell-sort",
+    "language": "cpp",
+    "title": "希尔排序",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid shellSort(vector<int>& a) {\n    for (int gap = (int)a.size() / 2; gap > 0; gap /= 2) {\n        for (int i = gap; i < (int)a.size(); ++i) {\n            int value = a[i];\n            int j = i;\n            while (j >= gap && a[j - gap] > value) {\n                a[j] = a[j - gap];\n                j -= gap;\n            }\n            a[j] = value;\n        }\n    }\n}"
+  },
+  {
+    "nodeId": "counting-sort",
+    "language": "cpp",
+    "title": "计数排序处理非负整数",
+    "code": "#include <vector>\nusing namespace std;\n\nvector<int> countingSort(const vector<int>& a, int maxValue) {\n    vector<int> count(maxValue + 1, 0);\n    for (int x : a) ++count[x];\n\n    vector<int> result;\n    for (int value = 0; value <= maxValue; ++value) {\n        while (count[value]-- > 0) result.push_back(value);\n    }\n    return result;\n}"
+  },
+  {
+    "nodeId": "radix-sort",
+    "language": "cpp",
+    "title": "LSD 基数排序",
+    "code": "#include <vector>\nusing namespace std;\n\nvoid radixSort(vector<int>& a) {\n    int maxValue = 0;\n    for (int x : a) if (x > maxValue) maxValue = x;\n\n    vector<int> output(a.size());\n    for (int exp = 1; maxValue / exp > 0; exp *= 10) {\n        vector<int> count(10, 0);\n        for (int x : a) ++count[(x / exp) % 10];\n        for (int i = 1; i < 10; ++i) count[i] += count[i - 1];\n        for (int i = (int)a.size() - 1; i >= 0; --i) {\n            int digit = (a[i] / exp) % 10;\n            output[--count[digit]] = a[i];\n        }\n        a = output;\n    }\n}"
+  },
+  {
+    "nodeId": "algorithm-thinking",
+    "language": "cpp",
+    "title": "按问题规模拆分函数",
+    "code": "#include <vector>\nusing namespace std;\n\nint solveSmall(const vector<int>& a) {\n    return a.empty() ? 0 : a[0];\n}\n\nint solve(const vector<int>& a) {\n    if (a.size() <= 1) return solveSmall(a);\n    int mid = a.size() / 2;\n    vector<int> left(a.begin(), a.begin() + mid);\n    vector<int> right(a.begin() + mid, a.end());\n    return solve(left) + solve(right);\n}"
+  },
+  {
+    "nodeId": "recursion",
+    "language": "cpp",
+    "title": "递归阶乘",
+    "code": "long long factorial(int n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}"
+  },
+  {
+    "nodeId": "divide-and-conquer",
+    "language": "cpp",
+    "title": "分治求数组最大值",
+    "code": "#include <algorithm>\n#include <vector>\nusing namespace std;\n\nint maxInRange(const vector<int>& a, int left, int right) {\n    if (left == right) return a[left];\n    int mid = left + (right - left) / 2;\n    return max(maxInRange(a, left, mid), maxInRange(a, mid + 1, right));\n}"
+  },
+  {
+    "nodeId": "greedy",
+    "language": "cpp",
+    "title": "区间调度贪心选择",
+    "code": "#include <algorithm>\n#include <utility>\n#include <vector>\nusing namespace std;\n\nint maxNonOverlapping(vector<pair<int, int>> intervals) {\n    sort(intervals.begin(), intervals.end(), [](auto a, auto b) {\n        return a.second < b.second;\n    });\n    int count = 0;\n    int lastEnd = -1e9;\n    for (auto [start, end] : intervals) {\n        if (start >= lastEnd) {\n            ++count;\n            lastEnd = end;\n        }\n    }\n    return count;\n}"
+  },
+  {
+    "nodeId": "dynamic-programming",
+    "language": "cpp",
+    "title": "0-1 背包动态规划",
+    "code": "#include <algorithm>\n#include <vector>\nusing namespace std;\n\nint knapsack(const vector<int>& weight, const vector<int>& value, int capacity) {\n    vector<int> dp(capacity + 1, 0);\n    for (int i = 0; i < (int)weight.size(); ++i) {\n        for (int c = capacity; c >= weight[i]; --c) {\n            dp[c] = max(dp[c], dp[c - weight[i]] + value[i]);\n        }\n    }\n    return dp[capacity];\n}"
   }
 ]
-
