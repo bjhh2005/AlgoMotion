@@ -109,6 +109,7 @@ type GraphNodeData = {
   node: KnowledgeNode;
   status: ProgressStatus;
   inSearch: boolean;
+  focused: boolean;
   related: boolean;
   dimmed: boolean;
   level: GraphNodeLevel;
@@ -120,8 +121,8 @@ type GraphNodeData = {
 type GraphFlowNode = Node<GraphNodeData, "knowledge">;
 type GraphFlowEdge = Edge<{ relation: KnowledgeEdge }>;
 
-function KnowledgeGraphNode({ data, selected }: NodeProps<GraphFlowNode>) {
-  const { node, status, inSearch, related, dimmed, level, viewMode, childCount } = data;
+function KnowledgeGraphNode({ data }: NodeProps<GraphFlowNode>) {
+  const { node, status, inSearch, focused, related, dimmed, level, viewMode, childCount } = data;
   const dotSize = dotSizeByLevel[level];
   const dotBackground = statusColor[status];
   const dotBorder = statusRingColor[status];
@@ -134,12 +135,17 @@ function KnowledgeGraphNode({ data, selected }: NodeProps<GraphFlowNode>) {
   };
 
   let opacity = 1;
-  if (!inSearch) opacity = 0.1;
-  else if (dimmed) opacity = 0.08;
+  if (focused || related) {
+    opacity = 1;
+  } else if (!inSearch) {
+    opacity = 0.1;
+  } else if (dimmed) {
+    opacity = 0.08;
+  }
 
   return (
     <div
-      className={`graph-flow-node graph-flow-node-${level} graph-view-${viewMode} ${selected ? "active" : ""} ${
+      className={`graph-flow-node graph-flow-node-${level} graph-view-${viewMode} ${focused ? "active" : ""} ${
         related ? "related" : ""
       } ${dimmed ? "dimmed" : ""}`}
       style={{ opacity, width: `${NODE_CONTAINER_WIDTH}px` }}
@@ -148,7 +154,7 @@ function KnowledgeGraphNode({ data, selected }: NodeProps<GraphFlowNode>) {
     >
       <Handle type="target" position={Position.Top} className="graph-handle" />
       <span
-        className={`graph-node-dot graph-node-dot--${status} ${selected ? "is-selected" : ""} ${related ? "is-related" : ""}`}
+        className={`graph-node-dot graph-node-dot--${status} ${focused ? "is-selected" : ""} ${related ? "is-related" : ""}`}
         style={dotStyle}
         aria-hidden
       />
@@ -358,6 +364,7 @@ function GraphFlow({
             node,
             status: progress[node.id]?.status ?? "not_started",
             inSearch: filteredIds.has(node.id),
+            focused: selected,
             related,
             dimmed,
             level: meta.level,

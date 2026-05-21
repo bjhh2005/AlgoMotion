@@ -222,7 +222,7 @@ export function App() {
   }
 
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key !== "Enter") return;
+    if (event.key !== "Enter" && event.key !== "Tab") return;
     const firstMatch = filteredNodes[0];
     if (!firstMatch) return;
     event.preventDefault();

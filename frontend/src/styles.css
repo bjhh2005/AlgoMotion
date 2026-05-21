@@ -1078,9 +1078,29 @@ body.is-resizing-split * {
 
 .graph-node-dot.is-selected {
   border-color: var(--node-accent);
+  border-width: 3px;
+  transform: scale(1.12);
   box-shadow:
-    0 4px 14px color-mix(in srgb, var(--node-accent) 28%, rgba(24, 34, 49, 0.16)),
-    0 0 0 3px color-mix(in srgb, var(--node-accent) 18%, transparent);
+    0 4px 16px color-mix(in srgb, var(--node-accent) 36%, rgba(24, 34, 49, 0.18)),
+    0 0 0 4px color-mix(in srgb, var(--node-accent) 24%, transparent);
+}
+
+.graph-flow-node.active .graph-node-dot.is-selected {
+  animation: graph-node-focus-pulse 2s ease-in-out infinite;
+}
+
+@keyframes graph-node-focus-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 16px color-mix(in srgb, var(--node-accent) 36%, rgba(24, 34, 49, 0.18)),
+      0 0 0 4px color-mix(in srgb, var(--node-accent) 24%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 6px 20px color-mix(in srgb, var(--node-accent) 44%, rgba(24, 34, 49, 0.2)),
+      0 0 0 6px color-mix(in srgb, var(--node-accent) 32%, transparent);
+  }
 }
 
 .graph-flow-node-root .graph-node-dot,
