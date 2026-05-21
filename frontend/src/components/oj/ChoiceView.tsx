@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, ChevronRight, Lightbulb, X } from "lucide-react";
-import { checkSelectCompleteAnswer, fetchProblemData } from "../../api";
+import { checkSelectCompleteAnswer, fetchProblemData, isProblemApiError } from "../../api";
 import type { Exercise, KnowledgeNode } from "../../types";
 import { difficultyLabel, exerciseRoute, knowledgeName, typeLabel } from "./oj-utils";
 
@@ -41,7 +41,7 @@ export function ChoiceView({ questions, index, onIndexChange, nodeById }: Props)
     fetchProblemData(q.id)
       .then((result) => {
         if (cancelled) return;
-        if (result.id === "Error") {
+        if (isProblemApiError(result)) {
           setLoadError(result.details ?? "题目加载失败");
           setRemoteQuestion(null);
           return;
@@ -65,7 +65,15 @@ export function ChoiceView({ questions, index, onIndexChange, nodeById }: Props)
     return <p className="oj-empty">暂无选择题</p>;
   }
 
-  const currentQuestion = remoteQuestion ?? q;
+  if (loadingQuestion) {
+    return <p className="oj-empty muted">正在从后端加载题目…</p>;
+  }
+
+  if (loadError || !remoteQuestion) {
+    return <p className="oj-problem-error">{loadError || "题目加载失败"}</p>;
+  }
+
+  const currentQuestion = remoteQuestion;
   const options = currentQuestion.choiceOptions ?? (currentQuestion.options ?? []).map((text, i) => ({
     key: String.fromCharCode(65 + i),
     text
@@ -112,8 +120,6 @@ export function ChoiceView({ questions, index, onIndexChange, nodeById }: Props)
 
       <article className="oj-card">
         <h3 className="oj-question-title">{currentQuestion.title}</h3>
-        {loadingQuestion && <p className="muted">正在加载题目...</p>}
-        {loadError && <p className="oj-problem-error">{loadError}</p>}
         {currentQuestion.stem && <p className="oj-question-stem">{currentQuestion.stem}</p>}
 
         <div className="oj-choice-list">

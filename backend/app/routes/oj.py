@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fastapi import APIRouter
 
-from ..config import EXERCISE_DIR
+from ..config import EXERCISE_DIR, ROOT
 from ..schemas import JudgeRequest, Select_CompleteRequest
 from ..storage import read_json
 
@@ -85,6 +85,13 @@ def load_data():
     return read_json(EXERCISE_DIR / "tag.json")
 
 
+def resolve_data_path(path: str) -> Path:
+    candidate = Path(path)
+    if candidate.is_absolute():
+        return candidate
+    return ROOT / path
+
+
 @router.get("/api/get_problem_data/{id}")
 async def get_problem(id: str):
     data_list = load_data()
@@ -97,13 +104,13 @@ async def get_problem(id: str):
             "details": "文件不存在",
         }
     
-    problem_path = Path(result["path"])
+    problem_path = resolve_data_path(result["path"])
     if problem_path.exists() and problem_path.is_file():
         try:
             with problem_path.open("r", encoding="utf-8") as file:
                 data = read_json(problem_path)
 
-            ret = next((item for item in data if item["id"] == req.problem_id), None)
+            ret = next((item for item in data if item["id"] == id), None)
         except Exception:
             return {
                 "id": "Error",
@@ -114,8 +121,15 @@ async def get_problem(id: str):
             "id": "Error",
             "details": "路径错误",
         }
+
+    if ret is None:
+        return {
+            "id": "Error",
+            "details": "题面不存在",
+        }
+
     if ret["type"] == "programming":
-        path = Path(ret["path"])
+        path = resolve_data_path(ret["path"])
         if path.exists() and path.is_file():
             try:
                 with path.open("r", encoding="utf-8") as file:
@@ -166,7 +180,7 @@ def check(id: str, req: Select_CompleteRequest):
             "details": "文件不存在",
         }
     
-    problem_path = Path(result["path"])
+    problem_path = resolve_data_path(result["path"])
     if problem_path.exists() and problem_path.is_file():
         try:
             with problem_path.open("r", encoding="utf-8") as file:
@@ -182,6 +196,12 @@ def check(id: str, req: Select_CompleteRequest):
         return {
             "id": "Error",
             "details": "路径错误",
+        }
+
+    if ret is None:
+        return {
+            "id": "Error",
+            "details": "题面不存在",
         }
 
     if ret["type"] == "programming":

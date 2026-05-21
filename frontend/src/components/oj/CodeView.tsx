@@ -3,6 +3,7 @@ import { Check, Clock, HardDrive, Play, Send, X } from "lucide-react";
 import {
   analyzeCode,
   fetchProblemData,
+  isProblemApiError,
   normalizeJudgeResponse,
   submitJudge,
   type JudgeCaseDetail,
@@ -12,12 +13,13 @@ import { MarkdownContent } from "./MarkdownContent";
 import type { CodeAnalysisRule, Exercise, KnowledgeContent, KnowledgeNode, ProgressRecord } from "../../types";
 import { CodeEditor } from "./CodeEditor";
 import { normalizeCodeString } from "./code-editor-utils";
+import { mergeProgrammingExercise } from "./programming-1001";
 import { difficultyLabel, exerciseRoute, knowledgeName, resolveOjProblemId } from "./oj-utils";
 import { parseSampleCasesFromMarkdown } from "./problem-markdown";
 import { useVerticalPaneResize } from "./useVerticalPaneResize";
 
 interface Props {
-  questions: Exercise[];
+  question: Exercise | null;
   nodeById: Record<string, KnowledgeNode>;
   contentByNodeId: Record<string, KnowledgeContent>;
   analysisRules: CodeAnalysisRule[];
@@ -131,14 +133,14 @@ function CaseDetailPanel({ detail }: { detail: JudgeCaseDetail }) {
 }
 
 export function CodeView({
-  questions,
+  question: indexQuestion,
   nodeById,
   contentByNodeId,
   onOpenKnowledge,
   onJudgeComplete
 }: Props) {
-  const question = questions[0];
-  const [code, setCode] = useState(() => normalizeCodeString(question?.starterCode ?? ""));
+  const [question, setQuestion] = useState<Exercise | null>(indexQuestion);
+  const [code, setCode] = useState("");
   const [descTab, setDescTab] = useState<DescTab>("desc");
   const [caseTab, setCaseTab] = useState(0);
   const [running, setRunning] = useState(false);
@@ -154,7 +156,8 @@ export function CodeView({
   const { paneRef, editorRatio, consoleRatio, isResizing, onResizeStart } = useVerticalPaneResize();
 
   useEffect(() => {
-    setCode(normalizeCodeString(question?.starterCode ?? ""));
+    setQuestion(indexQuestion);
+    setCode("");
     setJudgeResult(null);
     setSubmitStatus("");
     setAnalysisStatus("");
@@ -166,29 +169,28 @@ export function CodeView({
     setProblemMarkdown("");
     setProblemLoadStatus("idle");
     setProblemLoadMessage("");
-  }, [question?.id, question?.starterCode]);
+  }, [indexQuestion?.id]);
 
   useEffect(() => {
-    if (!question?.id) return;
+    if (!indexQuestion?.id) return;
 
     let cancelled = false;
     setProblemLoadStatus("loading");
     setProblemLoadMessage("");
     setProblemMarkdown("");
 
-    fetchProblemData(question.id)
+    fetchProblemData(indexQuestion.id)
       .then((payload) => {
         if (cancelled) return;
-        if (payload.id === "Error") {
+        if (isProblemApiError(payload)) {
           setProblemLoadStatus("error");
           setProblemLoadMessage(payload.details ?? "题面加载失败");
+          setQuestion(indexQuestion);
           return;
         }
+        setQuestion(mergeProgrammingExercise(indexQuestion, payload));
         if (payload.content) {
           setProblemMarkdown(payload.content);
-          if (payload.starterCode) {
-            setCode(normalizeCodeString(payload.starterCode));
-          }
           setProblemLoadStatus("ok");
           return;
         }
@@ -199,19 +201,22 @@ export function CodeView({
         if (cancelled) return;
         setProblemLoadStatus("error");
         setProblemLoadMessage(error.message);
+        setQuestion(indexQuestion);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [question?.id]);
+  }, [indexQuestion]);
 
-  if (!question) {
+  if (!indexQuestion) {
     return <p className="oj-empty">暂无编程题</p>;
   }
 
+  const activeQuestion = question ?? indexQuestion;
+
   const linkedNodeIds = Array.from(
-    new Set([question.nodeId, ...(question.linkedNodeIds ?? []), ...apiLinkedNodeIds])
+    new Set([activeQuestion.nodeId, ...(activeQuestion.linkedNodeIds ?? []), ...apiLinkedNodeIds])
   );
   const knowledgeTags = linkedNodeIds
     .map((id) => nodeById[id]?.name)
@@ -219,7 +224,7 @@ export function CodeView({
 
   function runErrorAnalysis() {
     setAnalysisStatus("正在分析错因…");
-    analyzeCode(code || question.title, question.title)
+    analyzeCode(code || activeQuestion.title, activeQuestion.title)
       .then((result) => {
         setApiLinkedNodeIds(result.linkedNodes);
         setAnalysisStatus(result.suggestions[0] ?? "错因分析完成");
@@ -246,7 +251,7 @@ export function CodeView({
 
     submitJudge({
       submission_id: submissionId,
-      problem_id: resolveOjProblemId(question),
+      problem_id: resolveOjProblemId(activeQuestion),
       code: trimmed,
       time_limit: DEFAULT_TIME_LIMIT,
       mem_limit: DEFAULT_MEM_LIMIT
@@ -280,7 +285,7 @@ export function CodeView({
             ...current
           ].slice(0, 10));
           try {
-            onJudgeComplete?.(question.nodeId, accepted);
+            onJudgeComplete?.(activeQuestion.nodeId, accepted);
           } catch {
             // 避免进度同步异常导致整页白屏
           }
@@ -326,11 +331,11 @@ export function CodeView({
     <div className="oj-code-view">
       <header className="oj-code-toolbar">
         <div className="oj-code-toolbar-meta">
-          <span className="muted">{exerciseRoute(question)}</span>
+          <span className="muted">{exerciseRoute(activeQuestion)}</span>
           <span>·</span>
-          <strong>{question.title}</strong>
-          <span className="oj-badge oj-badge-outline">{knowledgeName(question, nodeById)}</span>
-          <span className="oj-badge oj-badge-warn">{difficultyLabel[question.difficulty]}</span>
+          <strong>{activeQuestion.title}</strong>
+          <span className="oj-badge oj-badge-outline">{knowledgeName(activeQuestion, nodeById)}</span>
+          <span className="oj-badge oj-badge-warn">{difficultyLabel[activeQuestion.difficulty]}</span>
         </div>
         <div className="oj-code-toolbar-actions">
           <button type="button" className="oj-btn-outline" disabled={running} onClick={() => runJudge(false)}>

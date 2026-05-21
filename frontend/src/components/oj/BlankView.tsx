@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronRight, CloudUpload, Lightbulb } from "lucide-react";
-import { checkSelectCompleteAnswer, fetchProblemData } from "../../api";
+import { checkSelectCompleteAnswer, fetchProblemData, isProblemApiError } from "../../api";
 import type { Exercise, KnowledgeNode } from "../../types";
 import { difficultyLabel, exerciseRoute, knowledgeName, typeLabel } from "./oj-utils";
 
@@ -54,7 +54,7 @@ export function BlankView({ questions, index, onIndexChange, nodeById }: Props) 
     fetchProblemData(q.id)
       .then((result) => {
         if (cancelled) return;
-        if (result.id === "Error") {
+        if (isProblemApiError(result)) {
           setLoadError(result.details ?? "题目加载失败");
           setRemoteQuestion(null);
           return;
@@ -74,30 +74,39 @@ export function BlankView({ questions, index, onIndexChange, nodeById }: Props) 
     };
   }, [q?.id]);
 
-  const currentQuestion = remoteQuestion ?? q;
-
   const tokens = useMemo(() => {
-    if (!currentQuestion?.fillStem) return [];
+    if (!remoteQuestion?.fillStem) return [];
     const parts: { type: "text" | "blank"; value: string; id?: number }[] = [];
     const re = /\{\{(\d+)\}\}/g;
     let last = 0;
     let match: RegExpExecArray | null;
-    while ((match = re.exec(currentQuestion.fillStem)) !== null) {
+    while ((match = re.exec(remoteQuestion.fillStem)) !== null) {
       if (match.index > last) {
-        parts.push({ type: "text", value: currentQuestion.fillStem.slice(last, match.index) });
+        parts.push({ type: "text", value: remoteQuestion.fillStem.slice(last, match.index) });
       }
       parts.push({ type: "blank", value: "", id: Number(match[1]) });
       last = match.index + match[0].length;
     }
-    if (last < currentQuestion.fillStem.length) {
-      parts.push({ type: "text", value: currentQuestion.fillStem.slice(last) });
+    if (last < remoteQuestion.fillStem.length) {
+      parts.push({ type: "text", value: remoteQuestion.fillStem.slice(last) });
     }
     return parts;
-  }, [currentQuestion?.fillStem]);
+  }, [remoteQuestion?.fillStem]);
 
-  if (!currentQuestion || !currentQuestion.blanks?.length) {
+  if (!q) {
     return <p className="oj-empty">暂无填空题</p>;
   }
+
+  if (loadingQuestion) {
+    return <p className="oj-empty muted">正在从后端加载题目…</p>;
+  }
+
+  if (loadError || !remoteQuestion?.blanks?.length) {
+    return <p className="oj-problem-error">{loadError || "题目加载失败"}</p>;
+  }
+
+  const currentQuestion = remoteQuestion;
+  const blanks = currentQuestion.blanks!;
 
   const allCorrect = submitted && isCorrect === true;
 
@@ -106,7 +115,7 @@ export function BlankView({ questions, index, onIndexChange, nodeById }: Props) 
     setSubmitting(true);
     setSubmitError("");
     try {
-      const mergedAnswer = currentQuestion.blanks!
+      const mergedAnswer = blanks
         .map((blank) => (values[blank.id] ?? "").trim())
         .join(";");
       const result = await checkSelectCompleteAnswer(currentQuestion.id, {
@@ -149,8 +158,6 @@ export function BlankView({ questions, index, onIndexChange, nodeById }: Props) 
 
       <article className="oj-card">
         <h3 className="oj-question-title">{currentQuestion.title}</h3>
-        {loadingQuestion && <p className="muted">正在加载题目...</p>}
-        {loadError && <p className="oj-problem-error">{loadError}</p>}
         <p className="oj-fill-stem">
           {tokens.map((token, i) => {
             if (token.type === "text") {
@@ -158,7 +165,7 @@ export function BlankView({ questions, index, onIndexChange, nodeById }: Props) 
             }
             const id = token.id!;
             const value = values[id] ?? "";
-            const blank = currentQuestion.blanks!.find((item) => item.id === id)!;
+            const blank = blanks.find((item) => item.id === id)!;
             const isRight = submitted && value.trim() === blank.answer;
             const isWrong = submitted && !isRight;
             return (
@@ -184,7 +191,7 @@ export function BlankView({ questions, index, onIndexChange, nodeById }: Props) 
             <span className="oj-feedback-answer">参考答案如下</span>
           </div>
           <ul className="oj-blank-answers">
-            {currentQuestion.blanks.map((blank) => (
+            {blanks.map((blank) => (
               <li key={blank.id}>
                 <Check size={16} />
                 填空 {blank.id}：<strong>{blank.answer}</strong>
@@ -207,7 +214,7 @@ export function BlankView({ questions, index, onIndexChange, nodeById }: Props) 
           <button
             type="button"
             className="oj-btn-primary"
-            disabled={currentQuestion.blanks.some((blank) => !(values[blank.id] ?? "").trim()) || submitting}
+            disabled={blanks.some((blank) => !(values[blank.id] ?? "").trim()) || submitting}
             onClick={submitAnswer}
           >
             {submitting ? "提交中..." : "提交答案"}

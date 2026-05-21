@@ -144,8 +144,30 @@ export interface ProblemDataPayload extends Exercise {
   details?: string;
 }
 
+export function isProblemApiError(
+  payload: ProblemDataPayload | null | undefined
+): payload is ProblemDataPayload & { id: "Error"; details?: string } {
+  return payload?.id === "Error";
+}
+
 export function fetchProblemData(exerciseId: string) {
-  return requestJson<ProblemDataPayload>(`/api/get_problem_data/${exerciseId}`);
+  return requestJson<ProblemDataPayload>(`/api/get_problem_data/${encodeURIComponent(exerciseId)}`);
+}
+
+export interface TagProblemIndex {
+  id: string;
+  title: string;
+  tag: string[];
+  path: string;
+}
+
+export interface SearchTagResponse {
+  problems: TagProblemIndex[];
+}
+
+export function searchProblemsByTag(tag: string) {
+  const params = new URLSearchParams({ tag });
+  return requestJson<SearchTagResponse>(`/api/search_tag?${params}`);
 }
 
 export interface SelectCompleteCheckPayload {

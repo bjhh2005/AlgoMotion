@@ -362,7 +362,6 @@ export function App() {
 
         {page === "oj" && (
           <ExerciseOjPage
-            exercises={exercises}
             selectedExerciseId={selectedExerciseId}
             onSelectExercise={setSelectedExerciseId}
             onOpenKnowledge={openKnowledge}
