@@ -261,6 +261,8 @@ export interface ComprehensiveReport {
   cognitive_mastery: Record<string, CognitiveMastery>;
   propagation_analyses: PropagationAnalysis[];
   behavior_analyses: Record<string, BehaviorAnalysis>;
+  question_discriminations: DiscriminationAnalysis[];
+  investment_effectiveness: InvestmentEffectivenessAnalysis[];
   motivation_index: MotivationIndex;
 }
 
