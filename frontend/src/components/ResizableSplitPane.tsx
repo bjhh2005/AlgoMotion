@@ -6,10 +6,14 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode
 } from "react";
+import {
+  DEFAULT_SPLIT_RATIO,
+  getSplitGridColumns,
+  readStoredSplitRatio,
+  SPLIT_HANDLE_WIDTH,
+  SPLIT_STORAGE_KEY
+} from "../utils/splitLayout";
 
-const STORAGE_KEY = "algomotion-knowledge-split-ratio";
-const DEFAULT_RATIO = 0.62;
-const HANDLE_WIDTH = 10;
 const MIN_LEFT = 280;
 const MIN_RIGHT = 320;
 
@@ -17,56 +21,67 @@ interface Props {
   left: ReactNode;
   right: ReactNode;
   className?: string;
+  leftRatio?: number;
+  onLeftRatioChange?: (ratio: number) => void;
 }
 
 function clampRatio(ratio: number, containerWidth: number) {
-  const available = Math.max(containerWidth - HANDLE_WIDTH, MIN_LEFT + MIN_RIGHT);
+  const available = Math.max(containerWidth - SPLIT_HANDLE_WIDTH, MIN_LEFT + MIN_RIGHT);
   const minRatio = MIN_LEFT / available;
   const maxRatio = (available - MIN_RIGHT) / available;
   return Math.min(maxRatio, Math.max(minRatio, ratio));
 }
 
-function readStoredRatio(): number {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return DEFAULT_RATIO;
-    const value = Number(saved);
-    if (Number.isFinite(value) && value > 0.2 && value < 0.85) return value;
-  } catch {
-    /* ignore */
-  }
-  return DEFAULT_RATIO;
-}
-
-export function ResizableSplitPane({ left, right, className = "" }: Props) {
+export function ResizableSplitPane({
+  left,
+  right,
+  className = "",
+  leftRatio: controlledRatio,
+  onLeftRatioChange
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [leftRatio, setLeftRatio] = useState(readStoredRatio);
+  const [internalRatio, setInternalRatio] = useState(readStoredSplitRatio);
   const [dragging, setDragging] = useState(false);
   const dragRef = useRef(false);
+  const leftRatio = controlledRatio ?? internalRatio;
+  const leftRatioRef = useRef(leftRatio);
+  leftRatioRef.current = leftRatio;
 
-  const applyRatioFromPointer = useCallback((clientX: number) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const available = rect.width - HANDLE_WIDTH;
-    if (available <= 0) return;
-    const rawRatio = (clientX - rect.left) / available;
-    setLeftRatio(clampRatio(rawRatio, rect.width));
-  }, []);
+  const setLeftRatio = useCallback(
+    (nextRatio: number | ((current: number) => number)) => {
+      const resolved = typeof nextRatio === "function" ? nextRatio(leftRatio) : nextRatio;
+      if (onLeftRatioChange) {
+        onLeftRatioChange(resolved);
+      } else {
+        setInternalRatio(resolved);
+      }
+    },
+    [leftRatio, onLeftRatioChange]
+  );
+
+  const applyRatioFromPointer = useCallback(
+    (clientX: number) => {
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const available = rect.width - SPLIT_HANDLE_WIDTH;
+      if (available <= 0) return;
+      const rawRatio = (clientX - rect.left) / available;
+      setLeftRatio(clampRatio(rawRatio, rect.width));
+    },
+    [setLeftRatio]
+  );
 
   const stopDragging = useCallback(() => {
     if (!dragRef.current) return;
     dragRef.current = false;
     setDragging(false);
     document.body.classList.remove("is-resizing-split");
-    setLeftRatio((current) => {
-      try {
-        localStorage.setItem(STORAGE_KEY, String(current));
-      } catch {
-        /* ignore */
-      }
-      return current;
-    });
+    try {
+      localStorage.setItem(SPLIT_STORAGE_KEY, String(leftRatioRef.current));
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   useEffect(() => {
@@ -94,15 +109,12 @@ export function ResizableSplitPane({ left, right, className = "" }: Props) {
     if (!container || typeof ResizeObserver === "undefined") return;
 
     const observer = new ResizeObserver(() => {
-      setLeftRatio((current) => {
-        const width = container.getBoundingClientRect().width;
-        return clampRatio(current, width);
-      });
+      setLeftRatio((current) => clampRatio(current, container.getBoundingClientRect().width));
     });
 
     observer.observe(container);
     return () => observer.disconnect();
-  }, []);
+  }, [setLeftRatio]);
 
   function onHandlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     event.preventDefault();
@@ -114,21 +126,19 @@ export function ResizableSplitPane({ left, right, className = "" }: Props) {
   }
 
   function onHandleDoubleClick() {
-    setLeftRatio(DEFAULT_RATIO);
+    setLeftRatio(DEFAULT_SPLIT_RATIO);
     try {
-      localStorage.setItem(STORAGE_KEY, String(DEFAULT_RATIO));
+      localStorage.setItem(SPLIT_STORAGE_KEY, String(DEFAULT_SPLIT_RATIO));
     } catch {
       /* ignore */
     }
   }
 
-  const leftPercent = `${leftRatio * 100}%`;
-
   return (
     <div
       ref={containerRef}
       className={`split-pane ${dragging ? "split-pane--dragging" : ""} ${className}`.trim()}
-      style={{ gridTemplateColumns: `${leftPercent} ${HANDLE_WIDTH}px minmax(0, 1fr)` }}
+      style={{ gridTemplateColumns: getSplitGridColumns(leftRatio) }}
     >
       <div className="split-pane__left">{left}</div>
       <div
@@ -146,11 +156,15 @@ export function ResizableSplitPane({ left, right, className = "" }: Props) {
           const step = event.shiftKey ? 0.08 : 0.03;
           if (event.key === "ArrowLeft") {
             event.preventDefault();
-            setLeftRatio((current) => clampRatio(current - step, containerRef.current?.getBoundingClientRect().width ?? 0));
+            setLeftRatio((current) =>
+              clampRatio(current - step, containerRef.current?.getBoundingClientRect().width ?? 0)
+            );
           }
           if (event.key === "ArrowRight") {
             event.preventDefault();
-            setLeftRatio((current) => clampRatio(current + step, containerRef.current?.getBoundingClientRect().width ?? 0));
+            setLeftRatio((current) =>
+              clampRatio(current + step, containerRef.current?.getBoundingClientRect().width ?? 0)
+            );
           }
         }}
       >

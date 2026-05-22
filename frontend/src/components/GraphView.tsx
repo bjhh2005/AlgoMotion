@@ -27,6 +27,7 @@ interface Props {
   selectedId: string;
   progress: ProgressMap;
   onSelect: (nodeId: string) => void;
+  focusRequest?: { nodeId: string; seq: number };
 }
 
 const categoryPosition: Record<string, { x: number; y: number }> = {
@@ -69,6 +70,11 @@ const zoomMode = {
   focusMax: 1.05
 };
 
+const focusFitZoom = {
+  min: 0.4,
+  max: 1.5
+};
+
 const categoryTheme: Record<string, { base: string; soft: string; text: string; pale: string }> = {
   root: { base: "#263547", soft: "#eef2f7", text: "#182231", pale: "#f8fafc" },
   basic: { base: "#2f80c0", soft: "#d9ecfb", text: "#16496f", pale: "#f4f9fd" },
@@ -103,6 +109,7 @@ type GraphNodeData = {
   node: KnowledgeNode;
   status: ProgressStatus;
   inSearch: boolean;
+  focused: boolean;
   related: boolean;
   dimmed: boolean;
   level: GraphNodeLevel;
@@ -114,35 +121,31 @@ type GraphNodeData = {
 type GraphFlowNode = Node<GraphNodeData, "knowledge">;
 type GraphFlowEdge = Edge<{ relation: KnowledgeEdge }>;
 
-function KnowledgeGraphNode({ data, selected }: NodeProps<GraphFlowNode>) {
-  const { node, status, inSearch, related, dimmed, level, viewMode, childCount } = data;
+function KnowledgeGraphNode({ data }: NodeProps<GraphFlowNode>) {
+  const { node, status, inSearch, focused, related, dimmed, level, viewMode, childCount } = data;
   const dotSize = dotSizeByLevel[level];
-  const ringWidth = level === "root" ? 3 : level === "overview" ? 2 : 2;
-
   const dotBackground = statusColor[status];
   const dotBorder = statusRingColor[status];
-
-  let boxShadow = `inset 0 0 0 1px ${dotBorder}`;
-  if (selected) {
-    boxShadow = `0 0 0 ${ringWidth + 2}px rgba(24, 34, 49, 0.85), 0 0 0 ${ringWidth + 4}px rgba(24, 34, 49, 0.15)`;
-  } else if (related) {
-    boxShadow = `0 0 0 ${ringWidth}px rgba(24, 34, 49, 0.55)`;
-  }
 
   const dotStyle = {
     width: `${dotSize}px`,
     height: `${dotSize}px`,
-    background: dotBackground,
-    boxShadow
+    ["--node-fill" as string]: dotBackground,
+    ["--node-accent" as string]: dotBorder
   };
 
   let opacity = 1;
-  if (!inSearch) opacity = 0.1;
-  else if (dimmed) opacity = 0.22;
+  if (focused || related) {
+    opacity = 1;
+  } else if (!inSearch) {
+    opacity = 0.1;
+  } else if (dimmed) {
+    opacity = 0.08;
+  }
 
   return (
     <div
-      className={`graph-flow-node graph-flow-node-${level} graph-view-${viewMode} ${selected ? "active" : ""} ${
+      className={`graph-flow-node graph-flow-node-${level} graph-view-${viewMode} ${focused ? "active" : ""} ${
         related ? "related" : ""
       } ${dimmed ? "dimmed" : ""}`}
       style={{ opacity, width: `${NODE_CONTAINER_WIDTH}px` }}
@@ -150,7 +153,11 @@ function KnowledgeGraphNode({ data, selected }: NodeProps<GraphFlowNode>) {
       tabIndex={-1}
     >
       <Handle type="target" position={Position.Top} className="graph-handle" />
-      <span className="graph-node-dot" style={dotStyle} aria-hidden />
+      <span
+        className={`graph-node-dot graph-node-dot--${status} ${focused ? "is-selected" : ""} ${related ? "is-related" : ""}`}
+        style={dotStyle}
+        aria-hidden
+      />
       <span className="graph-node-label">
         <span className="graph-node-title">{node.name}</span>
         <span className="graph-node-meta">
@@ -210,8 +217,15 @@ function getNodeLevel(nodeId: string, parentById: Map<string, string>): GraphNod
   return "detail";
 }
 
-function shouldShowNode(level: GraphNodeLevel, viewMode: ViewMode, selected: boolean, related: boolean) {
+function shouldShowNode(
+  level: GraphNodeLevel,
+  viewMode: ViewMode,
+  selected: boolean,
+  related: boolean,
+  primaryOnly: boolean
+) {
   if (selected || related) return true;
+  if (primaryOnly) return level === "root" || level === "overview";
   if (viewMode === "overview") return level === "root" || level === "overview";
   if (viewMode === "focus") return level !== "detail";
   return true;
@@ -247,7 +261,15 @@ function layoutNodes(nodes: KnowledgeNode[], edges: KnowledgeEdge[]) {
   });
 }
 
-export function GraphView({ nodes, edges, filteredIds, selectedId, progress, onSelect }: Props) {
+export function GraphView({
+  nodes,
+  edges,
+  filteredIds,
+  selectedId,
+  progress,
+  onSelect,
+  focusRequest
+}: Props) {
   return (
     <ReactFlowProvider>
       <GraphFlow
@@ -257,17 +279,27 @@ export function GraphView({ nodes, edges, filteredIds, selectedId, progress, onS
         selectedId={selectedId}
         progress={progress}
         onSelect={onSelect}
+        focusRequest={focusRequest}
       />
     </ReactFlowProvider>
   );
 }
 
-function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }: Props) {
+function GraphFlow({
+  nodes,
+  edges,
+  filteredIds,
+  selectedId,
+  progress,
+  onSelect,
+  focusRequest
+}: Props) {
   const [flowNodes, setFlowNodes, onNodesChange] = useNodesState<GraphFlowNode>([]);
   const [flowEdges, setFlowEdges, onEdgesChange] = useEdgesState<GraphFlowEdge>([]);
-  const { getNode, setCenter } = useReactFlow<GraphFlowNode, GraphFlowEdge>();
+  const { fitView } = useReactFlow<GraphFlowNode, GraphFlowEdge>();
   const { zoom } = useViewport();
   const viewMode = getViewMode(zoom);
+  const primaryOnly = !selectedId || selectedId === overviewRootId;
   const { parentById, childCountById } = useMemo(() => buildContainmentMaps(edges), [edges]);
 
   const relatedNodeIds = useMemo(() => {
@@ -314,7 +346,7 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
         };
         const selected = node.id === selectedId;
         const related = relatedNodeIds.has(node.id);
-        const visible = shouldShowNode(meta.level, viewMode, selected, related);
+        const visible = shouldShowNode(meta.level, viewMode, selected, related, primaryOnly);
         const dimmed = Boolean(selectedId) && !selected && !related;
         const offset = getNodeOffset(meta.level);
         const position = previousPositionById.get(node.id) ?? {
@@ -332,6 +364,7 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
             node,
             status: progress[node.id]?.status ?? "not_started",
             inSearch: filteredIds.has(node.id),
+            focused: selected,
             related,
             dimmed,
             level: meta.level,
@@ -342,7 +375,7 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
         };
       });
     });
-  }, [filteredIds, nodeMetaById, positioned, progress, relatedNodeIds, selectedId, setFlowNodes, viewMode]);
+  }, [filteredIds, nodeMetaById, positioned, primaryOnly, progress, relatedNodeIds, selectedId, setFlowNodes, viewMode]);
 
   useEffect(() => {
     const nodeIds = new Set(nodes.map((node) => node.id));
@@ -350,7 +383,13 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
       nodes
         .filter((node) => {
           const meta = nodeMetaById.get(node.id);
-          return shouldShowNode(meta?.level ?? "detail", viewMode, node.id === selectedId, relatedNodeIds.has(node.id));
+          return shouldShowNode(
+            meta?.level ?? "detail",
+            viewMode,
+            node.id === selectedId,
+            relatedNodeIds.has(node.id),
+            primaryOnly
+          );
         })
         .map((node) => node.id)
     );
@@ -359,6 +398,7 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
       edges
         .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
         .map((edge) => {
+          const edgeKey = `${edge.source}-${edge.target}-${edge.type}`;
           const highlighted = selectedId === edge.source || selectedId === edge.target;
           const color = edgeColor[edge.type];
           const inSearch = filteredIds.has(edge.source) || filteredIds.has(edge.target);
@@ -368,7 +408,7 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
           const showLabel = highlighted;
 
           return {
-            id: `${edge.source}-${edge.target}-${edge.type}`,
+            id: edgeKey,
             source: edge.source,
             target: edge.target,
             type: "straight",
@@ -390,7 +430,7 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
               opacity: highlighted
                 ? 1
                 : selectedId
-                ? 0.05
+                ? 0.1
                 : inSearch
                 ? viewMode === "overview"
                   ? 0.42
@@ -405,24 +445,43 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
           };
         })
     );
-  }, [edges, filteredIds, nodeMetaById, nodes, relatedNodeIds, selectedId, setFlowEdges, viewMode]);
+  }, [edges, filteredIds, nodeMetaById, nodes, primaryOnly, relatedNodeIds, selectedId, setFlowEdges, viewMode]);
 
   useEffect(() => {
-    const selectedFlowNode = getNode(selectedId);
-    if (selectedFlowNode) {
-      const offset = getNodeOffset(selectedFlowNode.data.level);
-      setCenter(selectedFlowNode.position.x + offset.x, selectedFlowNode.position.y + offset.y, {
-        duration: 500,
-        zoom: 1.15
-      });
-      return;
-    }
+    if (!selectedId) return;
 
-    const selectedLayoutNode = positioned.find((node) => node.id === selectedId);
-    if (selectedLayoutNode) {
-      setCenter(selectedLayoutNode.x, selectedLayoutNode.y, { duration: 500, zoom: 1.15 });
-    }
-  }, [getNode, positioned, selectedId, setCenter]);
+    const focusNodes = Array.from(new Set<string>([selectedId, ...Array.from(relatedNodeIds)])).map((id) => ({
+      id
+    }));
+    const frame = window.requestAnimationFrame(() => {
+      fitView({
+        nodes: focusNodes,
+        duration: 520,
+        padding: 0.26,
+        minZoom: focusFitZoom.min,
+        maxZoom: focusFitZoom.max
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [fitView, relatedNodeIds, selectedId]);
+
+  useEffect(() => {
+    if (!focusRequest?.nodeId) return;
+
+    const focusNodes = [{ id: focusRequest.nodeId }];
+    const frame = window.requestAnimationFrame(() => {
+      fitView({
+        nodes: focusNodes,
+        duration: 420,
+        padding: 0.3,
+        minZoom: focusFitZoom.min,
+        maxZoom: focusFitZoom.max
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [fitView, focusRequest]);
 
   const handleNodeClick = useCallback(
     (_event: MouseEvent, node: GraphFlowNode) => {
@@ -443,7 +502,7 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
         fitView
         fitViewOptions={{ padding: 0.22 }}
         minZoom={0.28}
-        maxZoom={1.8}
+        maxZoom={focusFitZoom.max}
         nodesDraggable
         panOnDrag
         zoomOnScroll
@@ -451,6 +510,15 @@ function GraphFlow({ nodes, edges, filteredIds, selectedId, progress, onSelect }
       >
         <Background color="#d8e0ec" gap={20} />
         <MiniMap
+          position="top-right"
+          style={{
+            transform: 'scale(0.7)', 
+            transformOrigin: 'top right',
+            marginTop: '10px',
+            marginRight: '10px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}
           nodeColor={(node) => statusColor[(node as GraphFlowNode).data.status]}
           nodeStrokeWidth={3}
           pannable

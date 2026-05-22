@@ -7,7 +7,9 @@ import type {
   KnowledgeNode,
   ProgressMap,
   ProgressRecord,
-  RecommendationSeeds
+  RecommendationItem,
+  RecommendationSeeds,
+  RecommendationType
 } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
@@ -105,6 +107,25 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function fetchBootstrap() {
   return requestJson<BootstrapPayload>("/api/bootstrap");
+}
+
+export function fetchRecommendations(
+  type: RecommendationType = "next",
+  limit = 5,
+  nodeId?: string,
+  full = false
+) {
+  const params = new URLSearchParams({ type, limit: String(limit) });
+  if (nodeId) params.set("node_id", nodeId);
+  if (full) params.set("full", "true");
+  return requestJson<{ success: boolean; data: RecommendationItem[] }>(`/api/recommendations?${params}`).then(
+    (response) => {
+      if (!response.success || !Array.isArray(response.data)) {
+        throw new Error("推荐接口未返回有效数据");
+      }
+      return response.data;
+    }
+  );
 }
 
 export function updateProgress(nodeId: string, record: ProgressRecord) {

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { BarChart3, BookOpen, Bot, ClipboardList, Code2, Database, GitFork, LayoutList, Search, ShieldCheck } from "lucide-react";
-import { fetchBootstrap, updateProgress as postProgress } from "./api";
+import { fetchBootstrap, fetchRecommendations, updateProgress as postProgress } from "./api";
 import {
   contentByNodeId,
   examplesByNodeId,
@@ -23,6 +23,7 @@ import type {
   ProgressMap,
   ProgressRecord,
   ProgressStatus,
+  RecommendationItem,
   RecommendationSeeds
 } from "./types";
 import { DirectoryView } from "./components/DirectoryView";
@@ -31,7 +32,10 @@ import { KnowledgeDetail } from "./components/KnowledgeDetail";
 import { AiPanel } from "./components/AiPanel";
 import { ExerciseOjPage } from "./components/ExerciseOjPage";
 import { LearningAnalyticsPage } from "./components/LearningAnalyticsPage";
+import { PathGuidePanel } from "./components/PathGuidePanel";
 import { ResizableSplitPane } from "./components/ResizableSplitPane";
+import { computeLocalPathItems, computeLocalRecommendations, searchKnowledgeNodes } from "./utils/pathGuide";
+import { readStoredSplitRatio } from "./utils/splitLayout";
 
 const statusScore: Record<ProgressStatus, number> = {
   not_started: 0,
@@ -76,7 +80,7 @@ export function App() {
   const [exercises, setExercises] = useState<Exercise[]>(exerciseBank);
   const [analysisRules, setAnalysisRules] = useState<CodeAnalysisRule[]>(localAnalysisRules);
   const [recommendationsConfig, setRecommendationsConfig] = useState<RecommendationSeeds>(recommendationConfig);
-  const [selectedId, setSelectedId] = useState("stack");
+  const [selectedId, setSelectedId] = useState("data-structure");
   const [selectedExerciseId, setSelectedExerciseId] = useState(exerciseBank[0]?.id ?? "");
   /** 从知识库「进入 OJ」时指定要打开的题目；点击 OJ 导航则为 null，先显示题库 */
   const [ojOpenProblemId, setOjOpenProblemId] = useState<string | null>(null);
@@ -86,6 +90,11 @@ export function App() {
   const [progress, setProgress] = useState<ProgressMap>(seedProgress);
   const [apiStatus, setApiStatus] = useState<ApiStatus>("checking");
   const [apiMessage, setApiMessage] = useState("正在连接 FastAPI");
+  const [activePathStep, setActivePathStep] = useState<number | null>(null);
+  const [focusRequest, setFocusRequest] = useState<{ nodeId: string; seq: number } | undefined>();
+  const [recommendationItems, setRecommendationItems] = useState<RecommendationItem[]>([]);
+  const [pathItems, setPathItems] = useState<RecommendationItem[]>([]);
+  const [splitRatio, setSplitRatio] = useState(readStoredSplitRatio);
 
   useEffect(() => {
     let active = true;
@@ -133,41 +142,50 @@ export function App() {
 
   const selectedNode = currentNodeById[selectedId] ?? nodes[0] ?? nodeById[selectedId] ?? knowledgeNodes[0];
 
-  const filteredNodes = useMemo(() => {
-    const keyword = query.trim().toLowerCase();
-    if (!keyword) return nodes;
-    return nodes.filter((node) => {
-      return (
-        node.name.toLowerCase().includes(keyword) ||
-        node.id.toLowerCase().includes(keyword) ||
-        node.tags.some((tag) => tag.toLowerCase().includes(keyword))
+  const filteredNodes = useMemo(
+    () => searchKnowledgeNodes(nodes, currentContentByNodeId, query),
+    [nodes, currentContentByNodeId, query]
+  );
+
+  const refreshPathGuide = async (contextNodeId = selectedId) => {
+    const limit = Math.max(recommendationsConfig.maxRecommendations, recommendationsConfig.defaultPath.length, 10);
+
+    try {
+      const [nextItems, mainPathItems] = await Promise.all([
+        fetchRecommendations("next", recommendationsConfig.maxRecommendations, contextNodeId),
+        fetchRecommendations("path", limit, contextNodeId, true)
+      ]);
+      setRecommendationItems(nextItems);
+      setPathItems(mainPathItems);
+      setActivePathStep(() => {
+        const index = mainPathItems.findIndex((item) => item.id === contextNodeId);
+        return index >= 0 ? index : null;
+      });
+    } catch {
+      setRecommendationItems(
+        computeLocalRecommendations(edges, progress, recommendationsConfig, currentNodeById, contextNodeId)
       );
-    });
-  }, [nodes, query]);
+      const localPathItems = computeLocalPathItems(recommendationsConfig, currentNodeById, edges, contextNodeId);
+      setPathItems(localPathItems);
+      setActivePathStep(() => {
+        const index = localPathItems.findIndex((item) => item.id === contextNodeId);
+        return index >= 0 ? index : null;
+      });
+    }
+  };
 
-  const recommendations = useMemo(() => {
-    const mastered = new Set(
-      Object.entries(progress)
-        .filter(([, item]) => item.status === "mastered")
-        .map(([nodeId]) => nodeId)
-    );
-    const weak = new Set(
-      Object.entries(progress)
-        .filter(([, item]) => item.status === "weak")
-        .map(([nodeId]) => nodeId)
-    );
-    const nextIds = edges
-      .filter((edge) => mastered.has(edge.source) && !mastered.has(edge.target))
-      .map((edge) => edge.target);
-    const weakPrerequisites = edges
-      .filter((edge) => weak.has(edge.target) && edge.type === "prerequisite")
-      .map((edge) => edge.source);
+  useEffect(() => {
+    if (nodes.length === 0 || !selectedId) return;
+    void refreshPathGuide(selectedId);
+  }, [selectedId, nodes.length, recommendationsConfig.maxRecommendations, recommendationsConfig.defaultPath.length]);
 
-    return Array.from(new Set([...weakPrerequisites, ...nextIds, ...recommendationsConfig.defaultPath]))
-      .map((id) => currentNodeById[id])
-      .filter(Boolean)
-      .slice(0, recommendationsConfig.maxRecommendations) as KnowledgeNode[];
-  }, [currentNodeById, edges, progress, recommendationsConfig]);
+  const recommendations = useMemo(
+    () =>
+      recommendationItems
+        .map((item) => currentNodeById[item.id])
+        .filter(Boolean) as KnowledgeNode[],
+    [recommendationItems, currentNodeById]
+  );
 
   function updateStatus(nodeId: string, status: ProgressStatus) {
     const score = statusScore[status];
@@ -178,6 +196,7 @@ export function App() {
       .then(() => {
         setApiStatus("connected");
         setApiMessage(`FastAPI 已同步：${currentNodeById[nodeId]?.name ?? nodeId} -> ${statusLabel[status]}`);
+        return refreshPathGuide(selectedId);
       })
       .catch((error: Error) => {
         setApiStatus("error");
@@ -188,6 +207,28 @@ export function App() {
   function openKnowledge(nodeId: string) {
     setSelectedId(nodeId);
     setPage("knowledge");
+  }
+
+  function locateKnowledge(nodeId: string) {
+    openKnowledge(nodeId);
+    setView("graph");
+    setFocusRequest((current) => ({
+      nodeId,
+      seq: (current?.seq ?? 0) + 1
+    }));
+  }
+
+  function handleSelectPathStep(stepIndex: number, nodeId: string) {
+    setActivePathStep(stepIndex);
+    locateKnowledge(nodeId);
+  }
+
+  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== "Enter" && event.key !== "Tab") return;
+    const firstMatch = filteredNodes[0];
+    if (!firstMatch) return;
+    event.preventDefault();
+    locateKnowledge(firstMatch.id);
   }
 
   function openExercise(exerciseId: string) {
@@ -239,6 +280,7 @@ export function App() {
         setApiMessage(
           `OJ 已同步：${currentNodeById[nodeId]?.name ?? nodeId}，${accepted ? "通过" : "未通过"}（正确率 ${Math.round(correctRate * 100)}%）`
         );
+        return refreshPathGuide(nodeId);
       })
       .catch((error: Error) => {
         setApiStatus("error");
@@ -269,7 +311,8 @@ export function App() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索知识点 / 标签"
+            onKeyDown={page === "knowledge" ? handleSearchKeyDown : undefined}
+            placeholder="搜索知识点 / 标签 / 定义"
           />
         </div>
 
@@ -327,45 +370,64 @@ export function App() {
         <p className={`api-message ${apiStatus}`}>{apiMessage}</p>
 
         {page === "knowledge" && (
-          <ResizableSplitPane
-            className="main-grid"
-            left={
-              <section className="visual-panel">
-                {view === "graph" ? (
-                  <GraphView
-                    nodes={nodes}
-                    edges={edges}
-                    filteredIds={new Set(filteredNodes.map((node) => node.id))}
-                    selectedId={selectedId}
-                    progress={progress}
-                    onSelect={openKnowledge}
-                  />
-                ) : (
-                  <DirectoryView
-                    nodes={filteredNodes}
-                    edges={edges}
-                    selectedId={selectedId}
-                    progress={progress}
-                    onSelect={openKnowledge}
-                    expanded
-                  />
-                )}
-              </section>
-            }
-            right={
-              <KnowledgeDetail
-                node={selectedNode}
-                content={currentContentByNodeId[selectedId] ?? contentByNodeId[selectedId]}
-                codeExamples={currentExamplesByNodeId[selectedId] ?? []}
-                edges={edges}
-                exercises={exercises.filter((exercise) => exercise.nodeId === selectedId)}
-                progress={progress[selectedId]?.status ?? "not_started"}
-                onStatusChange={(status) => updateStatus(selectedId, status)}
-                onSelect={openKnowledge}
-                onOpenExercise={openExercise}
-              />
-            }
-          />
+          <>
+            <PathGuidePanel
+              query={query}
+              searchResults={filteredNodes}
+              pathItems={pathItems}
+              recommendationItems={recommendationItems}
+              progress={progress}
+              selectedId={selectedId}
+              selectedNodeName={selectedNode?.name ?? selectedId}
+              activePathStep={activePathStep}
+              splitRatio={splitRatio}
+              onSelectPathStep={handleSelectPathStep}
+              onLocate={locateKnowledge}
+            />
+
+            <ResizableSplitPane
+              className="main-grid"
+              leftRatio={splitRatio}
+              onLeftRatioChange={setSplitRatio}
+              left={
+                <section className="visual-panel">
+                  {view === "graph" ? (
+                    <GraphView
+                      nodes={nodes}
+                      edges={edges}
+                      filteredIds={new Set(filteredNodes.map((node) => node.id))}
+                      selectedId={selectedId}
+                      progress={progress}
+                      onSelect={openKnowledge}
+                      focusRequest={focusRequest}
+                    />
+                  ) : (
+                    <DirectoryView
+                      nodes={filteredNodes}
+                      edges={edges}
+                      selectedId={selectedId}
+                      progress={progress}
+                      onSelect={openKnowledge}
+                      expanded
+                    />
+                  )}
+                </section>
+              }
+              right={
+                <KnowledgeDetail
+                  node={selectedNode}
+                  content={currentContentByNodeId[selectedId] ?? contentByNodeId[selectedId]}
+                  codeExamples={currentExamplesByNodeId[selectedId] ?? []}
+                  edges={edges}
+                  exercises={exercises.filter((exercise) => exercise.nodeId === selectedId)}
+                  progress={progress[selectedId]?.status ?? "not_started"}
+                  onStatusChange={(status) => updateStatus(selectedId, status)}
+                  onSelect={openKnowledge}
+                  onOpenExercise={openExercise}
+                />
+              }
+            />
+          </>
         )}
 
         {page === "oj" && (
