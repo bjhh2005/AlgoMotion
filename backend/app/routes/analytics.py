@@ -210,7 +210,7 @@ async def get_weak_knowledge(
 # 综合学习报告
 # ============================================
 
-def build_comprehensive_report():
+def build_comprehensive_report() -> ComprehensiveReport:
     progress = get_progress_store()
     nodes = get_nodes_data()
     edges = get_edges_data()
@@ -439,9 +439,9 @@ def build_comprehensive_report():
             correlation_coefficient=round(min(1.0, avg_mastery * 0.6 + avg_correct_rate * 0.4), 3),
             efficiency_score=efficiency_score,
             flags={
-                "suspectedFakeEffort": efficiency_score < 40 and avg_correct_rate < 0.6,
-                "potentialMethodIssue": efficiency_score < 45,
-                "underUtilized": category == "dormant",
+                "suspected_fake_effort": efficiency_score < 40 and avg_correct_rate < 0.6,
+                "potential_method_issue": efficiency_score < 45,
+                "under_utilized": category == "dormant",
             },
             recommendations=[
                 "增加专项练习，提升薄弱知识点掌握度" if category in ("inefficient", "dormant") else "继续保持当前学习节奏并关注错题复习"
@@ -465,7 +465,7 @@ def build_comprehensive_report():
         fake_effort_suspicion=round(max(0.0, min(1.0, 0.3 + (1 - avg_correct_rate) * 0.5 - active_ratio * 0.2)), 3)
     )
 
-    report = ComprehensiveReport(
+    return ComprehensiveReport(
         student_id="current_user",
         timestamp=datetime.now().isoformat() + "Z",
         overview=overview,
@@ -476,7 +476,14 @@ def build_comprehensive_report():
         investment_effectiveness=investment_effectiveness,
         motivation_index=motivation_index
     )
-    
+
+
+@router.get("/report")
+async def get_comprehensive_report():
+    """
+    获取综合学习分析报告。
+    """
+    report = build_comprehensive_report()
     return success_response(report.model_dump())
 
 
