@@ -139,6 +139,58 @@ export function fetchExercises() {
   return requestJson<Exercise[]>("/api/exercises");
 }
 
+export interface ProblemDataPayload extends Exercise {
+  content?: string;
+  details?: string;
+}
+
+export function isProblemApiError(
+  payload: ProblemDataPayload | null | undefined
+): payload is ProblemDataPayload & { id: "Error"; details?: string } {
+  return payload?.id === "Error";
+}
+
+export function fetchProblemData(exerciseId: string) {
+  return requestJson<ProblemDataPayload>(`/api/get_problem_data/${encodeURIComponent(exerciseId)}`);
+}
+
+export interface TagProblemIndex {
+  id: string;
+  title: string;
+  tag: string[];
+  path: string;
+}
+
+export interface SearchTagResponse {
+  problems: TagProblemIndex[];
+}
+
+export function searchProblemsByTag(tag: string) {
+  const params = new URLSearchParams({ tag });
+  return requestJson<SearchTagResponse>(`/api/search_tag?${params}`);
+}
+
+export interface SelectCompleteCheckPayload {
+  problem_id: string;
+  answer: string;
+}
+
+export interface SelectCompleteCheckResponse {
+  status?: boolean;
+  id?: "Error";
+  details?: string;
+}
+
+export function checkSelectCompleteAnswer(
+  exerciseId: string,
+  payload: SelectCompleteCheckPayload
+) {
+  return requestJson<SelectCompleteCheckResponse>(`/api/check_S&C_ans/${exerciseId}`, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
 // ============================================
 // 学习分析 API
 // ============================================

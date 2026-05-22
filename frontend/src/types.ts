@@ -43,6 +43,10 @@ export interface Exercise {
   ojRoute?: string;
   /** OJ 判题数据目录 ID，如 1001，对应 data/oj-data/{id} */
   ojProblemId?: string;
+  /** 题面 Markdown 文件路径（相对项目根目录） */
+  path?: string;
+  /** 由 /api/get_problem_data 读取 path 后返回的 Markdown 正文 */
+  content?: string;
   linkedNodeIds?: string[];
   /** @deprecated 旧版选择题选项，优先使用 choiceOptions */
   options?: string[];
@@ -57,8 +61,6 @@ export interface Exercise {
   constraints?: string[];
   hints?: string[];
   starterCode?: string;
-  /** 编程题样例测例，用于控制台展示回退 */
-  ojSampleCases?: { input: string; expected: string }[];
 }
 
 export interface LearningMetrics {
