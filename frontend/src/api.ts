@@ -332,6 +332,44 @@ export interface MotivationIndex {
   fake_effort_suspicion: number;
 }
 
+export interface RawDiscriminationAnalysis {
+  exercise_id: string;
+  discrimination_index: number;
+  difficulty: number;
+  effectiveness: "excellent" | "good" | "acceptable" | "poor";
+}
+
+export interface RawLearningInvestment {
+  student_id: string;
+  node_id?: string | null;
+  study_time_minutes: number;
+  interaction_count: number;
+  practice_time_minutes: number;
+  note_count: number;
+  doubt_raised: number;
+  discussion_contribution: number;
+  engagement_depth: "surface" | "moderate" | "deep";
+}
+
+export interface RawInvestmentEffectivenessAnalysis {
+  student_id: string;
+  investment: RawLearningInvestment;
+  effectiveness: {
+    mastery_gain: number;
+    score_improvement: number;
+    skill_growth: number;
+  };
+  category: "efficient" | "inefficient" | "diving" | "dormant";
+  correlation_coefficient: number;
+  efficiency_score: number;
+  flags: {
+    suspected_fake_effort: boolean;
+    potential_method_issue: boolean;
+    under_utilized: boolean;
+  };
+  recommendations: string[];
+}
+
 export interface ComprehensiveReport {
   student_id: string;
   timestamp: string;
@@ -339,8 +377,8 @@ export interface ComprehensiveReport {
   cognitive_mastery: Record<string, CognitiveMastery>;
   propagation_analyses: PropagationAnalysis[];
   behavior_analyses: Record<string, BehaviorAnalysis>;
-  question_discriminations: DiscriminationAnalysis[];
-  investment_effectiveness: InvestmentEffectivenessAnalysis[];
+  question_discriminations: RawDiscriminationAnalysis[];
+  investment_effectiveness: RawInvestmentEffectivenessAnalysis[];
   motivation_index: MotivationIndex;
 }
 

@@ -358,7 +358,7 @@ function transformComprehensiveReport(report: ComprehensiveReport) {
       studentId: item.student_id,
       investment: {
         studentId: item.investment.student_id,
-        nodeId: item.investment.node_id,
+        nodeId: item.investment.node_id ?? undefined,
         studyTimeMinutes: item.investment.study_time_minutes,
         interactionCount: item.investment.interaction_count,
         practiceTimeMinutes: item.investment.practice_time_minutes,
