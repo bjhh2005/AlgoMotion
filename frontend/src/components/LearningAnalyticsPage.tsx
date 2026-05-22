@@ -19,6 +19,7 @@ import { LearningTrendChart } from "./LearningTrendChart";
 import { ProgressDistributionChart } from "./ProgressDistributionChart";
 import { EfficiencyGauge } from "./EfficiencyGauge";
 import {
+  downloadComprehensiveReport,
   fetchComprehensiveReport,
   fetchWeakKnowledge,
   type ComprehensiveReport,
@@ -103,21 +104,52 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
   );
 
   const propagationAnalyses: PropagationAnalysis[] = weakNodes.slice(0, 5).map((weakNode) => {
-    const affectedNodes = nodes
-      .filter((n) => n.id !== weakNode.id && Math.random() > 0.6)
-      .slice(0, Math.floor(Math.random() * 4) + 1)
-      .map((n) => ({
-        nodeId: n.id,
-        propagationStrength: Math.random() * 0.5 + 0.3,
-        pathType: (["prerequisite", "used_in", "related"] as const)[Math.floor(Math.random() * 3)],
-        rootCause: Math.random() > 0.7,
-      }));
+    const weakMastery = progress[weakNode.id]?.metrics.mastery ?? 0;
+    const candidates = nodes.filter((n) => n.id !== weakNode.id);
+
+    const affectedNodes = candidates
+      .sort(
+        (a, b) =>
+          (progress[b.id]?.metrics.attemptCount ?? 0) -
+          (progress[a.id]?.metrics.attemptCount ?? 0)
+      )
+      .slice(0, Math.max(1, Math.min(4, Math.round((1 - weakMastery) * 4))))
+      .map((n) => {
+        const targetMetrics = progress[n.id]?.metrics;
+        const targetMastery = targetMetrics?.mastery ?? 0;
+        const strength = Math.min(
+          1,
+          0.35 + (1 - weakMastery) * 0.45 + (1 - targetMastery) * 0.15 +
+            Math.min(0.15, (targetMetrics?.attemptCount ?? 0) * 0.02)
+        );
+
+        return {
+          nodeId: n.id,
+          propagationStrength: parseFloat(strength.toFixed(2)),
+          pathType: (['prerequisite', 'used_in', 'related'] as const)[
+            Math.floor(Math.random() * 3)
+          ],
+          rootCause: weakMastery < 0.45,
+        };
+      });
+
+    const weakLinkCount = affectedNodes.filter(
+      (item) => (progress[item.nodeId]?.metrics.mastery ?? 0) < 0.6
+    ).length;
+    const severity = Math.min(1, 0.35 + (1 - weakMastery) * 0.8 + weakLinkCount * 0.08);
 
     return {
       sourceNodeId: weakNode.id,
       affectedNodes,
-      weaknessSeverity: Math.random() * 0.5 + 0.4,
-      downstreamRisk: (["low", "medium", "high", "critical"] as const)[Math.floor(Math.random() * 4)],
+      weaknessSeverity: parseFloat(severity.toFixed(2)),
+      downstreamRisk:
+        severity >= 0.8
+          ? 'critical'
+          : severity >= 0.6
+          ? 'high'
+          : severity >= 0.4
+          ? 'medium'
+          : 'low',
     };
   });
 
@@ -141,67 +173,108 @@ function generateDefaultAdvancedData(nodes: KnowledgeNode[], progress: ProgressM
   });
 
   // 生成题目区分度数据
-  const questionDiscriminations: DiscriminationAnalysis[] = Array.from({ length: 15 }, (_, i) => ({
-    exerciseId: `EX${String(i + 1).padStart(3, "0")}`,
-    discriminationIndex: Math.random() * 0.6 + 0.1,
-    difficulty: Math.random() * 0.6 + 0.2,
-    effectiveness: (["excellent", "good", "acceptable", "poor"] as const)[
-      Math.floor(Math.random() * 4)
-    ],
-  }));
+  const questionDiscriminations: DiscriminationAnalysis[] = nodes
+    .slice(0, 15)
+    .map((node) => {
+      const metrics = progress[node.id]?.metrics;
+      const mastery = metrics?.mastery ?? 0;
+      const correctRate = metrics?.correctRate ?? mastery;
+      const errorCount = metrics?.errorCount ?? 0;
+      const discriminationIndex = parseFloat(
+        Math.max(-1, Math.min(1, correctRate * 0.6 + mastery * 0.3 - errorCount * 0.02)).toFixed(3)
+      );
+      const difficulty = parseFloat(
+        Math.max(0.1, Math.min(1, (node.difficulty ?? 5) / 10 * 0.7 + (1 - mastery) * 0.3)).toFixed(3)
+      );
+      const effectiveness =
+        discriminationIndex >= 0.7
+          ? 'excellent'
+          : discriminationIndex >= 0.55
+          ? 'good'
+          : discriminationIndex >= 0.4
+          ? 'acceptable'
+          : 'poor';
+
+      return {
+        exerciseId: `EX-${node.id}`,
+        discriminationIndex,
+        difficulty,
+        effectiveness,
+      };
+    });
 
   // 生成投入成效分析数据
-  const studentIds = ["学生A", "学生B", "学生C", "学生D", "学生E", "学生F", "学生G", "学生H"];
-  const investmentEffectiveness: InvestmentEffectivenessAnalysis[] = studentIds.map((studentId) => {
-    const studyTime = Math.random() * 300 + 50;
-    const practiceTime = Math.random() * 200 + 30;
-    const masteryGain = Math.random() * 0.4;
-
-    const isHighInvestment = studyTime + practiceTime > 250;
-    const isHighEffectiveness = masteryGain > 0.2;
-    let category: "efficient" | "inefficient" | "diving" | "dormant";
-    if (isHighInvestment && isHighEffectiveness) category = "efficient";
-    else if (isHighInvestment && !isHighEffectiveness) category = "inefficient";
-    else if (!isHighInvestment && isHighEffectiveness) category = "diving";
-    else category = "dormant";
-
-    const efficiencyScore = Math.round(
-      (isHighInvestment ? 50 : 30) + (isHighEffectiveness ? 50 : 30) + Math.random() * 20
-    );
-
-    return {
-      studentId,
+  const allRecords = Object.values(progress);
+  const totalStudyMinutes = allRecords.reduce(
+    (sum, record) => sum + (record.metrics?.studyMinutes ?? 0),
+    0
+  );
+  const totalAttempts = allRecords.reduce(
+    (sum, record) => sum + (record.metrics?.attemptCount ?? 0),
+    0
+  );
+  const avgMastery =
+    allRecords.length > 0
+      ? allRecords.reduce((sum, record) => sum + (record.metrics?.mastery ?? 0), 0) / allRecords.length
+      : 0;
+  const avgCorrectRate =
+    allRecords.length > 0
+      ? allRecords.reduce((sum, record) => sum + (record.metrics?.correctRate ?? 0), 0) / allRecords.length
+      : 0;
+  const activeRatio =
+    nodes.length > 0
+      ? allRecords.filter((record) => (record.metrics?.attemptCount ?? 0) > 0).length / nodes.length
+      : 0;
+  const efficiencyScore = Math.round(
+    Math.min(100, avgMastery * 60 + avgCorrectRate * 25 + Math.min(totalStudyMinutes / 4, 20))
+  );
+  const investmentEffectiveness: InvestmentEffectivenessAnalysis[] = [
+    {
+      studentId: "当前学生",
       investment: {
-        studentId,
-        studyTimeMinutes: Math.round(studyTime),
-        practiceTimeMinutes: Math.round(practiceTime),
-        interactionCount: Math.floor(Math.random() * 20),
-        noteCount: Math.floor(Math.random() * 10),
-        doubtRaised: Math.floor(Math.random() * 5),
-        discussionContribution: Math.floor(Math.random() * 10),
-        engagementDepth: efficiencyScore > 70 ? "deep" : efficiencyScore > 50 ? "moderate" : "surface",
+        studentId: "当前学生",
+        studyTimeMinutes: totalStudyMinutes,
+        practiceTimeMinutes: Math.round(totalAttempts * 2 + totalStudyMinutes * 0.15),
+        interactionCount: totalAttempts,
+        noteCount: Math.round(totalStudyMinutes / 30),
+        doubtRaised: Math.max(
+          0,
+          Math.round(allRecords.filter((record) => (record.metrics?.confidence ?? 1) < 0.5).length / 2)
+        ),
+        discussionContribution: Math.round(allRecords.filter((record) => (record.metrics?.streakDays ?? 0) >= 3).length / 2),
+        engagementDepth:
+          efficiencyScore >= 70 ? "deep" : efficiencyScore >= 50 ? "moderate" : "surface",
       },
       effectiveness: {
-        masteryGain,
-        scoreImprovement: masteryGain * 100,
-        skillGrowth: masteryGain * 80,
+        masteryGain: parseFloat(Math.min(1, avgMastery * 0.25 + 0.05).toFixed(3)),
+        scoreImprovement: parseFloat((avgMastery * 100 * 0.4).toFixed(1)),
+        skillGrowth: parseFloat((avgMastery * 80 * 0.4).toFixed(1)),
       },
-      category,
-      correlationCoefficient: Math.random() * 0.6 + 0.2,
+      category:
+        efficiencyScore >= 70
+          ? "efficient"
+          : efficiencyScore <= 40
+          ? "inefficient"
+          : avgMastery >= 0.6 && totalStudyMinutes < 80
+          ? "diving"
+          : "dormant",
+      correlationCoefficient: parseFloat(
+        Math.min(1, avgMastery * 0.6 + avgCorrectRate * 0.4).toFixed(3)
+      ),
       efficiencyScore,
       flags: {
-        suspectedFakeEffort: category === "inefficient" && Math.random() > 0.5,
-        potentialMethodIssue: category === "inefficient",
-        underUtilized: category === "dormant",
+        suspectedFakeEffort: efficiencyScore < 40 && avgCorrectRate < 0.6,
+        potentialMethodIssue: efficiencyScore < 45,
+        underUtilized: efficiencyScore < 50,
       },
       recommendations:
-        category === "inefficient"
-          ? ["建议优化学习方法", "增加针对性练习"]
-          : category === "dormant"
-          ? ["需要更多学习投入", "激活学习动力"]
-          : [],
-    };
-  });
+        efficiencyScore < 45
+          ? ["建议优化学习方法", "加强高质量练习和错题复盘"]
+          : efficiencyScore < 60
+          ? ["保持稳定投入，关注薄弱点提升"]
+          : ["继续保持当前节奏并拓展高阶认知练习"],
+    },
+  ];
 
   // 生成动机指数
   const motivationIndex: MotivationIndex = {
@@ -275,8 +348,40 @@ function transformComprehensiveReport(report: ComprehensiveReport) {
         },
       ])
     ),
-    questionDiscriminations: [],
-    investmentEffectiveness: [],
+    questionDiscriminations: report.question_discriminations.map((disc) => ({
+      exerciseId: disc.exercise_id,
+      discriminationIndex: disc.discrimination_index,
+      difficulty: disc.difficulty,
+      effectiveness: disc.effectiveness,
+    })),
+    investmentEffectiveness: report.investment_effectiveness.map((item) => ({
+      studentId: item.student_id,
+      investment: {
+        studentId: item.investment.student_id,
+        nodeId: item.investment.node_id,
+        studyTimeMinutes: item.investment.study_time_minutes,
+        interactionCount: item.investment.interaction_count,
+        practiceTimeMinutes: item.investment.practice_time_minutes,
+        noteCount: item.investment.note_count,
+        doubtRaised: item.investment.doubt_raised,
+        discussionContribution: item.investment.discussion_contribution,
+        engagementDepth: item.investment.engagement_depth as InvestmentEffectivenessAnalysis["investment"]["engagementDepth"],
+      },
+      effectiveness: {
+        masteryGain: item.effectiveness.mastery_gain,
+        scoreImprovement: item.effectiveness.score_improvement,
+        skillGrowth: item.effectiveness.skill_growth,
+      },
+      category: item.category as InvestmentEffectivenessAnalysis["category"],
+      correlationCoefficient: item.correlation_coefficient,
+      efficiencyScore: item.efficiency_score,
+      flags: {
+        suspectedFakeEffort: item.flags.suspected_fake_effort,
+        potentialMethodIssue: item.flags.potential_method_issue,
+        underUtilized: item.flags.under_utilized,
+      },
+      recommendations: item.recommendations,
+    })),
     motivationIndex: {
       studentId: report.motivation_index.student_id,
       consistencyScore: report.motivation_index.consistency_score,
@@ -298,6 +403,9 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
   const [weakKnowledge, setWeakKnowledge] = useState<WeakKnowledgePoint[]>([]);
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // 导出报告状态
+  const [exportingReport, setExportingReport] = useState(false);
 
   // 基础视图折叠状态
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
@@ -364,6 +472,29 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
     return () => { cancelled = true; };
   }, [nodes.length, Object.keys(progress).length]);
 
+  const handleExportReport = async () => {
+    setExportingReport(true);
+    setApiError(null);
+
+    try {
+      const blob = await downloadComprehensiveReport();
+      const fileUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = `learning-analytics-report-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(fileUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "导出报告失败";
+      setApiError(message);
+      console.error("Export report failed:", err);
+    } finally {
+      setExportingReport(false);
+    }
+  };
+
   // 默认选中第一个节点
   useEffect(() => {
     if (nodes.length > 0 && selectedNodeId === null) {
@@ -413,6 +544,15 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
               onClick={() => setViewMode("advanced")}
             >
               高级分析
+            </button>
+          </div>
+          <div className="title-buttons">
+            <button
+              className="secondary-button"
+              onClick={handleExportReport}
+              disabled={exportingReport}
+            >
+              {exportingReport ? "导出中..." : "导出报告"}
             </button>
           </div>
           <strong>{averageMastery}%</strong>

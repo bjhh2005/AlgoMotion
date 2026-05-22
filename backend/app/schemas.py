@@ -268,6 +268,8 @@ class ComprehensiveReport(BaseModel):
     cognitive_mastery: dict[str, CognitiveMastery] = Field(default_factory=dict)
     propagation_analyses: list[PropagationAnalysis] = Field(default_factory=list)
     behavior_analyses: dict[str, BehaviorAnalysis] = Field(default_factory=dict)
+    question_discriminations: list[DiscriminationAnalysis] = Field(default_factory=list)
+    investment_effectiveness: list[InvestmentEffectivenessAnalysis] = Field(default_factory=list)
     motivation_index: MotivationIndex | None = None
 
 

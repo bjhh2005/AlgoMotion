@@ -261,6 +261,8 @@ export interface ComprehensiveReport {
   cognitive_mastery: Record<string, CognitiveMastery>;
   propagation_analyses: PropagationAnalysis[];
   behavior_analyses: Record<string, BehaviorAnalysis>;
+  question_discriminations: DiscriminationAnalysis[];
+  investment_effectiveness: InvestmentEffectivenessAnalysis[];
   motivation_index: MotivationIndex;
 }
 
@@ -268,6 +270,14 @@ export function fetchComprehensiveReport() {
   return requestJson<{ success: boolean; data: ComprehensiveReport }>(
     "/api/analytics/report"
   );
+}
+
+export async function downloadComprehensiveReport() {
+  const response = await fetch(`${API_BASE_URL}/api/analytics/report/export`);
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+  return response.blob();
 }
 
 // 掌握度详细分析
