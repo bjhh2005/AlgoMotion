@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .ai_assistant import router as ai_router
 from .config import load_local_env
 from .routes.analytics import router as analytics_router
-from .routes.ai import router as ai_router
 from .routes.core import router as core_router
 from .routes.knowledge import router as knowledge_router
 from .routes.legacy import router as legacy_router

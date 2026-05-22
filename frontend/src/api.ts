@@ -1,4 +1,6 @@
 import type {
+  AiChatMessage,
+  AiLearningBundle,
   CodeAnalysisRule,
   CodeExample,
   Exercise,
@@ -25,15 +27,25 @@ export interface BootstrapPayload {
   recommendationConfig: RecommendationSeeds;
 }
 
-export interface ChatResponse {
+export interface ChatResponse extends AiLearningBundle {
   answer: string;
-  linkedNodes: string[];
+  message: AiChatMessage;
 }
 
-export interface CodeAnalysisResponse {
+export interface CodeAnalysisResponse extends AiLearningBundle {
   summary: string;
-  linkedNodes: string[];
   suggestions: string[];
+}
+
+export interface StudyArtifactsResponse extends AiLearningBundle {
+  title: string;
+  summary: string;
+}
+
+export interface CodeGenerationResponse extends AiLearningBundle {
+  code: string;
+  language: "cpp";
+  explanation: string;
 }
 
 export interface JudgeCaseDetail {
@@ -135,10 +147,14 @@ export function updateProgress(nodeId: string, record: ProgressRecord) {
   });
 }
 
-export function askAi(message: string, nodeId: string) {
+export function askAi(message: string, nodeId: string, history: AiChatMessage[] = []) {
   return requestJson<ChatResponse>("/api/ai/chat", {
     method: "POST",
-    body: JSON.stringify({ message, nodeId })
+    body: JSON.stringify({
+      message,
+      nodeId,
+      history: history.map(({ role, content }) => ({ role, content }))
+    })
   });
 }
 
@@ -146,6 +162,24 @@ export function analyzeCode(code: string, problem?: string) {
   return requestJson<CodeAnalysisResponse>("/api/ai/code-analysis", {
     method: "POST",
     body: JSON.stringify({ code, problem })
+  });
+}
+
+export function generateStudyArtifacts(sourceText: string, title: string, nodeId?: string) {
+  return requestJson<StudyArtifactsResponse>("/api/ai/study-artifacts", {
+    method: "POST",
+    body: JSON.stringify({ sourceText, title, nodeId })
+  });
+}
+
+export function generateCode(prompt: string, nodeId: string, history: AiChatMessage[] = []) {
+  return requestJson<CodeGenerationResponse>("/api/ai/code-generation", {
+    method: "POST",
+    body: JSON.stringify({
+      prompt,
+      nodeId,
+      history: history.map(({ role, content }) => ({ role, content }))
+    })
   });
 }
 

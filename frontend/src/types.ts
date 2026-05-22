@@ -337,3 +337,85 @@ export interface ComprehensiveLearningReport {
     compositeIndex: number;
   };
 }
+
+export interface AiChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  linkedNodeIds?: string[];
+}
+
+export interface AiNodeCard {
+  nodeId: string;
+  title: string;
+  description: string;
+  category: string;
+  difficulty: number;
+  tags: string[];
+  reason: string;
+  source: "knowledge-graph" | "oj-error" | "ai-analysis";
+}
+
+export interface AiGraphRelation {
+  subjectId: string;
+  subjectName: string;
+  predicate: KnowledgeEdgeType;
+  objectId: string;
+  objectName: string;
+  label: string;
+  source: "knowledge-graph" | "oj-error" | "ai-analysis";
+  evidence: "curated" | "exercise-attempt" | "rule-match";
+}
+
+export interface AiQuizItem {
+  id: string;
+  type: "choice" | "fill" | "short";
+  question: string;
+  options?: string[];
+  answer: string;
+  explanation: string;
+  linkedNodeIds: string[];
+}
+
+export interface AiKnowledgeCard {
+  nodeId: string;
+  front: string;
+  back: string;
+  bullets: string[];
+  mistake: string;
+}
+
+export interface AiRecommendedExercise {
+  exerciseId: string;
+  nodeId: string;
+  title: string;
+  type: Exercise["type"];
+  difficulty: Exercise["difficulty"];
+  reason: string;
+}
+
+export interface AiLearningAction {
+  type: "review" | "compare" | "practice";
+  label: string;
+  nodeId: string;
+  description: string;
+}
+
+export interface AiLearningLoop {
+  stage: string;
+  problem: string;
+  explainNodeId?: string;
+  practiceCount: number;
+  recommendation: string;
+}
+
+export interface AiLearningBundle {
+  linkedNodes: string[];
+  nodeCards: AiNodeCard[];
+  graphRelations: AiGraphRelation[];
+  quiz?: AiQuizItem[];
+  knowledgeCards?: AiKnowledgeCard[];
+  recommendedExercises?: AiRecommendedExercise[];
+  learningActions?: AiLearningAction[];
+  loop?: AiLearningLoop;
+}

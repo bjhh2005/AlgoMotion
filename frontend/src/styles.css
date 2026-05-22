@@ -1329,6 +1329,13 @@ body.is-resizing-split * {
   gap: 8px;
 }
 
+button:disabled,
+textarea:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 .inline-status {
   align-self: center;
   color: #66778c;
@@ -2774,12 +2781,267 @@ pre {
   color: #47586d;
 }
 
+.ai-workbench {
+  display: grid;
+  gap: 16px;
+}
+
+.ai-mode-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-mode-tabs button {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #e7edf5;
+  color: #243247;
+}
+
+.ai-mode-tabs button.active {
+  background: #36a3a0;
+  color: #fff;
+}
+
+.ai-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: 16px;
+}
+
+.ai-conversation,
+.ai-insights,
+.ai-output-grid section,
+.generated-code-panel {
+  border: 1px solid #dae2ed;
+  border-radius: 8px;
+  background: #fff;
+  padding: 14px;
+}
+
+.chat-stream {
+  display: grid;
+  gap: 10px;
+  max-height: 420px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.chat-message {
+  display: grid;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f5f8fb;
+}
+
+.chat-message.user {
+  background: #edf5f4;
+}
+
+.chat-message.waiting {
+  border: 1px solid #b8dcd7;
+  background: #f0faf8;
+}
+
+.chat-message span,
+.chat-message em,
+.quiz-list em,
+.flashcard-grid em {
+  color: #66778c;
+  font-size: 0.84rem;
+  font-style: normal;
+}
+
+.chat-message p {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.ai-pending-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  border: 1px solid #b8dcd7;
+  border-radius: 8px;
+  background: #f0faf8;
+  color: #155e5b;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.ai-pending-banner::before {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #36a3a0;
+  content: "";
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.typing-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #36a3a0;
+  animation: typing-bounce 1s infinite ease-in-out;
+}
+
+.typing-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typing-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.secondary-button {
+  background: #edf2f7;
+  color: #415269;
+}
+
+@keyframes typing-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.mini-link-row,
+.ai-relation-list,
+.ai-action-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mini-link-row button,
+.ai-relation-list button,
+.ai-action-list button {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #e7edf5;
+  color: #243247;
+}
+
+.ai-insights {
+  display: grid;
+  gap: 14px;
+}
+
+.ai-insights h4,
+.ai-output-grid h4,
+.generated-code-panel h4 {
+  margin: 0 0 10px;
+}
+
+.ai-card-grid,
+.quiz-list,
+.flashcard-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.ai-node-card {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  border: 1px solid #d3dde8;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  color: #243247;
+  text-align: left;
+}
+
+.ai-node-card span,
+.ai-action-list span,
+.quiz-list span {
+  color: #66778c;
+  line-height: 1.5;
+}
+
+.ai-node-card em {
+  color: #23706d;
+  font-style: normal;
+  font-size: 0.84rem;
+}
+
+.quiz-list article,
+.flashcard-grid article {
+  display: grid;
+  gap: 6px;
+  border-radius: 8px;
+  background: #f5f8fb;
+  padding: 12px;
+}
+
+.quiz-list p,
+.flashcard-grid p,
+.generated-code-panel p {
+  margin: 0;
+  color: #47586d;
+  line-height: 1.6;
+}
+
+.ai-output-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ai-action-list {
+  flex-direction: column;
+}
+
+.ai-action-list button {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.generated-code-panel pre {
+  margin-bottom: 0;
+}
+
 @media (max-width: 1040px) {
 
   .app-shell,
   .bottom-grid,
   .analytics-grid,
-  .oj-layout {
+  .oj-layout,
+  .ai-layout,
+  .ai-output-grid {
     grid-template-columns: 1fr;
   }
 
