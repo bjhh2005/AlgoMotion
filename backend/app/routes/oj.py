@@ -84,6 +84,13 @@ def run_judge(req: JudgeRequest):
 def load_data():
     return read_json(EXERCISE_DIR / "tag.json")
 
+@router.get("/api/git_tag")
+async def get_tag():
+    data_list = load_data()
+    result = []
+    for item in data_list:
+        result.extend(item["tag"])
+    return result
 
 @router.get("/api/get_problem_data/{id}")
 async def get_problem(id: str):
