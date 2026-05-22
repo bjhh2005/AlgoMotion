@@ -1,23 +1,11 @@
-import { fetchProblemData, isProblemApiError, searchProblemsByTag, type TagProblemIndex } from "../../api";
+import {
+  fetchGitTags,
+  fetchProblemData,
+  isProblemApiError,
+  searchProblemsByTag,
+  type TagProblemIndex
+} from "../../api";
 import type { Exercise, KnowledgeNode, ProgressMap, ProgressStatus } from "../../types";
-
-/** 与 data/exercises/tag.json 中 tag 字段一致 */
-export const CATALOG_TAG_SLUGS = [
-  "union-find",
-  "stack",
-  "queue",
-  "kmp",
-  "linked-list",
-  "avl-tree",
-  "red-black-tree",
-  "heap",
-  "huffman-tree",
-  "topological-sort",
-  "mst",
-  "shortest-path",
-  "binary-search",
-  "merge-sort"
-] as const;
 
 export type OjPracticeStatus = "未尝试" | "尝试中" | "已通过";
 
@@ -42,19 +30,29 @@ export function tagLabel(slug: string, nodeById: Record<string, KnowledgeNode>) 
   return nodeById[slug]?.name ?? slug;
 }
 
-export function allTagLabels(nodeById: Record<string, KnowledgeNode>) {
-  return CATALOG_TAG_SLUGS.map((slug) => ({
+export function allTagLabels(tagSlugs: string[], nodeById: Record<string, KnowledgeNode>) {
+  return tagSlugs.map((slug) => ({
     slug,
     label: tagLabel(slug, nodeById)
   }));
 }
 
+/** 从 GET /api/git_tag 拉取并去重排序 */
+export async function fetchCatalogTags(): Promise<string[]> {
+  const raw = await fetchGitTags();
+  if (!Array.isArray(raw)) return [];
+  return [...new Set(raw.filter((tag) => typeof tag === "string" && tag.trim()))].sort();
+}
+
 export async function fetchProblemCatalog(
   nodeById: Record<string, KnowledgeNode>,
-  progress: ProgressMap
+  progress: ProgressMap,
+  tagSlugs: string[]
 ): Promise<OjCatalogItem[]> {
+  if (tagSlugs.length === 0) return [];
+
   const responses = await Promise.all(
-    CATALOG_TAG_SLUGS.map((slug) => searchProblemsByTag(slug).catch(() => ({ problems: [] })))
+    tagSlugs.map((slug) => searchProblemsByTag(slug).catch(() => ({ problems: [] })))
   );
 
   const indexMap = new Map<string, TagProblemIndex>();

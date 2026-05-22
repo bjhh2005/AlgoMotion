@@ -8,6 +8,7 @@ import { ProblemList } from "./oj/ProblemList";
 import {
   applyRecommendations,
   catalogItemToExercise,
+  fetchCatalogTags,
   fetchProblemCatalog,
   type OjCatalogItem
 } from "./oj/oj-catalog";
@@ -16,7 +17,8 @@ import type { CodeAnalysisRule, KnowledgeContent, KnowledgeNode, ProgressMap, Pr
 import { typeLabel } from "./oj/oj-utils";
 
 interface Props {
-  selectedExerciseId: string;
+  /** 仅知识库跳转时传入；为 null 时显示题库检索页 */
+  openProblemId: string | null;
   onSelectExercise: (exerciseId: string) => void;
   onOpenKnowledge: (nodeId: string) => void;
   onJudgeComplete?: (nodeId: string, accepted: boolean, previous?: ProgressRecord) => void;
@@ -31,7 +33,7 @@ function indexInList(list: OjCatalogItem[], id: string) {
 }
 
 export function ExerciseOjPage({
-  selectedExerciseId,
+  openProblemId,
   onSelectExercise,
   onOpenKnowledge,
   onJudgeComplete,
@@ -41,6 +43,7 @@ export function ExerciseOjPage({
 }: Props) {
   const [progress, setProgress] = useState<ProgressMap>({});
   const [catalog, setCatalog] = useState<OjCatalogItem[]>([]);
+  const [catalogTags, setCatalogTags] = useState<string[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [catalogError, setCatalogError] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -55,11 +58,14 @@ export function ExerciseOjPage({
     setCatalogLoading(true);
     setCatalogError("");
     try {
-      const items = await fetchProblemCatalog(nodeById, progress);
+      const tags = await fetchCatalogTags();
+      setCatalogTags(tags);
+      const items = await fetchProblemCatalog(nodeById, progress, tags);
       setCatalog(items);
     } catch (error) {
       setCatalogError(error instanceof Error ? error.message : "题库加载失败");
       setCatalog([]);
+      setCatalogTags([]);
     } finally {
       setCatalogLoading(false);
     }
@@ -70,10 +76,15 @@ export function ExerciseOjPage({
   }, [loadCatalog]);
 
   useEffect(() => {
-    if (!selectedExerciseId || catalog.length === 0) return;
-    const exists = catalog.some((item) => item.id === selectedExerciseId);
-    if (exists) setActiveId(selectedExerciseId);
-  }, [selectedExerciseId, catalog]);
+    if (!openProblemId) {
+      setActiveId(null);
+      return;
+    }
+    if (catalog.length === 0) return;
+    if (catalog.some((item) => item.id === openProblemId)) {
+      setActiveId(openProblemId);
+    }
+  }, [openProblemId, catalog]);
 
   const activeItem = useMemo(
     () => catalog.find((item) => item.id === activeId) ?? null,
@@ -146,6 +157,7 @@ export function ExerciseOjPage({
       {!activeItem ? (
         <ProblemList
           items={catalog}
+          tagSlugs={catalogTags}
           loading={catalogLoading}
           error={catalogError}
           nodeById={nodeById}

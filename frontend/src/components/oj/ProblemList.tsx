@@ -12,6 +12,7 @@ import { difficultyLabel, typeLabel } from "./oj-utils";
 
 interface Props {
   items: OjCatalogItem[];
+  tagSlugs: string[];
   loading: boolean;
   error: string;
   nodeById: Record<string, KnowledgeNode>;
@@ -60,6 +61,7 @@ function diffClass(difficulty?: Exercise["difficulty"]) {
 
 export function ProblemList({
   items,
+  tagSlugs,
   loading,
   error,
   nodeById,
@@ -72,7 +74,7 @@ export function ProblemList({
   const [statusFilter, setStatusFilter] = useState<"all" | OjPracticeStatus>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const tagOptions = useMemo(() => allTagLabels(nodeById), [nodeById]);
+  const tagOptions = useMemo(() => allTagLabels(tagSlugs, nodeById), [tagSlugs, nodeById]);
 
   const filtered = useMemo(
     () =>
@@ -161,6 +163,12 @@ export function ProblemList({
               )}
             </div>
             <div className="oj-bank-tag-cloud">
+              {loading && tagOptions.length === 0 && (
+                <span className="oj-bank-hint muted">正在加载标签…</span>
+              )}
+              {!loading && tagOptions.length === 0 && (
+                <span className="oj-bank-hint muted">暂无可用标签</span>
+              )}
               {tagOptions.map(({ slug, label }) => (
                 <button
                   key={slug}

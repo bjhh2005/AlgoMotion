@@ -170,6 +170,11 @@ export function searchProblemsByTag(tag: string) {
   return requestJson<SearchTagResponse>(`/api/search_tag?${params}`);
 }
 
+/** 题库全部标签（GET /api/git_tag，去重后用于筛选与拉取题目） */
+export function fetchGitTags() {
+  return requestJson<string[]>("/api/git_tag");
+}
+
 export interface SelectCompleteCheckPayload {
   problem_id: string;
   answer: string;
