@@ -1,0 +1,7 @@
+import random
+rd = random.randint
+
+n, m = rd(1, 100), rd(1, 1000)
+print(n, m, sep=' ')
+for _ in range(m):
+    print(rd(1, n), rd(1, n), rd(1, 1000000))

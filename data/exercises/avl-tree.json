@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-avl-tree-001",
+    "ojProblemId": "avl-tree-001",
+    "nodeId": "avl-tree",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "单向链表",
+    "path": "data/oj-data/avl-tree-001/problem.md",
+    "starterCode": "data/oj-data/avl-tree-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-avl-tree-001",
+    "linkedNodeIds": ["avl-tree"]
+  }
+]

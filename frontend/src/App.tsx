@@ -78,6 +78,8 @@ export function App() {
   const [recommendationsConfig, setRecommendationsConfig] = useState<RecommendationSeeds>(recommendationConfig);
   const [selectedId, setSelectedId] = useState("stack");
   const [selectedExerciseId, setSelectedExerciseId] = useState(exerciseBank[0]?.id ?? "");
+  /** 从知识库「进入 OJ」时指定要打开的题目；点击 OJ 导航则为 null，先显示题库 */
+  const [ojOpenProblemId, setOjOpenProblemId] = useState<string | null>(null);
   const [page, setPage] = useState<AppPage>("knowledge");
   const [query, setQuery] = useState("");
   const [view, setView] = useState<"graph" | "directory">("graph");
@@ -190,6 +192,12 @@ export function App() {
 
   function openExercise(exerciseId: string) {
     setSelectedExerciseId(exerciseId);
+    setOjOpenProblemId(exerciseId);
+    setPage("oj");
+  }
+
+  function openOjCatalog() {
+    setOjOpenProblemId(null);
     setPage("oj");
   }
 
@@ -270,7 +278,7 @@ export function App() {
             <BookOpen size={17} />
             知识库
           </button>
-          <button className={page === "oj" ? "active" : ""} onClick={() => setPage("oj")}>
+          <button className={page === "oj" ? "active" : ""} onClick={openOjCatalog}>
             <ClipboardList size={17} />
             OJ 练习
           </button>
@@ -362,8 +370,7 @@ export function App() {
 
         {page === "oj" && (
           <ExerciseOjPage
-            exercises={exercises}
-            selectedExerciseId={selectedExerciseId}
+            openProblemId={ojOpenProblemId}
             onSelectExercise={setSelectedExerciseId}
             onOpenKnowledge={openKnowledge}
             onJudgeComplete={handleJudgeComplete}

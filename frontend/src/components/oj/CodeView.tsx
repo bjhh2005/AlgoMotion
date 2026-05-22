@@ -1,14 +1,25 @@
 import { useEffect, useState } from "react";
 import { Check, Clock, HardDrive, Play, Send, X } from "lucide-react";
-import { analyzeCode, normalizeJudgeResponse, submitJudge, type JudgeCaseDetail, type JudgeResponse } from "../../api";
+import {
+  analyzeCode,
+  fetchProblemData,
+  isProblemApiError,
+  normalizeJudgeResponse,
+  submitJudge,
+  type JudgeCaseDetail,
+  type JudgeResponse
+} from "../../api";
+import { MarkdownContent } from "./MarkdownContent";
 import type { CodeAnalysisRule, Exercise, KnowledgeContent, KnowledgeNode, ProgressRecord } from "../../types";
 import { CodeEditor } from "./CodeEditor";
 import { normalizeCodeString } from "./code-editor-utils";
+import { mergeProgrammingExercise } from "./programming-1001";
 import { difficultyLabel, exerciseRoute, knowledgeName, resolveOjProblemId } from "./oj-utils";
+import { parseSampleCasesFromMarkdown } from "./problem-markdown";
 import { useVerticalPaneResize } from "./useVerticalPaneResize";
 
 interface Props {
-  questions: Exercise[];
+  question: Exercise | null;
   nodeById: Record<string, KnowledgeNode>;
   contentByNodeId: Record<string, KnowledgeContent>;
   analysisRules: CodeAnalysisRule[];
@@ -19,7 +30,7 @@ interface Props {
 const DEFAULT_TIME_LIMIT = 2;
 const DEFAULT_MEM_LIMIT = 256;
 
-type DescTab = "desc" | "hint" | "submit";
+type DescTab = "desc" | "submit";
 
 interface SubmissionRecord {
   id: string;
@@ -62,11 +73,10 @@ function formatMemory() {
   return "—";
 }
 
-function enrichJudgeWithSamples(result: JudgeResponse, question: Exercise): JudgeResponse {
-  const samples =
-    question.ojSampleCases ??
-    question.examples?.map((example) => ({ input: example.input, expected: example.output })) ??
-    [];
+function enrichJudgeWithSamples(
+  result: JudgeResponse,
+  samples: { input: string; expected: string }[]
+): JudgeResponse {
 
   return {
     ...result,
@@ -123,14 +133,14 @@ function CaseDetailPanel({ detail }: { detail: JudgeCaseDetail }) {
 }
 
 export function CodeView({
-  questions,
+  question: indexQuestion,
   nodeById,
   contentByNodeId,
   onOpenKnowledge,
   onJudgeComplete
 }: Props) {
-  const question = questions[0];
-  const [code, setCode] = useState(() => normalizeCodeString(question?.starterCode ?? ""));
+  const [question, setQuestion] = useState<Exercise | null>(indexQuestion);
+  const [code, setCode] = useState("");
   const [descTab, setDescTab] = useState<DescTab>("desc");
   const [caseTab, setCaseTab] = useState(0);
   const [running, setRunning] = useState(false);
@@ -139,11 +149,15 @@ export function CodeView({
   const [analysisStatus, setAnalysisStatus] = useState("");
   const [apiLinkedNodeIds, setApiLinkedNodeIds] = useState<string[]>([]);
   const [showErrorBind, setShowErrorBind] = useState(false);
+  const [problemMarkdown, setProblemMarkdown] = useState("");
+  const [problemLoadStatus, setProblemLoadStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [problemLoadMessage, setProblemLoadMessage] = useState("");
   const [submissionRecords, setSubmissionRecords] = useState<SubmissionRecord[]>([]);
   const { paneRef, editorRatio, consoleRatio, isResizing, onResizeStart } = useVerticalPaneResize();
 
   useEffect(() => {
-    setCode(normalizeCodeString(question?.starterCode ?? ""));
+    setQuestion(indexQuestion);
+    setCode("");
     setJudgeResult(null);
     setSubmitStatus("");
     setAnalysisStatus("");
@@ -152,14 +166,57 @@ export function CodeView({
     setShowErrorBind(false);
     setApiLinkedNodeIds([]);
     setSubmissionRecords([]);
-  }, [question?.id, question?.starterCode]);
+    setProblemMarkdown("");
+    setProblemLoadStatus("idle");
+    setProblemLoadMessage("");
+  }, [indexQuestion?.id]);
 
-  if (!question) {
+  useEffect(() => {
+    if (!indexQuestion?.id) return;
+
+    let cancelled = false;
+    setProblemLoadStatus("loading");
+    setProblemLoadMessage("");
+    setProblemMarkdown("");
+
+    fetchProblemData(indexQuestion.id)
+      .then((payload) => {
+        if (cancelled) return;
+        if (isProblemApiError(payload)) {
+          setProblemLoadStatus("error");
+          setProblemLoadMessage(payload.details ?? "题面加载失败");
+          setQuestion(indexQuestion);
+          return;
+        }
+        setQuestion(mergeProgrammingExercise(indexQuestion, payload));
+        if (payload.content) {
+          setProblemMarkdown(payload.content);
+          setProblemLoadStatus("ok");
+          return;
+        }
+        setProblemLoadStatus("error");
+        setProblemLoadMessage("未返回题面 Markdown 内容");
+      })
+      .catch((error: Error) => {
+        if (cancelled) return;
+        setProblemLoadStatus("error");
+        setProblemLoadMessage(error.message);
+        setQuestion(indexQuestion);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [indexQuestion]);
+
+  if (!indexQuestion) {
     return <p className="oj-empty">暂无编程题</p>;
   }
 
+  const activeQuestion = question ?? indexQuestion;
+
   const linkedNodeIds = Array.from(
-    new Set([question.nodeId, ...(question.linkedNodeIds ?? []), ...apiLinkedNodeIds])
+    new Set([activeQuestion.nodeId, ...(activeQuestion.linkedNodeIds ?? []), ...apiLinkedNodeIds])
   );
   const knowledgeTags = linkedNodeIds
     .map((id) => nodeById[id]?.name)
@@ -167,7 +224,7 @@ export function CodeView({
 
   function runErrorAnalysis() {
     setAnalysisStatus("正在分析错因…");
-    analyzeCode(code || question.title, question.title)
+    analyzeCode(code || activeQuestion.title, activeQuestion.title)
       .then((result) => {
         setApiLinkedNodeIds(result.linkedNodes);
         setAnalysisStatus(result.suggestions[0] ?? "错因分析完成");
@@ -194,13 +251,14 @@ export function CodeView({
 
     submitJudge({
       submission_id: submissionId,
-      problem_id: resolveOjProblemId(question),
+      problem_id: resolveOjProblemId(activeQuestion),
       code: trimmed,
       time_limit: DEFAULT_TIME_LIMIT,
       mem_limit: DEFAULT_MEM_LIMIT
     })
       .then((raw) => {
-        const result = enrichJudgeWithSamples(normalizeJudgeResponse(raw), question);
+        const samples = parseSampleCasesFromMarkdown(problemMarkdown);
+        const result = enrichJudgeWithSamples(normalizeJudgeResponse(raw), samples);
         setJudgeResult(result);
         setCaseTab(0);
 
@@ -227,7 +285,7 @@ export function CodeView({
             ...current
           ].slice(0, 10));
           try {
-            onJudgeComplete?.(question.nodeId, accepted);
+            onJudgeComplete?.(activeQuestion.nodeId, accepted);
           } catch {
             // 避免进度同步异常导致整页白屏
           }
@@ -273,11 +331,11 @@ export function CodeView({
     <div className="oj-code-view">
       <header className="oj-code-toolbar">
         <div className="oj-code-toolbar-meta">
-          <span className="muted">{exerciseRoute(question)}</span>
+          <span className="muted">{exerciseRoute(activeQuestion)}</span>
           <span>·</span>
-          <strong>{question.title}</strong>
-          <span className="oj-badge oj-badge-outline">{knowledgeName(question, nodeById)}</span>
-          <span className="oj-badge oj-badge-warn">{difficultyLabel[question.difficulty]}</span>
+          <strong>{activeQuestion.title}</strong>
+          <span className="oj-badge oj-badge-outline">{knowledgeName(activeQuestion, nodeById)}</span>
+          <span className="oj-badge oj-badge-warn">{difficultyLabel[activeQuestion.difficulty]}</span>
         </div>
         <div className="oj-code-toolbar-actions">
           <button type="button" className="oj-btn-outline" disabled={running} onClick={() => runJudge(false)}>
@@ -297,9 +355,6 @@ export function CodeView({
             <button type="button" className={descTab === "desc" ? "active" : ""} onClick={() => setDescTab("desc")}>
               题目描述
             </button>
-            <button type="button" className={descTab === "hint" ? "active" : ""} onClick={() => setDescTab("hint")}>
-              提示
-            </button>
             <button type="button" className={descTab === "submit" ? "active" : ""} onClick={() => setDescTab("submit")}>
               提交记录
             </button>
@@ -307,23 +362,14 @@ export function CodeView({
 
           {descTab === "desc" && (
             <div className="oj-desc-body">
-              <h3>{question.title}</h3>
-              {question.description && <p className="oj-desc-text">{question.description}</p>}
-              {question.examples?.map((example, index) => (
-                <div key={index} className="oj-example-block">
-                  <div className="oj-example-title">示例 {index + 1}：</div>
-                  <pre>{`输入: ${example.input}\n输出: ${example.output}${example.explanation ? `\n解释: ${example.explanation}` : ""}`}</pre>
-                </div>
-              ))}
-              {question.constraints && question.constraints.length > 0 && (
-                <div>
-                  <div className="oj-example-title">约束条件：</div>
-                  <ul className="oj-constraints">
-                    {question.constraints.map((item) => (
-                      <li key={item}><code>{item}</code></li>
-                    ))}
-                  </ul>
-                </div>
+              {problemLoadStatus === "loading" && (
+                <p className="muted">正在加载题面…</p>
+              )}
+              {problemLoadStatus === "error" && (
+                <p className="oj-problem-error">{problemLoadMessage || "题面加载失败"}</p>
+              )}
+              {problemLoadStatus === "ok" && (
+                <MarkdownContent markdown={problemMarkdown} />
               )}
               {knowledgeTags.length > 0 && (
                 <div className="oj-knowledge-card">
@@ -347,17 +393,6 @@ export function CodeView({
                 </div>
               )}
             </div>
-          )}
-
-          {descTab === "hint" && (
-            <ul className="oj-hint-list">
-              {(question.hints ?? []).map((hint) => (
-                <li key={hint}>{hint}</li>
-              ))}
-              {(question.hints ?? []).length === 0 && (
-                <li className="muted">暂无提示，可查看知识点详情中的代码模板。</li>
-              )}
-            </ul>
           )}
 
           {descTab === "submit" && (submissionRecords.length > 0 ? (

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-dsu-001",
+    "ojProblemId": "dsu-001",
+    "nodeId": "union-find",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[模板]并查集",
+    "path": "data/oj-data/dsu-001/problem.md",
+    "starterCode": "data/oj-data/dsu-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-dsu-001",
+    "linkedNodeIds": ["union-find"]
+  }
+]

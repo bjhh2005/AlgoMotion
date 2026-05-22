@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fastapi import APIRouter
 
-from ..config import EXERCISE_DIR
+from ..config import EXERCISE_DIR, ROOT
 from ..schemas import JudgeRequest, Select_CompleteRequest
 from ..storage import read_json
 
@@ -82,7 +82,21 @@ def run_judge(req: JudgeRequest):
 
 
 def load_data():
-    return read_json(EXERCISE_DIR / "exercises.json")
+    return read_json(EXERCISE_DIR / "tag.json")
+
+@router.get("/api/git_tag")
+async def get_tag():
+    data_list = load_data()
+    result = []
+    for item in data_list:
+        result.extend(item["tag"])
+    return result
+
+def resolve_data_path(path: str) -> Path:
+    candidate = Path(path)
+    if candidate.is_absolute():
+        return candidate
+    return ROOT / path
 
 
 @router.get("/api/get_problem_data/{id}")
@@ -96,15 +110,39 @@ async def get_problem(id: str):
             "id": "Error",
             "details": "文件不存在",
         }
+    
+    problem_path = resolve_data_path(result["path"])
+    if problem_path.exists() and problem_path.is_file():
+        try:
+            with problem_path.open("r", encoding="utf-8") as file:
+                data = read_json(problem_path)
 
-    if result["type"] == "programming":
-        path = Path(result["path"])
+            ret = next((item for item in data if item["id"] == id), None)
+        except Exception:
+            return {
+                "id": "Error",
+                "details": "题面不存在",
+            }
+    else:
+        return {
+            "id": "Error",
+            "details": "路径错误",
+        }
+
+    if ret is None:
+        return {
+            "id": "Error",
+            "details": "题面不存在",
+        }
+
+    if ret["type"] == "programming":
+        path = resolve_data_path(ret["path"])
         if path.exists() and path.is_file():
             try:
                 with path.open("r", encoding="utf-8") as file:
                     md_content = file.read()
 
-                full_data = result.copy()
+                full_data = ret.copy()
                 full_data["content"] = md_content
 
                 return full_data
@@ -120,27 +158,65 @@ async def get_problem(id: str):
                 "details": "路径错误",
             }
     else:
-        return result
+        return ret
 
+@router.get("/api/search_tag")
+async def search_tag(tag: str):
+    data = load_data()
+    result = [item for item in data if tag in item["tag"]]
+    
+    return {
+        "problems": result
+    }
 
 @router.post("/api/check_S&C_ans/{id}")
-def check(req: Select_CompleteRequest):
+def check(id: str, req: Select_CompleteRequest):
+    if req.problem_id != id:
+        return {
+            "id": "Error",
+            "details": "参数错误",
+        }
+
     data_list = load_data()
 
-    result = next((item for item in data_list if item["id"] == req.problem_id), None)
+    result = next((item for item in data_list if item["id"] == id), None)
 
     if result is None:
         return {
             "id": "Error",
             "details": "文件不存在",
         }
+    
+    problem_path = resolve_data_path(result["path"])
+    if problem_path.exists() and problem_path.is_file():
+        try:
+            with problem_path.open("r", encoding="utf-8") as file:
+                data = read_json(problem_path)
 
-    if result["type"] == "programming":
+            ret = next((item for item in data if item["id"] == req.problem_id), None)
+        except Exception:
+            return {
+                "id": "Error",
+                "details": "题面不存在",
+            }
+    else:
+        return {
+            "id": "Error",
+            "details": "路径错误",
+        }
+
+    if ret is None:
+        return {
+            "id": "Error",
+            "details": "题面不存在",
+        }
+
+    if ret["type"] == "programming":
         return {
             "id": "Error",
             "details": "题目并非是选填",
         }
     else:
         return {
-            "status": result["answer"] == req.answer,
+            "status": ret["answer"] == req.answer,
         }
