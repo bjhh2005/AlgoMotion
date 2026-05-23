@@ -207,6 +207,7 @@ export function App() {
   function openKnowledge(nodeId: string) {
     setSelectedId(nodeId);
     setPage("knowledge");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function locateKnowledge(nodeId: string) {
