@@ -8,7 +8,7 @@ export function searchKnowledgeNodes(
   const keyword = query.trim().toLowerCase();
   if (!keyword) return nodes;
 
-  return nodes.filter((node) => {
+  function matchesNode(node: KnowledgeNode): boolean {
     const content = contentsByNodeId[node.id];
     const haystack = [
       node.name,
@@ -26,7 +26,32 @@ export function searchKnowledgeNodes(
       .toLowerCase();
 
     return haystack.includes(keyword);
-  });
+  }
+
+  function nameMatchRank(name: string): number | null {
+    const normalized = name.toLowerCase();
+    if (normalized === keyword) return 0;
+    if (normalized.startsWith(keyword)) return 1;
+    if (normalized.includes(keyword)) return 2;
+    return null;
+  }
+
+  return nodes
+    .filter(matchesNode)
+    .sort((left, right) => {
+      const leftRank = nameMatchRank(left.name);
+      const rightRank = nameMatchRank(right.name);
+
+      if (leftRank !== null && rightRank !== null) {
+        if (leftRank !== rightRank) return leftRank - rightRank;
+        return left.name.localeCompare(right.name, "zh-CN");
+      }
+
+      if (leftRank !== null) return -1;
+      if (rightRank !== null) return 1;
+
+      return left.name.localeCompare(right.name, "zh-CN");
+    });
 }
 
 export function buildPathEdgeKeys(pathIds: string[], edges: KnowledgeEdge[]): Set<string> {

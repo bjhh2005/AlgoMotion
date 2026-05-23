@@ -1,4 +1,5 @@
 import { Crosshair, MapPin, Navigation, Search } from "lucide-react";
+import type { KeyboardEvent } from "react";
 import type { KnowledgeNode, ProgressMap, RecommendationItem } from "../types";
 import { getPathReason, getStatusLabel } from "../utils/pathGuide";
 
@@ -14,6 +15,8 @@ interface Props {
   selectedNodeName: string;
   activePathStep: number | null;
   splitRatio: number;
+  onQueryChange: (value: string) => void;
+  onSearchKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
   onSelectPathStep: (stepIndex: number, nodeId: string) => void;
   onLocate: (nodeId: string) => void;
 }
@@ -28,6 +31,8 @@ export function PathGuidePanel({
   selectedNodeName,
   activePathStep,
   splitRatio,
+  onQueryChange,
+  onSearchKeyDown,
   onSelectPathStep,
   onLocate
 }: Props) {
@@ -114,10 +119,21 @@ export function PathGuidePanel({
           )}
         </div>
 
+        <label className="path-guide-search-box">
+          <Search size={16} aria-hidden="true" />
+          <input
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+            onKeyDown={onSearchKeyDown}
+            placeholder="搜索知识点 / 标签 / 定义"
+            aria-label="搜索知识点"
+          />
+        </label>
+
         <div className="path-guide-search-scroll">
           {!showSearch ? (
             <p className="path-guide-hint">
-              在左侧搜索框输入关键词（名称、标签、定义等），此处显示结果并支持一键定位到图谱。
+              输入关键词后，此处显示匹配结果并支持一键定位到图谱；按 Enter 可定位首个匹配。
             </p>
           ) : searchResults.length === 0 ? (
             <p className="path-guide-empty">未找到匹配「{keyword}」的知识点</p>

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@xyflow/react": "^12.10.2",
+    "highlight.js": "^11.11.1",
     "katex": "^0.17.0",
     "lucide-react": "^0.468.0",
     "marked": "^18.0.4",
