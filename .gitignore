@@ -11,6 +11,7 @@ algomotion
 algomotion.exe
 *.o
 *.out
+!data/oj-data/**/*.out
 
 # Frontend dependencies and builds
 node_modules/
