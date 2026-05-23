@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactElement } from "react";
+import { BookOpen, Bot, ClipboardList, Code2, FileText, GitBranch, Loader2, MessageSquareText, Send, Sparkles, Trash2 } from "lucide-react";
 import { analyzeCode, askAi, generateCode, generateStudyArtifacts } from "../api";
 import type {
   AiChatMessage,
@@ -58,6 +60,11 @@ const waitingMessageId = "assistant-waiting";
 const defaultMessage = "我不会判断这段栈代码为什么可能出错，能帮我讲清楚并给练习吗？";
 const defaultCode = "stack<int> s;\ns.pop();";
 const defaultSourceText = "栈具有后进先出特性，递归调用会把未完成的函数状态保存在调用栈中。空栈时直接 pop 或 top 是常见错误。";
+const promptSuggestions = [
+  { label: "讲清概念", value: "请用生活类比解释这个知识点，并指出最容易混淆的地方。" },
+  { label: "生成练习", value: "围绕当前知识点生成 3 道由浅入深的练习，并给出解析。" },
+  { label: "错因定位", value: "我这段代码哪里可能出错？请关联到知识图谱中的知识点。" }
+];
 
 function welcomeMessage(selectedNode: KnowledgeNode): AiChatMessage {
   return {
@@ -110,6 +117,47 @@ function loadSessionSnapshot(): AiSessionSnapshot | null {
   }
 }
 
+function renderInlineMarkdown(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean).map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={index}>{part.slice(1, -1)}</code>;
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
+
+function renderAssistantContent(content: string): ReactElement[] {
+  const blocks = content
+    .replace(/<\/?(details|summary)>/g, "")
+    .split(/```/)
+    .map((block, index) => ({ block, isCode: index % 2 === 1 }));
+
+  return blocks.flatMap(({ block, isCode }, blockIndex) => {
+    if (isCode) {
+      const lines = block.replace(/^\w+\n/, "").trim();
+      return lines ? [<pre key={`code-${blockIndex}`}><code>{lines}</code></pre>] : [];
+    }
+
+    return block.split(/\n+/).map((line, lineIndex) => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed === "---") return null;
+      if (/^#{1,6}\s+/.test(trimmed)) {
+        return <h5 key={`h-${blockIndex}-${lineIndex}`}>{trimmed.replace(/^#{1,6}\s+/, "")}</h5>;
+      }
+      if (/^[-*]\s+/.test(trimmed)) {
+        return <p key={`li-${blockIndex}-${lineIndex}`} className="markdown-list-line">{renderInlineMarkdown(trimmed.replace(/^[-*]\s+/, ""))}</p>;
+      }
+      if (/^\d+\.\s+/.test(trimmed)) {
+        return <p key={`ol-${blockIndex}-${lineIndex}`} className="markdown-list-line ordered">{renderInlineMarkdown(trimmed.replace(/^\d+\.\s+/, ""))}</p>;
+      }
+      return <p key={`p-${blockIndex}-${lineIndex}`}>{renderInlineMarkdown(trimmed)}</p>;
+    }).filter((item): item is ReactElement => item !== null);
+  });
+}
+
 function mergeWorkspace(current: AiWorkspace, next: Partial<AiWorkspace>): AiWorkspace {
   return {
     ...current,
@@ -151,6 +199,8 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
   }, [messages, workspace.nodeCards]);
 
   const isPending = pendingAction !== null;
+  const sourceCount = workspace.nodeCards.length;
+  const studioCount = workspace.quiz.length + workspace.knowledgeCards.length + workspace.recommendedExercises.length + workspace.learningActions.length;
 
   useEffect(() => {
     const snapshot: AiSessionSnapshot = {
@@ -328,133 +378,179 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
   }
 
   return (
-    <section className="ai-panel ai-workbench">
-      <div className="panel-title">
+    <section className="ai-panel ai-notebook">
+      <header className="ai-notebook-header">
         <div>
-          <span className="eyebrow">AI Assistant</span>
-          <h3>多轮学习助手</h3>
+          <span className="eyebrow">AI Notebook</span>
+          <h3>数据结构学习工作台</h3>
+          <p>把知识图谱、问答、代码诊断和练习推荐收束到同一个学习空间。</p>
         </div>
-        <strong>{status}</strong>
-      </div>
+        <div className="ai-header-metrics" aria-label="AI 工作台统计">
+          <span><strong>{sourceCount}</strong>上下文</span>
+          <span><strong>{messages.length}</strong>轮对话</span>
+          <span><strong>{studioCount}</strong>产物</span>
+        </div>
+        <div className="ai-status-chip">
+          {isPending && <Loader2 size={15} />}
+          <span>{status}</span>
+        </div>
+      </header>
 
-      <div className="ai-mode-tabs" aria-label="AI 功能切换">
-        <button className={mode === "chat" ? "active" : ""} onClick={() => setMode("chat")}>对话</button>
-        <button className={mode === "artifact" ? "active" : ""} onClick={() => setMode("artifact")}>资料学习包</button>
-        <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>代码闭环</button>
-      </div>
+      <div className="ai-notebook-grid">
+        <aside className="ai-sources-panel">
+          <div className="ai-panel-heading">
+            <span><FileText size={16} /> Sources</span>
+            <em>{sourceCount} 个上下文</em>
+          </div>
 
-      <div className="ai-layout">
-        <section className="ai-conversation">
+          <button className="source-current-card" onClick={() => onSelect(selectedNode.id)}>
+            <span>当前知识点</span>
+            <strong>{selectedNode.name}</strong>
+            <small>{selectedNode.description}</small>
+            <em>{selectedNode.tags.slice(0, 3).join(" · ")}</em>
+          </button>
+
+          <div className="source-list">
+            {workspace.nodeCards.map((card) => (
+              <button key={`${card.nodeId}-${card.source}`} className="source-card" onClick={() => onSelect(card.nodeId)}>
+                <BookOpen size={15} />
+                <span>
+                  <strong>{card.title}</strong>
+                  <small>{card.category} · 难度 {card.difficulty}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div className="source-editor">
+            <label>
+              <span>粘贴资料</span>
+              <textarea value={sourceText} onChange={(event) => setSourceText(event.target.value)} rows={7} disabled={isPending} />
+            </label>
+            <button onClick={handleArtifacts} disabled={isPending || !sourceText.trim()}>
+              <Sparkles size={16} />
+              {pendingAction === "artifact" ? "生成中..." : "生成学习包"}
+            </button>
+          </div>
+
+          <div className="source-relations">
+            <span><GitBranch size={15} /> 图谱关系</span>
+            {workspace.graphRelations.length === 0 ? (
+              <p>对话或分析后会出现关联关系。</p>
+            ) : (
+              workspace.graphRelations.map((relation) => (
+                <button key={`${relation.subjectId}-${relation.objectId}-${relation.label}`} onClick={() => onSelect(relation.objectId)}>
+                  {relation.subjectName} {relation.label} {relation.objectName}
+                </button>
+              ))
+            )}
+          </div>
+        </aside>
+
+        <section className="ai-chat-panel">
+          <div className="ai-chat-toolbar">
+            <div className="ai-mode-tabs" aria-label="AI 功能切换">
+              <button className={mode === "chat" ? "active" : ""} onClick={() => setMode("chat")}><MessageSquareText size={15} /> 对话</button>
+              <button className={mode === "artifact" ? "active" : ""} onClick={() => setMode("artifact")}><ClipboardList size={15} /> 学习包</button>
+              <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}><Code2 size={15} /> 代码</button>
+            </div>
+            <button type="button" className="icon-text-button" onClick={clearSession} disabled={isPending}>
+              <Trash2 size={15} /> 清空
+            </button>
+          </div>
+
           <div className="chat-stream" ref={chatStreamRef} aria-live="polite">
             {messages.map((item) => (
               <article key={item.id} className={`chat-message ${item.role} ${item.id === waitingMessageId ? "waiting" : ""}`}>
-                <span>{item.role === "user" ? "我" : "AI"}</span>
-                <p>{item.content}</p>
-                {item.id === waitingMessageId && <div className="typing-dots" aria-label="正在等待模型回复"><i /><i /><i /></div>}
-                {(item.linkedNodeIds ?? []).length > 0 && (
-                  <div className="mini-link-row">
-                    {(item.linkedNodeIds ?? []).map((nodeId) => (
-                      <button key={nodeId} onClick={() => onSelect(nodeId)}>
-                        {nodeById[nodeId]?.name ?? nodeId}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <div className="chat-avatar">{item.role === "user" ? "我" : <Bot size={16} />}</div>
+                <div className="chat-bubble">
+                  {item.role === "assistant" ? (
+                    <div className="assistant-markdown">{renderAssistantContent(item.content)}</div>
+                  ) : (
+                    <p>{item.content}</p>
+                  )}
+                  {item.id === waitingMessageId && <div className="typing-dots" aria-label="正在等待模型回复"><i /><i /><i /></div>}
+                  {(item.linkedNodeIds ?? []).length > 0 && (
+                    <div className="mini-link-row">
+                      {(item.linkedNodeIds ?? []).map((nodeId) => (
+                        <button key={nodeId} onClick={() => onSelect(nodeId)}>
+                          {nodeById[nodeId]?.name ?? nodeId}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </article>
             ))}
+            {messages.length <= 1 && (
+              <div className="prompt-suggestion-grid">
+                {promptSuggestions.map((suggestion) => (
+                  <button key={suggestion.label} onClick={() => setMessage(suggestion.value)} disabled={isPending}>
+                    <Sparkles size={15} />
+                    <strong>{suggestion.label}</strong>
+                    <span>{suggestion.value}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+
           {isPending && (
             <div className="ai-pending-banner" role="status">
               正在等待大模型回复，当前请求还在处理中，请不要重复提交。
             </div>
           )}
 
-          {mode === "chat" && (
-            <>
-              <label>
-                多轮提问
-                <textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={4} disabled={isPending} />
-              </label>
-              <div className="status-actions">
-                <button onClick={handleChat} disabled={isPending || !message.trim()}>
-                  {pendingAction === "chat" ? "等待回复中..." : "发送并生成闭环"}
+          <div className="ai-composer">
+            {mode === "chat" && (
+              <>
+                <textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={4} disabled={isPending} placeholder="围绕当前知识点继续提问..." />
+                <button className="send-button" onClick={handleChat} disabled={isPending || !message.trim()}>
+                  {pendingAction === "chat" ? <Loader2 size={16} /> : <Send size={16} />}
+                  {pendingAction === "chat" ? "等待回复" : "发送"}
                 </button>
-                <button type="button" className="secondary-button" onClick={clearSession} disabled={isPending}>清空对话</button>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {mode === "artifact" && (
-            <>
-              <label>
-                上传/粘贴资料
-                <textarea value={sourceText} onChange={(event) => setSourceText(event.target.value)} rows={8} disabled={isPending} />
-              </label>
-              <div className="status-actions">
-                <button onClick={handleArtifacts} disabled={isPending || !sourceText.trim()}>
-                  {pendingAction === "artifact" ? "生成中..." : "生成 Quiz 与知识卡片"}
+            {mode === "artifact" && (
+              <>
+                <textarea value={sourceText} onChange={(event) => setSourceText(event.target.value)} rows={4} disabled={isPending} placeholder="粘贴一段课程资料，生成 Quiz 和知识卡片..." />
+                <button className="send-button" onClick={handleArtifacts} disabled={isPending || !sourceText.trim()}>
+                  {pendingAction === "artifact" ? <Loader2 size={16} /> : <Sparkles size={16} />}
+                  {pendingAction === "artifact" ? "生成中" : "生成学习包"}
                 </button>
-                <button type="button" className="secondary-button" onClick={clearSession} disabled={isPending}>清空对话</button>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {mode === "code" && (
-            <>
-              <label>
-                C++ 代码或生成需求
-                <textarea value={code} onChange={(event) => setCode(event.target.value)} rows={7} disabled={isPending} />
-              </label>
-              <label>
-                代码生成需求
-                <input value={message} onChange={(event) => setMessage(event.target.value)} disabled={isPending} />
-              </label>
-              <div className="status-actions">
-                <button onClick={handleAnalyze} disabled={isPending || !code.trim()}>
-                  {pendingAction === "analysis" ? "分析中..." : "分析错误并跳转"}
-                </button>
-                <button onClick={handleGenerateCode} disabled={isPending}>
-                  {pendingAction === "code" ? "生成中..." : "生成规范 C++ 代码"}
-                </button>
-                <button type="button" className="secondary-button" onClick={clearSession} disabled={isPending}>清空对话</button>
+            {mode === "code" && (
+              <div className="code-composer">
+                <textarea value={code} onChange={(event) => setCode(event.target.value)} rows={5} disabled={isPending} />
+                <input value={message} onChange={(event) => setMessage(event.target.value)} disabled={isPending} placeholder="描述你想生成的 C++ 代码或错误现象" />
+                <div className="composer-actions">
+                  <button onClick={handleAnalyze} disabled={isPending || !code.trim()}>
+                    {pendingAction === "analysis" ? <Loader2 size={16} /> : <GitBranch size={16} />}
+                    {pendingAction === "analysis" ? "分析中" : "分析错误"}
+                  </button>
+                  <button onClick={handleGenerateCode} disabled={isPending}>
+                    {pendingAction === "code" ? <Loader2 size={16} /> : <Code2 size={16} />}
+                    {pendingAction === "code" ? "生成中" : "生成代码"}
+                  </button>
+                </div>
               </div>
-            </>
-          )}
+            )}
+          </div>
         </section>
 
-        <aside className="ai-insights">
-          <section>
-            <h4>知识点跳转卡片</h4>
-            <div className="ai-card-grid">
-              {workspace.nodeCards.map((card) => (
-                <button key={`${card.nodeId}-${card.source}`} className="ai-node-card" onClick={() => onSelect(card.nodeId)}>
-                  <strong>{card.title}</strong>
-                  <span>{card.description}</span>
-                  <em>难度 {card.difficulty} / {card.category}</em>
-                </button>
-              ))}
-            </div>
-          </section>
+        <aside className="ai-studio-panel">
+          <div className="ai-panel-heading">
+            <span><Sparkles size={16} /> Studio</span>
+            <em>{studioCount} 个产物</em>
+          </div>
 
-          <section>
-            <h4>图谱关系</h4>
-            <div className="ai-relation-list">
-              {workspace.graphRelations.length === 0 ? (
-                <p className="muted">对话或分析后会显示知识图谱关系。</p>
-              ) : (
-                workspace.graphRelations.map((relation) => (
-                  <button key={`${relation.subjectId}-${relation.objectId}-${relation.label}`} onClick={() => onSelect(relation.objectId)}>
-                    {relation.subjectName} {relation.label} {relation.objectName}
-                  </button>
-                ))
-              )}
-            </div>
-          </section>
-
-          <section>
+          <section className="studio-section">
             <h4>Quiz</h4>
             <div className="quiz-list">
-              {(workspace.quiz.length ? workspace.quiz : []).map((item) => (
+              {workspace.quiz.map((item) => (
                 <article key={item.id}>
                   <strong>{item.question}</strong>
                   {item.options && <p>{item.options.join(" / ")}</p>}
@@ -462,60 +558,69 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
                   <span>{item.explanation}</span>
                 </article>
               ))}
-              {workspace.quiz.length === 0 && <p className="muted">资料学习包或问答闭环会生成 Quiz。</p>}
+              {workspace.quiz.length === 0 && <p className="muted">生成学习包或完成问答后会出现在这里。</p>}
             </div>
           </section>
+
+          <section className="studio-section">
+            <h4>知识卡片</h4>
+            <div className="flashcard-grid">
+              {workspace.knowledgeCards.map((card) => (
+                <article key={card.nodeId}>
+                  <strong>{card.front}</strong>
+                  <p>{card.back}</p>
+                  <em>{card.mistake}</em>
+                </article>
+              ))}
+              {workspace.knowledgeCards.length === 0 && <p className="muted">还没有生成知识卡片。</p>}
+            </div>
+          </section>
+
+          <section className="studio-section">
+            <h4>推荐行动</h4>
+            <div className="ai-action-list">
+              {workspace.recommendedExercises.map((exercise) => (
+                <button key={exercise.exerciseId} onClick={() => onSelect(exercise.nodeId)}>
+                  {exercise.title}
+                  <span>{exercise.reason}</span>
+                </button>
+              ))}
+              {workspace.learningActions.map((action) => (
+                <button key={`${action.type}-${action.nodeId}`} onClick={() => onSelect(action.nodeId)}>
+                  {action.label}
+                  <span>{action.description}</span>
+                </button>
+              ))}
+              {workspace.recommendedExercises.length === 0 && workspace.learningActions.length === 0 && (
+                <p className="muted">AI 会把薄弱点转换成复习和练习建议。</p>
+              )}
+            </div>
+          </section>
+
+          {studioCount === 0 && (
+            <div className="studio-empty-card">
+              <Sparkles size={18} />
+              <strong>让 AI 生成第一组学习产物</strong>
+              <span>从一次提问或一段资料开始，系统会自动补全 Quiz、知识卡片和推荐路径。</span>
+            </div>
+          )}
+
+          {workspace.generatedCode && (
+            <section className="studio-section generated-code-panel">
+              <h4>生成的 C++ 代码</h4>
+              <p>{workspace.generatedExplanation}</p>
+              <pre><code>{workspace.generatedCode}</code></pre>
+            </section>
+          )}
+
+          <div className="relation-list">
+            {linkedNodes.map((nodeId) => (
+              <button key={nodeId} onClick={() => onSelect(nodeId)}>
+                跳转: {nodeById[nodeId]?.name ?? nodeId}
+              </button>
+            ))}
+          </div>
         </aside>
-      </div>
-
-      <div className="ai-output-grid">
-        <section>
-          <h4>知识卡片</h4>
-          <div className="flashcard-grid">
-            {workspace.knowledgeCards.map((card) => (
-              <article key={card.nodeId}>
-                <strong>{card.front}</strong>
-                <p>{card.back}</p>
-                <em>{card.mistake}</em>
-              </article>
-            ))}
-            {workspace.knowledgeCards.length === 0 && <p className="muted">还没有生成知识卡片。</p>}
-          </div>
-        </section>
-
-        <section>
-          <h4>练习与推荐</h4>
-          <div className="ai-action-list">
-            {workspace.recommendedExercises.map((exercise) => (
-              <button key={exercise.exerciseId} onClick={() => onSelect(exercise.nodeId)}>
-                {exercise.title}
-                <span>{exercise.reason}</span>
-              </button>
-            ))}
-            {workspace.learningActions.map((action) => (
-              <button key={`${action.type}-${action.nodeId}`} onClick={() => onSelect(action.nodeId)}>
-                {action.label}
-                <span>{action.description}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      {workspace.generatedCode && (
-        <section className="generated-code-panel">
-          <h4>生成的 C++ 代码</h4>
-          <p>{workspace.generatedExplanation}</p>
-          <pre><code>{workspace.generatedCode}</code></pre>
-        </section>
-      )}
-
-      <div className="relation-list">
-        {linkedNodes.map((nodeId) => (
-          <button key={nodeId} onClick={() => onSelect(nodeId)}>
-            跳转: {nodeById[nodeId]?.name ?? nodeId}
-          </button>
-        ))}
       </div>
     </section>
   );
