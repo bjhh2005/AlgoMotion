@@ -201,6 +201,7 @@ python scripts/validate_data.py
 学习分析：
 
 - `GET /api/analytics/report`
+- `GET /api/analytics/report/export` (format: json / markdown / html)
 - `GET /api/analytics/weak`
 - `GET /api/analytics/trend`
 - `GET /api/analytics/cognitive/{node_id}`
@@ -331,3 +332,15 @@ data/learning-content/progress.json
 ### OJ 编程题判题失败
 
 检查 Docker 和 `global-judger` 容器是否启动。只看知识库、学习追踪、AI 页面时可以先忽略。
+
+### 学习分析报告导出
+
+支持三种格式：
+
+- **JSON**：结构化原始数据，适合程序处理。
+- **Markdown**：纯文本报告，适合在编辑器或笔记软件中查看。
+- **HTML**：精美的可视化报告，直接在浏览器新标签页中打开，包含进度条、彩色徽章、卡片布局等视觉元素，也支持 `Ctrl+P` 打印为 PDF。
+
+导出按钮位于学习分析页面顶部，鼠标悬停"导出报告"按钮即可选择格式。
+
+> **关于 PDF 导出**：原先的 PDF 导出依赖 WeasyPrint + GTK3 原生库，在 Windows 上安装 GTK3 运行时较为繁琐（需额外下载安装 [GTK3 for Windows](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases) 并重启终端）。现已改为 HTML 导出替代——HTML 报告本身支持浏览器打印为 PDF，效果更佳且零额外依赖。

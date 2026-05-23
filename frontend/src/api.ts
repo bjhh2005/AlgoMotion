@@ -422,12 +422,18 @@ export function fetchComprehensiveReport() {
   );
 }
 
-export async function downloadComprehensiveReport() {
-  const response = await fetch(`${API_BASE_URL}/api/analytics/report/export`);
+export async function downloadComprehensiveReport(format: "json" | "markdown" | "html" = "json") {
+  const response = await fetch(`${API_BASE_URL}/api/analytics/report/export?format=${format}`);
   if (!response.ok) {
     throw new Error(`${response.status} ${response.statusText}`);
   }
   return response.blob();
+}
+
+export async function clearAllLearningData() {
+  return requestJson<{ success: boolean; data: { message: string } }>("/api/analytics/data", {
+    method: "DELETE"
+  });
 }
 
 // 掌握度详细分析

@@ -7,4 +7,4 @@ pydantic==2.10.4
 # packages satisfy dependency checks commonly triggered by preinstalled AI libs.
 jsonpatch>=1.33,<2.0
 zstandard>=0.23.0,<0.24.0
-
+markdown>=3.5

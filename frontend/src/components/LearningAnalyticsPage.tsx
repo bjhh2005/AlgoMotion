@@ -22,6 +22,7 @@ import {
   downloadComprehensiveReport,
   fetchComprehensiveReport,
   fetchWeakKnowledge,
+  clearAllLearningData,
   type ComprehensiveReport,
   type WeakKnowledgePoint,
 } from "../api";
@@ -444,11 +445,11 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
           if (reportResponse.status === "fulfilled" && reportResponse.value.success) {
             setAdvancedData(transformComprehensiveReport(reportResponse.value.data));
           } else {
-            // 使用默认数据
+            const reason = reportResponse.status === "rejected" ? reportResponse.reason?.message || "服务器错误" : "接口未返回有效数据";
+            setApiError(`Failed to fetch: ${reason}，显示示例数据`);
             setAdvancedData(generateDefaultAdvancedData(nodes, progress));
           }
 
-          // 处理薄弱知识点
           if (weakResponse.status === "fulfilled" && weakResponse.value.success) {
             setWeakKnowledge(weakResponse.value.data);
           }
@@ -472,26 +473,43 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
     return () => { cancelled = true; };
   }, [nodes.length, Object.keys(progress).length]);
 
-  const handleExportReport = async () => {
+  const handleExportReport = async (format: "json" | "markdown" | "html" = "json") => {
     setExportingReport(true);
     setApiError(null);
 
     try {
-      const blob = await downloadComprehensiveReport();
-      const fileUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      link.download = `learning-analytics-report-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(fileUrl);
+      const blob = await downloadComprehensiveReport(format);
+      if (format === "html") {
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+      } else {
+        const fileUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        const ext = format === "markdown" ? "md" : format;
+        link.download = `learning-report-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.${ext}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(fileUrl);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "导出报告失败";
       setApiError(message);
       console.error("Export report failed:", err);
     } finally {
       setExportingReport(false);
+    }
+  };
+
+  const handleClearData = async () => {
+    if (!window.confirm("确定要清空所有学习数据吗？此操作不可撤销。")) return;
+    try {
+      await clearAllLearningData();
+      window.location.reload();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "清空数据失败";
+      setApiError(message);
     }
   };
 
@@ -547,12 +565,31 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
             </button>
           </div>
           <div className="title-buttons">
+            <div className="export-dropdown-wrapper">
+              <button
+                className="secondary-button"
+                disabled={exportingReport}
+              >
+                {exportingReport ? "导出中..." : "导出报告 ▾"}
+              </button>
+              <div className="export-dropdown-menu">
+                <button onClick={() => handleExportReport("json")} disabled={exportingReport}>
+                  导出 JSON
+                </button>
+                <button onClick={() => handleExportReport("markdown")} disabled={exportingReport}>
+                  导出 Markdown
+                </button>
+                <button onClick={() => handleExportReport("html")} disabled={exportingReport}>
+                  导出 HTML
+                </button>
+              </div>
+            </div>
             <button
               className="secondary-button"
-              onClick={handleExportReport}
-              disabled={exportingReport}
+              onClick={handleClearData}
+              style={{ color: "#c0392b" }}
             >
-              {exportingReport ? "导出中..." : "导出报告"}
+              清空数据
             </button>
           </div>
           <strong>{averageMastery}%</strong>

@@ -20,6 +20,7 @@ from ..mastery import (
     calculate_bloom_weighted_mastery,
     DIFFICULTY_WEIGHTS,
 )
+from ..learning_records import append_exercise_record, update_daily_snapshot
 
 router = APIRouter(prefix="/api/progress", tags=["学习进度"])
 
@@ -192,7 +193,22 @@ async def submit_exercises(
         "masteryAnalysis": calculation.mastery_breakdown
     }
     persist_progress_record(node_id, progress_record)
-    
+
+    now_iso = datetime.now().isoformat() + "Z"
+    for ex in submission.exercises:
+        append_exercise_record({
+            "nodeId": node_id,
+            "timestamp": now_iso,
+            "correct": ex.get("correct", False),
+            "difficulty": ex.get("difficulty", 5),
+            "timeSpent": ex.get("time_spent", 60),
+            "cognitiveLevel": ex.get("cognitive_level", "apply"),
+            "guess": ex.get("guess", False),
+        })
+
+    study_minutes_delta = submission.score // 2
+    update_daily_snapshot(node_id, calculation.new_mastery, study_minutes_delta, len(exercise_results))
+
     return success_response({
         "nodeId": node_id,
         "previousMastery": current_mastery,
