@@ -140,6 +140,71 @@ export function fetchRecommendations(
   );
 }
 
+export interface V2RecommendationResponse {
+  strategy: string;
+  strategy_reason: string;
+  weights: Record<string, number>;
+  student_profile: {
+    rush_rate: number;
+    hesitation_rate: number;
+    correct_rate: number;
+    fake_effort_suspicion: number;
+    consistency: number;
+  };
+  summary: {
+    total_candidates: number;
+    total_recommended: number;
+    category_counts: Record<string, number>;
+  };
+  recommendations: V2RecommendationItem[];
+  category_groups: {
+    category: string;
+    label: string;
+    icon: string;
+    description: string;
+    items: V2RecommendationItem[];
+  }[];
+}
+
+export interface V2RecommendationItem {
+  rank: number;
+  node_id: string;
+  node_name: string;
+  score: number;
+  factor_breakdown: {
+    gap: number;
+    uncertainty: number;
+    risk: number;
+    centrality: number;
+    efficiency: number;
+  };
+  reason: string;
+  action: string;
+  knowledge_state: string;
+  category: string;
+}
+
+export async function fetchV2Recommendations(
+  currentNodeId?: string,
+  count = 5,
+  strategy = "auto"
+): Promise<V2RecommendationResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/recommendations/v2`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: "default",
+      current_node_id: currentNodeId ?? null,
+      count,
+      strategy,
+    }),
+  });
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  const json = await response.json();
+  if (!json.success) throw new Error("V2推荐接口未返回有效数据");
+  return json.data;
+}
+
 export function updateProgress(nodeId: string, record: ProgressRecord) {
   return requestJson<{ ok: boolean; progress: ProgressRecord }>("/api/progress/update", {
     method: "POST",

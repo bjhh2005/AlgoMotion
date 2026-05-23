@@ -288,6 +288,17 @@ class RecommendationItem(BaseModel):
 
 
 # ============================================
+# V2 推荐相关模型
+# ============================================
+
+class V2RecommendationRequest(BaseModel):
+    user_id: str = "default"
+    current_node_id: str | None = None
+    count: int = Field(default=5, ge=1, le=20)
+    strategy: str = Field(default="auto", description="auto/balanced/consolidation/slow_down/encourage")
+
+
+# ============================================
 # AI 对话相关模型
 # ============================================
 

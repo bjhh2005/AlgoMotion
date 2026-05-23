@@ -23,8 +23,10 @@ import {
   fetchComprehensiveReport,
   fetchWeakKnowledge,
   clearAllLearningData,
+  fetchV2Recommendations,
   type ComprehensiveReport,
   type WeakKnowledgePoint,
+  type V2RecommendationResponse,
 } from "../api";
 
 interface Props {
@@ -408,6 +410,10 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
   // 导出报告状态
   const [exportingReport, setExportingReport] = useState(false);
 
+  // V2 智能推荐状态
+  const [v2Recommendations, setV2Recommendations] = useState<V2RecommendationResponse | null>(null);
+  const [v2Loading, setV2Loading] = useState(false);
+
   // 基础视图折叠状态
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     overview: false,      // 概览指标
@@ -470,6 +476,19 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
     }
 
     loadAnalytics();
+
+    async function loadV2Recs() {
+      setV2Loading(true);
+      try {
+        const data = await fetchV2Recommendations(undefined, 5);
+        if (!cancelled) setV2Recommendations(data);
+      } catch {
+      } finally {
+        if (!cancelled) setV2Loading(false);
+      }
+    }
+    loadV2Recs();
+
     return () => { cancelled = true; };
   }, [nodes.length, Object.keys(progress).length]);
 
@@ -695,24 +714,142 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
               )}
             </div>
             
-            {/* 推荐路径 - 可折叠 */}
-            <div className="collapsible-section">
-              <div className="section-header" onClick={() => toggleSection("recommendPath")}>
-                <h4>🧭 推荐路径 ({recommendations.length})</h4>
-                <button className="collapse-btn">
-                  {collapsedSections.recommendPath ? "展开" : "收起"}
-                </button>
+            {/* 智能推荐路径 - V2 大版块 */}
+            <div className="v2-recommend-section">
+              <div className="v2-section-header">
+                <h4>🧭 智能学习路径推荐</h4>
+                {v2Recommendations && (
+                  <div className="v2-strategy-badge">
+                    <span className={`strategy-tag strategy-${v2Recommendations.strategy}`}>
+                      {v2Recommendations.strategy === "balanced" ? "平衡策略" :
+                       v2Recommendations.strategy === "consolidation" ? "巩固策略" :
+                       v2Recommendations.strategy === "slow_down" ? "减速策略" :
+                       v2Recommendations.strategy === "encourage" ? "鼓励策略" : v2Recommendations.strategy}
+                    </span>
+                    <span className="strategy-reason">{v2Recommendations.strategy_reason}</span>
+                  </div>
+                )}
               </div>
-              {!collapsedSections.recommendPath && (
-                <div className="recommend-list">
-                  {recommendations.length > 0 ? recommendations.map((node) => (
-                    <button key={node.id} onClick={() => onSelect(node.id)}>
-                      {node.name}
-                      <span>难度 {node.difficulty}</span>
-                    </button>
-                  )) : <div className="empty-state">暂无推荐路径</div>}
-                </div>
+
+              {v2Loading && <div className="v2-rec-loading">正在计算推荐...</div>}
+
+              {v2Recommendations && !v2Loading && (
+                <>
+                  {/* 画像摘要条 */}
+                  <div className="v2-profile-strip">
+                    <div className="profile-item">
+                      <span className="profile-label">仓促率</span>
+                      <span className="profile-value">{(v2Recommendations.student_profile.rush_rate * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="profile-item">
+                      <span className="profile-label">犹豫率</span>
+                      <span className="profile-value">{(v2Recommendations.student_profile.hesitation_rate * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="profile-item">
+                      <span className="profile-label">正确率</span>
+                      <span className="profile-value">{(v2Recommendations.student_profile.correct_rate * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="profile-item">
+                      <span className="profile-label">虚假努力</span>
+                      <span className="profile-value">{(v2Recommendations.student_profile.fake_effort_suspicion * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="profile-separator" />
+                    <div className="profile-item">
+                      <span className="profile-label">候选池</span>
+                      <span className="profile-value">{v2Recommendations.summary.total_candidates}</span>
+                    </div>
+                    <div className="profile-item">
+                      <span className="profile-label">已推荐</span>
+                      <span className="profile-value highlight">{v2Recommendations.summary.total_recommended}</span>
+                    </div>
+                  </div>
+
+                  {/* 因子权重条 */}
+                  <div className="v2-weights-strip">
+                    <span className="weights-label">因子权重</span>
+                    {Object.entries(v2Recommendations.weights).map(([k, v]) => (
+                      <div key={k} className="weight-chip">
+                        <span className="weight-name">
+                          {k === "gap" ? "缺口" : k === "uncertainty" ? "不确定" : k === "risk" ? "风险" : k === "centrality" ? "枢纽" : "成效"}
+                        </span>
+                        <span className="weight-val">{(v * 100).toFixed(0)}%</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* 4类推荐卡片 */}
+                  <div className="v2-category-grid">
+                    {v2Recommendations.category_groups.map((group) => (
+                      <div key={group.category} className={`v2-category-card cat-${group.category}`}>
+                        <div className="v2-category-header">
+                          <span className="v2-category-icon">{group.icon}</span>
+                          <span className="v2-category-label">{group.label}</span>
+                          <span className="v2-category-count">{group.items.length}</span>
+                        </div>
+                        <p className="v2-category-desc">{group.description}</p>
+                        {group.items.length > 0 ? (
+                          <div className="v2-category-items">
+                            {group.items.map((rec) => (
+                              <button key={rec.node_id} className="v2-rec-item" onClick={() => onSelect(rec.node_id)}>
+                                <div className="v2-rec-top-row">
+                                  <span className="v2-rec-rank">#{rec.rank}</span>
+                                  <strong className="v2-rec-name">{rec.node_name}</strong>
+                                  <span className={`v2-ks-tag ks-${rec.knowledge_state}`}>
+                                    {rec.knowledge_state === "truly_mastered" ? "真掌握" :
+                                     rec.knowledge_state === "fragile" ? "假懂" :
+                                     rec.knowledge_state === "developing" ? "发展中" :
+                                     rec.knowledge_state === "weak" ? "薄弱" : rec.knowledge_state}
+                                  </span>
+                                </div>
+                                <div className="v2-rec-reason">{rec.reason}</div>
+                                <div className="v2-rec-score-row">
+                                  <span className="score-label">综合得分</span>
+                                  <div className="score-track">
+                                    <div className="score-fill" style={{ width: `${rec.score * 100}%` }} />
+                                  </div>
+                                  <span className="score-val">{(rec.score * 100).toFixed(0)}</span>
+                                </div>
+                                <div className="v2-rec-factors">
+                                  <div className="factor-bar" title="掌握缺口">
+                                    <span className="factor-label">缺口</span>
+                                    <div className="factor-track"><div className="factor-fill fill-gap" style={{ width: `${rec.factor_breakdown.gap * 100}%` }} /></div>
+                                    <span className="factor-pct">{(rec.factor_breakdown.gap * 100).toFixed(0)}</span>
+                                  </div>
+                                  <div className="factor-bar" title="不确定性">
+                                    <span className="factor-label">不确定</span>
+                                    <div className="factor-track"><div className="factor-fill fill-unc" style={{ width: `${rec.factor_breakdown.uncertainty * 100}%` }} /></div>
+                                    <span className="factor-pct">{(rec.factor_breakdown.uncertainty * 100).toFixed(0)}</span>
+                                  </div>
+                                  <div className="factor-bar" title="传播风险">
+                                    <span className="factor-label">风险</span>
+                                    <div className="factor-track"><div className="factor-fill fill-risk" style={{ width: `${rec.factor_breakdown.risk * 100}%` }} /></div>
+                                    <span className="factor-pct">{(rec.factor_breakdown.risk * 100).toFixed(0)}</span>
+                                  </div>
+                                  <div className="factor-bar" title="枢纽程度">
+                                    <span className="factor-label">枢纽</span>
+                                    <div className="factor-track"><div className="factor-fill fill-cen" style={{ width: `${rec.factor_breakdown.centrality * 100}%` }} /></div>
+                                    <span className="factor-pct">{(rec.factor_breakdown.centrality * 100).toFixed(0)}</span>
+                                  </div>
+                                  <div className="factor-bar" title="投入成效">
+                                    <span className="factor-label">成效</span>
+                                    <div className="factor-track"><div className="factor-fill fill-eff" style={{ width: `${rec.factor_breakdown.efficiency * 100}%` }} /></div>
+                                    <span className="factor-pct">{(rec.factor_breakdown.efficiency * 100).toFixed(0)}</span>
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="v2-category-empty">
+                            当前画像下暂无此类推荐
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
+              {!v2Recommendations && !v2Loading && <div className="empty-state">推荐数据加载失败</div>}
             </div>
           </div>
           

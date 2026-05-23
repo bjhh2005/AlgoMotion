@@ -3,7 +3,7 @@
 """
 from fastapi import APIRouter, HTTPException, Query
 
-from ..schemas import RecommendationItem
+from ..schemas import RecommendationItem, V2RecommendationRequest
 from ..response import success_response
 
 router = APIRouter(prefix="/api/recommendations", tags=["推荐"])
@@ -322,3 +322,69 @@ async def get_recommendations(
                 ))
     
     return success_response([r.model_dump() for r in recommendations])
+
+
+# ============================================
+# V2 智能推荐（多因子打分 + 自适应策略）
+# ============================================
+
+@router.post("/v2", response_model=dict)
+async def get_v2_recommendations(req: V2RecommendationRequest):
+    """
+    V2 智能推荐：基于多因子打分 + 贝叶斯认知建模 + 自适应策略
+    """
+    from ..recommendation_engine import recommend
+    from ..storage import progress_store
+
+    nodes = get_nodes_data()
+    edges = get_edges_data()
+    progress = dict(progress_store)
+
+    cognitive_mastery = None
+    behavior_analyses = None
+    motivation_index = None
+    investment_effectiveness = None
+    propagation_analyses = None
+
+    try:
+        from .analytics import build_comprehensive_report
+        report = build_comprehensive_report()
+        cognitive_mastery = {
+            k: v if isinstance(v, dict) else v.model_dump()
+            for k, v in report.cognitive_mastery.items()
+        }
+        behavior_analyses = {
+            k: v if isinstance(v, dict) else v.model_dump()
+            for k, v in report.behavior_analyses.items()
+        }
+        motivation_index = (
+            report.motivation_index.model_dump()
+            if report.motivation_index else None
+        )
+        investment_effectiveness = [
+            v.model_dump() if not isinstance(v, dict) else v
+            for v in report.investment_effectiveness
+        ]
+        propagation_analyses = [
+            v.model_dump() if not isinstance(v, dict) else v
+            for v in report.propagation_analyses
+        ]
+    except Exception:
+        pass
+
+    strategy_override = req.strategy if req.strategy != "auto" else None
+    result = recommend(
+        nodes=nodes,
+        edges=edges,
+        progress=progress,
+        cognitive_mastery=cognitive_mastery,
+        behavior_analyses=behavior_analyses,
+        motivation_index=motivation_index,
+        investment_effectiveness=investment_effectiveness,
+        propagation_analyses=propagation_analyses,
+        current_node_id=req.current_node_id,
+        count=req.count,
+        strategy_override=strategy_override,
+    )
+
+    return success_response(result)
