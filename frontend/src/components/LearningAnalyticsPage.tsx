@@ -683,7 +683,7 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
               {!collapsedSections.weakKnowledge && (
                 <div className="record-list">
                   {riskItems.length > 0 ? riskItems.map(({ node, record }) => (
-                    <button key={node.id} onClick={() => handleNodeSelect(node.id)}>
+                    <button key={node.id} onClick={() => onSelect(node.id)}>
                       <span>
                         <strong>{node.name}</strong>
                         <em>{statusText[record.status]} / 复习 {record.metrics.reviewDueAt ?? "待安排"}</em>
@@ -706,7 +706,7 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
               {!collapsedSections.recommendPath && (
                 <div className="recommend-list">
                   {recommendations.length > 0 ? recommendations.map((node) => (
-                    <button key={node.id} onClick={() => handleNodeSelect(node.id)}>
+                    <button key={node.id} onClick={() => onSelect(node.id)}>
                       {node.name}
                       <span>难度 {node.difficulty}</span>
                     </button>
@@ -716,29 +716,6 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
             </div>
           </div>
           
-          {/* 指标说明 - 可折叠 */}
-          <div className="collapsible-section">
-            <div className="section-header" onClick={() => toggleSection("schema")}>
-              <h4>📋 指标说明</h4>
-              <button className="collapse-btn">
-                {collapsedSections.schema ? "展开" : "收起"}
-              </button>
-            </div>
-            {!collapsedSections.schema && (
-              <section>
-                <div className="schema-grid">
-                  <span>status: 学习状态</span>
-                  <span>mastery: 知识掌握度</span>
-                  <span>confidence: 自评置信度</span>
-                  <span>studyMinutes: 有效学习时长</span>
-                  <span>attemptCount: OJ 尝试次数</span>
-                  <span>correctRate: 练习正确率</span>
-                  <span>errorCount: 绑定错因数量</span>
-                  <span>reviewDueAt: 间隔复习时间</span>
-                </div>
-              </section>
-            )}
-          </div>
         </>
       ) : (
         <>
