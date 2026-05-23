@@ -585,9 +585,8 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
               </div>
             </div>
             <button
-              className="secondary-button"
+              className="danger-ghost-btn"
               onClick={handleClearData}
-              style={{ color: "#c0392b" }}
             >
               清空数据
             </button>
@@ -772,6 +771,7 @@ export function LearningAnalyticsPage({ nodes, edges = [], progress, recommendat
             }}
             selectedNodeId={selectedNodeId}
             onSelectNode={handleNodeSelect}
+            progress={progress}
           />
         </>
       )}

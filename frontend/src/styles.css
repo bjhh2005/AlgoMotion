@@ -2911,6 +2911,31 @@ pre {
   color: #415269;
 }
 
+.export-dropdown-wrapper .secondary-button {
+  background: #fff;
+  color: #36a3a0;
+  border: 1px solid #99f6e4;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.export-dropdown-wrapper .secondary-button:hover {
+  background: #f0fdfa;
+  border-color: #5eead4;
+  box-shadow: 0 2px 8px rgba(54, 163, 160, 0.15);
+}
+
+.export-dropdown-wrapper .secondary-button:disabled {
+  background: #f8fafc;
+  color: #99f6e4;
+  border-color: #e2e8f0;
+  box-shadow: none;
+}
+
 .export-dropdown-wrapper {
   position: relative;
   display: inline-block;
@@ -2922,12 +2947,12 @@ pre {
   top: 100%;
   left: 0;
   background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border: 1px solid #99f6e4;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.15);
   min-width: 150px;
   z-index: 100;
-  padding: 4px 0;
+  padding: 6px 0;
   margin-top: 2px;
 }
 
@@ -2944,16 +2969,37 @@ pre {
   text-align: left;
   cursor: pointer;
   font-size: 13px;
-  color: #374151;
+  color: #115e59;
+  transition: background 0.15s;
 }
 
 .export-dropdown-menu button:hover {
-  background: #edf2f7;
+  background: #f0fdfa;
+  color: #0d9488;
 }
 
 .export-dropdown-menu button:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.danger-ghost-btn {
+  background: #fff;
+  color: #e74c3c;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.danger-ghost-btn:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.12);
 }
 
 @keyframes typing-bounce {
@@ -3357,13 +3403,25 @@ pre {
   background: #f8fafc;
   border-radius: 12px;
   padding: 20px;
+  overflow-x: auto;
+}
+
+.knowledge-propagation-graph svg {
+  min-width: 1000px;
 }
 
 .propagation-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 16px;
+}
+
+.propagation-explanation {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
 }
 
 .propagation-header h5 {
@@ -3371,11 +3429,36 @@ pre {
   color: #1e293b;
 }
 
+.propagation-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reset-view-btn {
+  padding: 3px 12px;
+  border: 1px solid #99f6e4;
+  border-radius: 6px;
+  background: #f0fdfa;
+  color: #0d9488;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.reset-view-btn:hover {
+  background: #ccfbf1;
+  border-color: #5eead4;
+}
+
 .propagation-legend {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   font-size: 0.8rem;
   color: #64748b;
+  margin-top: 4px;
 }
 
 .propagation-legend .legend-item {

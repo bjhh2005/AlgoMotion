@@ -25,6 +25,7 @@ interface Props {
   motivationIndex: MotivationIndex | null;
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string) => void;
+  progress?: Record<string, { metrics?: { mastery?: number; attemptCount?: number; studyMinutes?: number }; status?: string }>;
 }
 
 // 高级学习分析综合面板 - 整合三个维度的分析
@@ -39,6 +40,7 @@ export function AdvancedAnalyticsDashboard({
   motivationIndex,
   selectedNodeId,
   onSelectNode,
+  progress,
 }: Props) {
   const [activeDimension, setActiveDimension] = useState<"structure" | "quality" | "engagement">("structure");
   const initializedRef = useRef(false);
@@ -204,8 +206,7 @@ export function AdvancedAnalyticsDashboard({
                   propagationAnalyses={propagationAnalyses}
                   selectedNodeId={selectedNodeId}
                   onNodeClick={onSelectNode}
-                  width={700}
-                  height={400}
+                  progress={progress}
                 />
               </div>
               
