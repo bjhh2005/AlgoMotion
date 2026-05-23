@@ -9,6 +9,7 @@ import {
   Target
 } from "lucide-react";
 import { nodeById } from "../data";
+import { CppCodeBlock } from "./CppCodeBlock";
 import type { CodeExample, Exercise, KnowledgeContent, KnowledgeEdge, KnowledgeNode, ProgressStatus } from "../types";
 
 interface Props {
@@ -160,13 +161,13 @@ export function KnowledgeDetail({
 
       <SectionCard title="C++ 代码" icon={<Braces size={17} />} className="detail-card--code">
         {codeExamples.length === 0 ? (
-          <pre className="detail-code-block"><code>{`// ${node.name} 的 C++ 示例代码占位
-// 内容组可在 data/learning-content/code-examples.json 中补充。`}</code></pre>
+          <CppCodeBlock code={`// ${node.name} 的 C++ 示例代码占位
+// 内容组可在 data/learning-content/code-examples.json 中补充。`} />
         ) : (
           codeExamples.map((example) => (
             <div className="code-example" key={`${example.nodeId}-${example.title}`}>
               <strong>{example.title}</strong>
-              <pre className="detail-code-block"><code>{example.code}</code></pre>
+              <CppCodeBlock code={example.code} />
             </div>
           ))
         )}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
-import { BarChart3, BookOpen, Bot, ClipboardList, Code2, Database, GitFork, LayoutList, Search, ShieldCheck } from "lucide-react";
+import { BarChart3, BookOpen, Bot, ClipboardList, Code2, Database, GitFork, LayoutList, ShieldCheck } from "lucide-react";
 import { fetchBootstrap, fetchRecommendations, updateProgress as postProgress } from "./api";
 import {
   contentByNodeId,
@@ -307,16 +307,6 @@ export function App() {
           </div>
         </div>
 
-        <div className="search-box">
-          <Search size={18} />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={page === "knowledge" ? handleSearchKeyDown : undefined}
-            placeholder="搜索知识点 / 标签 / 定义"
-          />
-        </div>
-
         <nav className="primary-nav" aria-label="主功能导航">
           <button className={page === "knowledge" ? "active" : ""} onClick={() => setPage("knowledge")}>
             <BookOpen size={17} />
@@ -382,6 +372,8 @@ export function App() {
               selectedNodeName={selectedNode?.name ?? selectedId}
               activePathStep={activePathStep}
               splitRatio={splitRatio}
+              onQueryChange={setQuery}
+              onSearchKeyDown={handleSearchKeyDown}
               onSelectPathStep={handleSelectPathStep}
               onLocate={locateKnowledge}
             />
