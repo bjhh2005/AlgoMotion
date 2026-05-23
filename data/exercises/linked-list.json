@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/linked-list-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-linked-list-001",
-    "linkedNodeIds": ["linked-list"]
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-linked-list-choice-001",
+    "nodeId": "linked-list",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "单链表插入",
+    "stem": "在单链表已知结点 p 之后插入结点 s，时间复杂度为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "O(1)"
+      },
+      {
+        "key": "B",
+        "text": "O(n)"
+      },
+      {
+        "key": "C",
+        "text": "O(log n)"
+      },
+      {
+        "key": "D",
+        "text": "O(n log n)"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "已知前驱时插入为 O(1)。",
+    "ojRoute": "/oj/ex-linked-list-choice-001",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-linked-list-choice-002",
+    "nodeId": "linked-list",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "链表与数组",
+    "stem": "与顺序表相比，链表的典型优点是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "随机访问更快"
+      },
+      {
+        "key": "B",
+        "text": "插入删除更灵活，无需大规模移动元素"
+      },
+      {
+        "key": "C",
+        "text": "缓存局部性更好"
+      },
+      {
+        "key": "D",
+        "text": "存储密度更高"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "链表在动态插入删除上更灵活。",
+    "ojRoute": "/oj/ex-linked-list-choice-002",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-linked-list-fill-001",
+    "nodeId": "linked-list",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "链表结构",
+    "fillStem": "单链表中每个结点除数据域外，还包含指向下一个结点的 {{1}} ；访问第 i 个元素最坏需 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "指针"
+      },
+      {
+        "id": 2,
+        "answer": "O(n)"
+      }
+    ],
+    "answer": "指针;O(n)",
+    "analysis": "链表通过指针链接；不支持随机访问。",
+    "ojRoute": "/oj/ex-linked-list-fill-001",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-linked-list-fill-002",
+    "nodeId": "linked-list",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "双向链表",
+    "fillStem": "双向链表结点含有 {{1}} 与 {{2}} 两个指针，便于双向遍历。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "前驱"
+      },
+      {
+        "id": 2,
+        "answer": "后继"
+      }
+    ],
+    "answer": "前驱;后继",
+    "analysis": "双向链表可前后移动。",
+    "ojRoute": "/oj/ex-linked-list-fill-002",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
   }
 ]

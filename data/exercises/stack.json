@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/stack-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-stack-001",
-    "linkedNodeIds": ["stack"]
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-stack-choice-001",
+    "nodeId": "stack",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "栈的删除操作发生在哪一端？",
+    "stem": "对于一个顺序栈 S，其 top 指针指向栈顶元素。下列关于栈的删除（pop）操作的描述，正确的是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "在栈底进行删除，时间复杂度 O(n)"
+      },
+      {
+        "key": "B",
+        "text": "在栈顶进行删除，时间复杂度 O(1)"
+      },
+      {
+        "key": "C",
+        "text": "在任意位置删除，时间复杂度 O(n)"
+      },
+      {
+        "key": "D",
+        "text": "栈不支持删除操作"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "栈是后进先出（LIFO）的线性结构，插入与删除均在栈顶进行。",
+    "ojRoute": "/oj/ex-stack-choice-001",
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-stack-choice-002",
+    "nodeId": "stack",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "栈的应用场景",
+    "stem": "下列哪项最适合用栈实现？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "广度优先搜索 frontier"
+      },
+      {
+        "key": "B",
+        "text": "括号匹配检验"
+      },
+      {
+        "key": "C",
+        "text": "多源最短路径"
+      },
+      {
+        "key": "D",
+        "text": "哈希查找"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "括号匹配、表达式求值等是栈的经典应用。",
+    "ojRoute": "/oj/ex-stack-choice-002",
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-stack-fill-001",
+    "nodeId": "stack",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "顺序栈操作",
+    "fillStem": "顺序栈在栈顶进行 push/pop，均摊时间复杂度为 {{1}} ；空栈判断条件通常为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(1)"
+      },
+      {
+        "id": 2,
+        "answer": "top==-1"
+      }
+    ],
+    "answer": "O(1);top==-1",
+    "analysis": "栈顶操作常数时间；空栈可用 top 指针判断。",
+    "ojRoute": "/oj/ex-stack-fill-001",
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-stack-fill-002",
+    "nodeId": "stack",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "栈与递归",
+    "fillStem": "函数调用时系统往往用 {{1}} 保存返回地址与局部变量；深度过大可能导致 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "栈"
+      },
+      {
+        "id": 2,
+        "answer": "栈溢出"
+      }
+    ],
+    "answer": "栈;栈溢出",
+    "analysis": "调用栈是栈结构的典型体现。",
+    "ojRoute": "/oj/ex-stack-fill-002",
+    "linkedNodeIds": [
+      "stack"
+    ]
   }
 ]

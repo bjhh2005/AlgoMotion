@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Filter, Search, Shuffle, Sparkles, X } from "lucide-react";
+import { Filter, Search, X } from "lucide-react";
 import type { Exercise, KnowledgeNode } from "../../types";
 import {
   allTagLabels,
@@ -17,7 +17,6 @@ interface Props {
   error: string;
   nodeById: Record<string, KnowledgeNode>;
   onOpen: (item: OjCatalogItem) => void;
-  onRefreshRecommendations: () => void;
 }
 
 const typeFilterOptions: { value: "all" | Exercise["type"]; label: string }[] = [
@@ -65,8 +64,7 @@ export function ProblemList({
   loading,
   error,
   nodeById,
-  onOpen,
-  onRefreshRecommendations
+  onOpen
 }: Props) {
   const [keyword, setKeyword] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | Exercise["type"]>("all");
@@ -87,8 +85,6 @@ export function ProblemList({
       }),
     [items, keyword, typeFilter, diffFilter, statusFilter, selectedTags]
   );
-
-  const recommended = useMemo(() => items.filter((item) => item.recommended), [items]);
 
   const hasFilter =
     Boolean(keyword) ||
@@ -209,40 +205,6 @@ export function ProblemList({
 
         {loading && <p className="oj-bank-hint muted">正在从后端加载题库…</p>}
         {error && <p className="oj-problem-error">{error}</p>}
-
-        {!loading && !error && !hasFilter && recommended.length > 0 && (
-          <section className="oj-bank-section">
-            <div className="oj-bank-section-head">
-              <Sparkles size={16} className="spark" />
-              <h3>为你推荐</h3>
-              <span className="muted">基于你最近的学习进度</span>
-              <button type="button" className="oj-bank-link" onClick={onRefreshRecommendations}>
-                <Shuffle size={14} />
-                换一批
-              </button>
-            </div>
-            <div className="oj-bank-rec-grid">
-              {recommended.slice(0, 4).map((item) => (
-                <button key={item.id} type="button" className="oj-bank-rec-card" onClick={() => onOpen(item)}>
-                  <div className="oj-bank-rec-meta">
-                    <span className={`oj-type-pill ${typeBadgeClass(item.type)}`}>
-                      {item.type ? typeLabel[item.type] : "题目"}
-                    </span>
-                    <span className={`oj-diff-text ${diffClass(item.difficulty)}`}>
-                      {item.difficulty ? difficultyLabel[item.difficulty] : "—"}
-                    </span>
-                  </div>
-                  <div className="oj-bank-rec-title">{item.title}</div>
-                  <div className="oj-bank-rec-tags">
-                    {item.tag.map((slug) => (
-                      <span key={slug}>#{tagLabel(slug, nodeById)}</span>
-                    ))}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
 
         <section className="oj-bank-section">
           <div className="oj-bank-section-head">

@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/huffman-tree-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-huffman-tree-001",
-    "linkedNodeIds": ["huffman-tree"]
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-choice-001",
+    "nodeId": "huffman-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "哈夫曼编码",
+    "stem": "哈夫曼树用于构造：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "等长编码"
+      },
+      {
+        "key": "B",
+        "text": "最优前缀无歧义变长编码"
+      },
+      {
+        "key": "C",
+        "text": "哈希表"
+      },
+      {
+        "key": "D",
+        "text": "平衡 BST"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "哈夫曼得到最优前缀码。",
+    "ojRoute": "/oj/ex-huffman-tree-choice-001",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-choice-002",
+    "nodeId": "huffman-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "哈夫曼构建",
+    "stem": "构建哈夫曼树时，每次合并：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "权值最大的两个结点"
+      },
+      {
+        "key": "B",
+        "text": "权值最小的两个结点"
+      },
+      {
+        "key": "C",
+        "text": "深度最大的两个结点"
+      },
+      {
+        "key": "D",
+        "text": "随机两个结点"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "贪心合并最小权。",
+    "ojRoute": "/oj/ex-huffman-tree-choice-002",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-fill-001",
+    "nodeId": "huffman-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "前缀码",
+    "fillStem": "哈夫曼编码中任一字符编码都不是另一字符编码的 {{1}} ，因此可 {{2}} 解码。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "前缀"
+      },
+      {
+        "id": 2,
+        "answer": "唯一"
+      }
+    ],
+    "answer": "前缀;唯一",
+    "analysis": "前缀码保证无歧义。",
+    "ojRoute": "/oj/ex-huffman-tree-fill-001",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-fill-002",
+    "nodeId": "huffman-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "带权路径长度",
+    "fillStem": "树的带权路径长度 WPL 为各叶子权值乘 {{1}} 之和；哈夫曼树使 WPL {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "路径长度"
+      },
+      {
+        "id": 2,
+        "answer": "最小"
+      }
+    ],
+    "answer": "路径长度;最小",
+    "analysis": "哈夫曼最小化 WPL。",
+    "ojRoute": "/oj/ex-huffman-tree-fill-002",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
   }
 ]

@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/kmp-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-kmp-001",
-    "linkedNodeIds": ["kmp"]
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-kmp-choice-001",
+    "nodeId": "kmp",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "KMP 算法核心",
+    "stem": "KMP 字符串匹配相比暴力匹配的主要改进是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "利用已匹配信息避免模式串指针回退"
+      },
+      {
+        "key": "B",
+        "text": "将模式串排序后再匹配"
+      },
+      {
+        "key": "C",
+        "text": "必须使用哈希函数"
+      },
+      {
+        "key": "D",
+        "text": "只适用于单字符字母表"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "KMP 通过 next 数组避免无效回溯。",
+    "ojRoute": "/oj/ex-kmp-choice-001",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-kmp-choice-002",
+    "nodeId": "kmp",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "next 数组含义",
+    "stem": "KMP 中 next[j] 通常表示：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "模式串前 j 个字符的最长相同前后缀长度"
+      },
+      {
+        "key": "B",
+        "text": "主串第 j 个字符的 ASCII 码"
+      },
+      {
+        "key": "C",
+        "text": "匹配失败时主串回退步数"
+      },
+      {
+        "key": "D",
+        "text": "模式串长度"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "next 记录 border 信息。",
+    "ojRoute": "/oj/ex-kmp-choice-002",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-kmp-fill-001",
+    "nodeId": "kmp",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "KMP 复杂度",
+    "fillStem": "KMP 在主串长度 n、模式串长度 m 时，时间复杂度为 {{1}} ；预处理 next 数组复杂度为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(n+m)"
+      },
+      {
+        "id": 2,
+        "answer": "O(m)"
+      }
+    ],
+    "answer": "O(n+m);O(m)",
+    "analysis": "KMP 线性时间完成匹配。",
+    "ojRoute": "/oj/ex-kmp-fill-001",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-kmp-fill-002",
+    "nodeId": "kmp",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "字符串匹配",
+    "fillStem": "暴力字符串匹配最坏时间复杂度为 {{1}} ；KMP 通过维护 {{2}} 数组优化。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(nm)"
+      },
+      {
+        "id": 2,
+        "answer": "next"
+      }
+    ],
+    "answer": "O(nm);next",
+    "analysis": "暴力匹配二次方；KMP 用 next。",
+    "ojRoute": "/oj/ex-kmp-fill-002",
+    "linkedNodeIds": [
+      "kmp"
+    ]
   }
 ]

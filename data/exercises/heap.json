@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/heap-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-heap-001",
-    "linkedNodeIds": ["heap"]
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-heap-choice-001",
+    "nodeId": "heap",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "堆的性质",
+    "stem": "大根堆（最大堆）满足：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "父结点关键字不大于子结点"
+      },
+      {
+        "key": "B",
+        "text": "父结点关键字不小于子结点"
+      },
+      {
+        "key": "C",
+        "text": "中序遍历有序"
+      },
+      {
+        "key": "D",
+        "text": "所有叶子在同一层"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "大根堆父≥子。",
+    "ojRoute": "/oj/ex-heap-choice-001",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-heap-choice-002",
+    "nodeId": "heap",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "堆排序",
+    "stem": "建堆时间复杂度通常为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "O(n)"
+      },
+      {
+        "key": "B",
+        "text": "O(n log n)"
+      },
+      {
+        "key": "C",
+        "text": "O(n²)"
+      },
+      {
+        "key": "D",
+        "text": "O(log n)"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "Floyd 建堆为 O(n)。",
+    "ojRoute": "/oj/ex-heap-choice-002",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-heap-fill-001",
+    "nodeId": "heap",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "堆存储",
+    "fillStem": "完全二叉树常用 {{1}} 存储，父结点 i 的左孩子下标为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "数组"
+      },
+      {
+        "id": 2,
+        "answer": "2i"
+      }
+    ],
+    "answer": "数组;2i",
+    "analysis": "堆用数组下标表示父子关系。",
+    "ojRoute": "/oj/ex-heap-fill-001",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-heap-fill-002",
+    "nodeId": "heap",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "优先队列",
+    "fillStem": "优先队列可用 {{1}} 实现，取最值时间复杂度为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "堆"
+      },
+      {
+        "id": 2,
+        "answer": "O(log n)"
+      }
+    ],
+    "answer": "堆;O(log n)",
+    "analysis": "二叉堆支持高效取极值。",
+    "ojRoute": "/oj/ex-heap-fill-002",
+    "linkedNodeIds": [
+      "heap"
+    ]
   }
 ]

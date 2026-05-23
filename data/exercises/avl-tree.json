@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/avl-tree-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-avl-tree-001",
-    "linkedNodeIds": ["avl-tree"]
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-choice-001",
+    "nodeId": "avl-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "AVL 平衡条件",
+    "stem": "AVL 树中任意结点的平衡因子绝对值不超过：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "0"
+      },
+      {
+        "key": "B",
+        "text": "1"
+      },
+      {
+        "key": "C",
+        "text": "2"
+      },
+      {
+        "key": "D",
+        "text": "log n"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "AVL 要求 |BF|≤1。",
+    "ojRoute": "/oj/ex-avl-tree-choice-001",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-choice-002",
+    "nodeId": "avl-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "旋转操作",
+    "stem": "AVL 树在插入后不平衡时，通常通过什么恢复平衡？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "左旋/右旋等旋转"
+      },
+      {
+        "key": "B",
+        "text": "重新排序所有关键字"
+      },
+      {
+        "key": "C",
+        "text": "分裂结点"
+      },
+      {
+        "key": "D",
+        "text": "染色为红或黑"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "AVL 用旋转维持平衡。",
+    "ojRoute": "/oj/ex-avl-tree-choice-002",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-fill-001",
+    "nodeId": "avl-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "AVL 高度",
+    "fillStem": "含 n 个结点的 AVL 树高度为 {{1}} 量级；查找时间复杂度为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(log n)"
+      },
+      {
+        "id": 2,
+        "answer": "O(log n)"
+      }
+    ],
+    "answer": "O(log n);O(log n)",
+    "analysis": "AVL 保持对数高度。",
+    "ojRoute": "/oj/ex-avl-tree-fill-001",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-fill-002",
+    "nodeId": "avl-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "平衡因子",
+    "fillStem": "平衡因子 BF 等于左子树高度减 {{1}} ；当 |BF|>1 时需 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "右子树高度"
+      },
+      {
+        "id": 2,
+        "answer": "旋转"
+      }
+    ],
+    "answer": "右子树高度;旋转",
+    "analysis": "BF 衡量左右子树高度差。",
+    "ojRoute": "/oj/ex-avl-tree-fill-002",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
   }
 ]

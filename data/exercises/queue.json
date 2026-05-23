@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/queue-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-queue-001",
-    "linkedNodeIds": ["queue"]
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-queue-choice-001",
+    "nodeId": "queue",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "循环队列判空条件",
+    "stem": "采用 front、rear 双指针实现的循环队列（牺牲一个存储空间），队空的判断条件是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "front == rear"
+      },
+      {
+        "key": "B",
+        "text": "(rear + 1) % MAXSIZE == front"
+      },
+      {
+        "key": "C",
+        "text": "front == 0"
+      },
+      {
+        "key": "D",
+        "text": "rear == MAXSIZE - 1"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "队空：front == rear；队满：(rear+1)%MAXSIZE == front。",
+    "ojRoute": "/oj/ex-queue-choice-001",
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-queue-choice-002",
+    "nodeId": "queue",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "队列的应用",
+    "stem": "广度优先搜索（BFS）中，通常用哪种结构维护待访问结点？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "栈"
+      },
+      {
+        "key": "B",
+        "text": "队列"
+      },
+      {
+        "key": "C",
+        "text": "堆"
+      },
+      {
+        "key": "D",
+        "text": "并查集"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "BFS 按层扩展，使用队列。",
+    "ojRoute": "/oj/ex-queue-choice-002",
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-queue-fill-001",
+    "nodeId": "queue",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "循环队列",
+    "fillStem": "循环队列通过取模运算将数组视为 {{1}} 结构；牺牲一个单元时，队满条件常为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "环状"
+      },
+      {
+        "id": 2,
+        "answer": "(rear+1)%n==front"
+      }
+    ],
+    "answer": "环状;(rear+1)%n==front",
+    "analysis": "循环队列复用数组空间。",
+    "ojRoute": "/oj/ex-queue-fill-001",
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-queue-fill-002",
+    "nodeId": "queue",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "双端队列",
+    "fillStem": "双端队列（deque）允许在 {{1}} 和 {{2}} 两端进行插入与删除。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "队头"
+      },
+      {
+        "id": 2,
+        "answer": "队尾"
+      }
+    ],
+    "answer": "队头;队尾",
+    "analysis": "deque 两端均可操作。",
+    "ojRoute": "/oj/ex-queue-fill-002",
+    "linkedNodeIds": [
+      "queue"
+    ]
   }
 ]

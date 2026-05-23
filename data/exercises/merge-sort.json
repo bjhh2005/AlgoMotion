@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/merge-sort-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-merge-sort-001",
-    "linkedNodeIds": ["merge-sort"]
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-choice-001",
+    "nodeId": "merge-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "归并排序稳定性",
+    "stem": "归并排序是稳定排序，因为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "合并时相等元素保持相对次序"
+      },
+      {
+        "key": "B",
+        "text": "不需要额外空间"
+      },
+      {
+        "key": "C",
+        "text": "原地交换相邻元素"
+      },
+      {
+        "key": "D",
+        "text": "只适用于链表"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "稳定合并保证相等元素顺序。",
+    "ojRoute": "/oj/ex-merge-sort-choice-001",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-choice-002",
+    "nodeId": "merge-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "归并复杂度",
+    "stem": "归并排序的时间复杂度为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "O(n)"
+      },
+      {
+        "key": "B",
+        "text": "O(n log n)"
+      },
+      {
+        "key": "C",
+        "text": "O(n²)"
+      },
+      {
+        "key": "D",
+        "text": "O(log n)"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "归并排序 O(n log n)。",
+    "ojRoute": "/oj/ex-merge-sort-choice-002",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-fill-001",
+    "nodeId": "merge-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "分治",
+    "fillStem": "归并排序采用 {{1}} 思想：先递归排序左右两半，再 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "分治"
+      },
+      {
+        "id": 2,
+        "answer": "合并"
+      }
+    ],
+    "answer": "分治;合并",
+    "analysis": "分治+合并是归并核心。",
+    "ojRoute": "/oj/ex-merge-sort-fill-001",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-fill-002",
+    "nodeId": "merge-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "逆序对",
+    "fillStem": "归并排序合并时可统计 {{1}} ；序列逆序对个数可用归并在 {{2}} 时间内求解。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "逆序对"
+      },
+      {
+        "id": 2,
+        "answer": "O(n log n)"
+      }
+    ],
+    "answer": "逆序对;O(n log n)",
+    "analysis": "P1908 逆序对经典题。",
+    "ojRoute": "/oj/ex-merge-sort-fill-002",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
   }
 ]

@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/mst-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-mst-001",
-    "linkedNodeIds": ["mst"]
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-mst-choice-001",
+    "nodeId": "mst",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "最小生成树",
+    "stem": "最小生成树（MST）连接图中所有顶点且：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "边权之和最大"
+      },
+      {
+        "key": "B",
+        "text": "边权之和最小"
+      },
+      {
+        "key": "C",
+        "text": "边数最多"
+      },
+      {
+        "key": "D",
+        "text": "必为完全图"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "MST 最小化总权值。",
+    "ojRoute": "/oj/ex-mst-choice-001",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-mst-choice-002",
+    "nodeId": "mst",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "MST 算法",
+    "stem": "下列哪项不是经典 MST 算法？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "Prim"
+      },
+      {
+        "key": "B",
+        "text": "Kruskal"
+      },
+      {
+        "key": "C",
+        "text": "Dijkstra"
+      },
+      {
+        "key": "D",
+        "text": "Borůvka"
+      }
+    ],
+    "choiceAnswer": "C",
+    "answer": "C",
+    "analysis": "Dijkstra 求单源最短路，不是 MST。",
+    "ojRoute": "/oj/ex-mst-choice-002",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-mst-fill-001",
+    "nodeId": "mst",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "Kruskal",
+    "fillStem": "Kruskal 按边权 {{1}} 选边，并用 {{2}} 判断是否成环。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "升序"
+      },
+      {
+        "id": 2,
+        "answer": "并查集"
+      }
+    ],
+    "answer": "升序;并查集",
+    "analysis": "Kruskal 贪心+并查集。",
+    "ojRoute": "/oj/ex-mst-fill-001",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-mst-fill-002",
+    "nodeId": "mst",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "Prim",
+    "fillStem": "Prim 从某顶点扩展，每次加入连接树内外且权值 {{1}} 的边；常用 {{2}} 优化选边。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "最小"
+      },
+      {
+        "id": 2,
+        "answer": "堆"
+      }
+    ],
+    "answer": "最小;堆",
+    "analysis": "Prim 类似扩展最短路思想。",
+    "ojRoute": "/oj/ex-mst-fill-002",
+    "linkedNodeIds": [
+      "mst"
+    ]
   }
 ]

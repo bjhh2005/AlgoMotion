@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/dsu-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-dsu-001",
-    "linkedNodeIds": ["union-find"]
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-dsu-choice-001",
+    "nodeId": "union-find",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "并查集路径压缩的作用",
+    "stem": "在并查集的 find 操作中引入路径压缩后，主要效果是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "降低单次 find 均摊时间复杂度"
+      },
+      {
+        "key": "B",
+        "text": "保证树高恒为 O(1)"
+      },
+      {
+        "key": "C",
+        "text": "只能用于无向图"
+      },
+      {
+        "key": "D",
+        "text": "必须配合堆结构使用"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "路径压缩将查找路径上的结点直接挂到根上，降低后续查询成本。",
+    "ojRoute": "/oj/ex-dsu-choice-001",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-dsu-choice-002",
+    "nodeId": "union-find",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "按秩合并的策略",
+    "stem": "并查集按秩（rank）合并时，通常将：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "秩大的树合并到秩小的树下"
+      },
+      {
+        "key": "B",
+        "text": "秩小的树合并到秩大的树下"
+      },
+      {
+        "key": "C",
+        "text": "随机选一棵作为子树"
+      },
+      {
+        "key": "D",
+        "text": "总是合并深度更深的树"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "按秩合并令浅树挂到深树下，有助于控制树高。",
+    "ojRoute": "/oj/ex-dsu-choice-002",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-dsu-fill-001",
+    "nodeId": "union-find",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "并查集基础",
+    "fillStem": "并查集支持两种核心操作：{{1}} 与 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "查找"
+      },
+      {
+        "id": 2,
+        "answer": "合并"
+      }
+    ],
+    "answer": "查找;合并",
+    "analysis": "find/union 是并查集的基本操作。",
+    "ojRoute": "/oj/ex-dsu-fill-001",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-dsu-fill-002",
+    "nodeId": "union-find",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "并查集应用",
+    "fillStem": "判断无向图是否连通、求连通块个数等问题，常用 {{1}} 维护元素所属集合，均摊时间接近 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "并查集"
+      },
+      {
+        "id": 2,
+        "answer": "O(α(n))"
+      }
+    ],
+    "answer": "并查集;O(α(n))",
+    "analysis": "并查集在连通性判定中非常高效。",
+    "ojRoute": "/oj/ex-dsu-fill-002",
+    "linkedNodeIds": [
+      "union-find"
+    ]
   }
 ]

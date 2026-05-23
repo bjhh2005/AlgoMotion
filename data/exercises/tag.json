@@ -2,85 +2,569 @@
   {
     "id": "ex-dsu-001",
     "title": "[模板]并查集",
-    "tag": ["union-find"],
+    "tag": [
+      "union-find"
+    ],
+    "path": "data/exercises/dsu.json"
+  },
+  {
+    "id": "ex-dsu-choice-001",
+    "title": "并查集路径压缩的作用",
+    "tag": [
+      "union-find"
+    ],
+    "path": "data/exercises/dsu.json"
+  },
+  {
+    "id": "ex-dsu-choice-002",
+    "title": "按秩合并的策略",
+    "tag": [
+      "union-find"
+    ],
+    "path": "data/exercises/dsu.json"
+  },
+  {
+    "id": "ex-dsu-fill-001",
+    "title": "并查集基础",
+    "tag": [
+      "union-find"
+    ],
+    "path": "data/exercises/dsu.json"
+  },
+  {
+    "id": "ex-dsu-fill-002",
+    "title": "并查集应用",
+    "tag": [
+      "union-find"
+    ],
     "path": "data/exercises/dsu.json"
   },
   {
     "id": "ex-stack-001",
     "title": "[NOIP 2003 普及组] 栈",
-    "tag": ["stack"],
+    "tag": [
+      "stack"
+    ],
+    "path": "data/exercises/stack.json"
+  },
+  {
+    "id": "ex-stack-choice-001",
+    "title": "栈的删除操作发生在哪一端？",
+    "tag": [
+      "stack"
+    ],
+    "path": "data/exercises/stack.json"
+  },
+  {
+    "id": "ex-stack-choice-002",
+    "title": "栈的应用场景",
+    "tag": [
+      "stack"
+    ],
+    "path": "data/exercises/stack.json"
+  },
+  {
+    "id": "ex-stack-fill-001",
+    "title": "顺序栈操作",
+    "tag": [
+      "stack"
+    ],
+    "path": "data/exercises/stack.json"
+  },
+  {
+    "id": "ex-stack-fill-002",
+    "title": "栈与递归",
+    "tag": [
+      "stack"
+    ],
     "path": "data/exercises/stack.json"
   },
   {
     "id": "ex-queue-001",
     "title": "【模板】队列",
-    "tag": ["queue"],
+    "tag": [
+      "queue"
+    ],
     "path": "data/exercises/queue.json"
   },
   {
-    "id":"ex-kmp-001",
+    "id": "ex-queue-choice-001",
+    "title": "循环队列判空条件",
+    "tag": [
+      "queue"
+    ],
+    "path": "data/exercises/queue.json"
+  },
+  {
+    "id": "ex-queue-choice-002",
+    "title": "队列的应用",
+    "tag": [
+      "queue"
+    ],
+    "path": "data/exercises/queue.json"
+  },
+  {
+    "id": "ex-queue-fill-001",
+    "title": "循环队列",
+    "tag": [
+      "queue"
+    ],
+    "path": "data/exercises/queue.json"
+  },
+  {
+    "id": "ex-queue-fill-002",
+    "title": "双端队列",
+    "tag": [
+      "queue"
+    ],
+    "path": "data/exercises/queue.json"
+  },
+  {
+    "id": "ex-kmp-001",
     "title": "【模板】KMP",
-    "tag": ["kmp"],
+    "tag": [
+      "kmp"
+    ],
     "path": "data/exercises/kmp.json"
   },
   {
-    "id":"ex-linked-list-001",
+    "id": "ex-kmp-choice-001",
+    "title": "KMP 算法核心",
+    "tag": [
+      "kmp"
+    ],
+    "path": "data/exercises/kmp.json"
+  },
+  {
+    "id": "ex-kmp-choice-002",
+    "title": "next 数组含义",
+    "tag": [
+      "kmp"
+    ],
+    "path": "data/exercises/kmp.json"
+  },
+  {
+    "id": "ex-kmp-fill-001",
+    "title": "KMP 复杂度",
+    "tag": [
+      "kmp"
+    ],
+    "path": "data/exercises/kmp.json"
+  },
+  {
+    "id": "ex-kmp-fill-002",
+    "title": "字符串匹配",
+    "tag": [
+      "kmp"
+    ],
+    "path": "data/exercises/kmp.json"
+  },
+  {
+    "id": "ex-linked-list-001",
     "title": "单向链表",
-    "tag": ["linked-list"],
+    "tag": [
+      "linked-list"
+    ],
+    "path": "data/exercises/linked-list.json"
+  },
+  {
+    "id": "ex-linked-list-choice-001",
+    "title": "单链表插入",
+    "tag": [
+      "linked-list"
+    ],
+    "path": "data/exercises/linked-list.json"
+  },
+  {
+    "id": "ex-linked-list-choice-002",
+    "title": "链表与数组",
+    "tag": [
+      "linked-list"
+    ],
+    "path": "data/exercises/linked-list.json"
+  },
+  {
+    "id": "ex-linked-list-fill-001",
+    "title": "链表结构",
+    "tag": [
+      "linked-list"
+    ],
+    "path": "data/exercises/linked-list.json"
+  },
+  {
+    "id": "ex-linked-list-fill-002",
+    "title": "双向链表",
+    "tag": [
+      "linked-list"
+    ],
     "path": "data/exercises/linked-list.json"
   },
   {
     "id": "ex-avl-tree-001",
-    "title": "【模板】普通平衡树",
-    "tag": ["avl-tree"],
+    "title": "单向链表",
+    "tag": [
+      "avl-tree"
+    ],
+    "path": "data/exercises/avl-tree.json"
+  },
+  {
+    "id": "ex-avl-tree-choice-001",
+    "title": "AVL 平衡条件",
+    "tag": [
+      "avl-tree"
+    ],
+    "path": "data/exercises/avl-tree.json"
+  },
+  {
+    "id": "ex-avl-tree-choice-002",
+    "title": "旋转操作",
+    "tag": [
+      "avl-tree"
+    ],
+    "path": "data/exercises/avl-tree.json"
+  },
+  {
+    "id": "ex-avl-tree-fill-001",
+    "title": "AVL 高度",
+    "tag": [
+      "avl-tree"
+    ],
+    "path": "data/exercises/avl-tree.json"
+  },
+  {
+    "id": "ex-avl-tree-fill-002",
+    "title": "平衡因子",
+    "tag": [
+      "avl-tree"
+    ],
     "path": "data/exercises/avl-tree.json"
   },
   {
     "id": "ex-red-black-tree-001",
     "title": "[SDOI2008] 红黑树",
-    "tag": ["red-black-tree"],
+    "tag": [
+      "red-black-tree"
+    ],
+    "path": "data/exercises/red-black-tree.json"
+  },
+  {
+    "id": "ex-red-black-tree-choice-001",
+    "title": "红黑树性质",
+    "tag": [
+      "red-black-tree"
+    ],
+    "path": "data/exercises/red-black-tree.json"
+  },
+  {
+    "id": "ex-red-black-tree-choice-002",
+    "title": "红黑树与 AVL",
+    "tag": [
+      "red-black-tree"
+    ],
+    "path": "data/exercises/red-black-tree.json"
+  },
+  {
+    "id": "ex-red-black-tree-fill-001",
+    "title": "红黑树颜色",
+    "tag": [
+      "red-black-tree"
+    ],
+    "path": "data/exercises/red-black-tree.json"
+  },
+  {
+    "id": "ex-red-black-tree-fill-002",
+    "title": "红黑树应用",
+    "tag": [
+      "red-black-tree"
+    ],
     "path": "data/exercises/red-black-tree.json"
   },
   {
     "id": "ex-heap-001",
     "title": "【模板】堆",
-    "tag": ["heap"],
+    "tag": [
+      "heap"
+    ],
+    "path": "data/exercises/heap.json"
+  },
+  {
+    "id": "ex-heap-choice-001",
+    "title": "堆的性质",
+    "tag": [
+      "heap"
+    ],
+    "path": "data/exercises/heap.json"
+  },
+  {
+    "id": "ex-heap-choice-002",
+    "title": "堆排序",
+    "tag": [
+      "heap"
+    ],
+    "path": "data/exercises/heap.json"
+  },
+  {
+    "id": "ex-heap-fill-001",
+    "title": "堆存储",
+    "tag": [
+      "heap"
+    ],
+    "path": "data/exercises/heap.json"
+  },
+  {
+    "id": "ex-heap-fill-002",
+    "title": "优先队列",
+    "tag": [
+      "heap"
+    ],
     "path": "data/exercises/heap.json"
   },
   {
     "id": "ex-huffman-tree-001",
     "title": "[NOI2015] 荷马史诗",
-    "tag": ["huffman-tree"],
+    "tag": [
+      "huffman-tree"
+    ],
+    "path": "data/exercises/huffman-tree.json"
+  },
+  {
+    "id": "ex-huffman-tree-choice-001",
+    "title": "哈夫曼编码",
+    "tag": [
+      "huffman-tree"
+    ],
+    "path": "data/exercises/huffman-tree.json"
+  },
+  {
+    "id": "ex-huffman-tree-choice-002",
+    "title": "哈夫曼构建",
+    "tag": [
+      "huffman-tree"
+    ],
+    "path": "data/exercises/huffman-tree.json"
+  },
+  {
+    "id": "ex-huffman-tree-fill-001",
+    "title": "前缀码",
+    "tag": [
+      "huffman-tree"
+    ],
+    "path": "data/exercises/huffman-tree.json"
+  },
+  {
+    "id": "ex-huffman-tree-fill-002",
+    "title": "带权路径长度",
+    "tag": [
+      "huffman-tree"
+    ],
     "path": "data/exercises/huffman-tree.json"
   },
   {
     "id": "ex-topological-sort-001",
     "title": "最大食物链计数",
-    "tag": ["topological-sort"],
+    "tag": [
+      "topological-sort"
+    ],
+    "path": "data/exercises/topological-sort.json"
+  },
+  {
+    "id": "ex-topological-sort-choice-001",
+    "title": "拓扑排序前提",
+    "tag": [
+      "topological-sort"
+    ],
+    "path": "data/exercises/topological-sort.json"
+  },
+  {
+    "id": "ex-topological-sort-choice-002",
+    "title": "拓扑排序算法",
+    "tag": [
+      "topological-sort"
+    ],
+    "path": "data/exercises/topological-sort.json"
+  },
+  {
+    "id": "ex-topological-sort-fill-001",
+    "title": "入度",
+    "tag": [
+      "topological-sort"
+    ],
+    "path": "data/exercises/topological-sort.json"
+  },
+  {
+    "id": "ex-topological-sort-fill-002",
+    "title": "拓扑应用",
+    "tag": [
+      "topological-sort"
+    ],
     "path": "data/exercises/topological-sort.json"
   },
   {
     "id": "ex-mst-001",
     "title": "【模板】最小生成树",
-    "tag": ["mst"],
+    "tag": [
+      "mst"
+    ],
+    "path": "data/exercises/mst.json"
+  },
+  {
+    "id": "ex-mst-choice-001",
+    "title": "最小生成树",
+    "tag": [
+      "mst"
+    ],
+    "path": "data/exercises/mst.json"
+  },
+  {
+    "id": "ex-mst-choice-002",
+    "title": "MST 算法",
+    "tag": [
+      "mst"
+    ],
+    "path": "data/exercises/mst.json"
+  },
+  {
+    "id": "ex-mst-fill-001",
+    "title": "Kruskal",
+    "tag": [
+      "mst"
+    ],
+    "path": "data/exercises/mst.json"
+  },
+  {
+    "id": "ex-mst-fill-002",
+    "title": "Prim",
+    "tag": [
+      "mst"
+    ],
     "path": "data/exercises/mst.json"
   },
   {
     "id": "ex-shortest-path-001",
     "title": "【模板】单源最短路径（标准版）",
-    "tag": ["shortest-path"],
+    "tag": [
+      "shortest-path"
+    ],
     "path": "data/exercises/shortest-path.json"
   },
-    {
+  {
+    "id": "ex-shortest-path-002",
+    "title": "A + B（两整数求和）",
+    "tag": [
+      "shortest-path"
+    ],
+    "path": "data/exercises/shortest-path.json"
+  },
+  {
+    "id": "ex-shortest-path-choice-001",
+    "title": "Dijkstra 适用条件",
+    "tag": [
+      "shortest-path"
+    ],
+    "path": "data/exercises/shortest-path.json"
+  },
+  {
+    "id": "ex-shortest-path-choice-002",
+    "title": "单源最短路",
+    "tag": [
+      "shortest-path"
+    ],
+    "path": "data/exercises/shortest-path.json"
+  },
+  {
+    "id": "ex-shortest-path-fill-001",
+    "title": "最短路算法",
+    "tag": [
+      "shortest-path"
+    ],
+    "path": "data/exercises/shortest-path.json"
+  },
+  {
+    "id": "ex-shortest-path-fill-002",
+    "title": "松弛操作",
+    "tag": [
+      "shortest-path"
+    ],
+    "path": "data/exercises/shortest-path.json"
+  },
+  {
     "id": "ex-binary-search-001",
     "title": "【深基13.例1】查找",
-    "tag": ["binary-search"],
+    "tag": [
+      "binary-search"
+    ],
+    "path": "data/exercises/binary-search.json"
+  },
+  {
+    "id": "ex-binary-search-choice-001",
+    "title": "二分查找前提",
+    "tag": [
+      "binary-search"
+    ],
+    "path": "data/exercises/binary-search.json"
+  },
+  {
+    "id": "ex-binary-search-choice-002",
+    "title": "二分边界",
+    "tag": [
+      "binary-search"
+    ],
+    "path": "data/exercises/binary-search.json"
+  },
+  {
+    "id": "ex-binary-search-fill-001",
+    "title": "二分查找的前提条件",
+    "tag": [
+      "binary-search"
+    ],
+    "path": "data/exercises/binary-search.json"
+  },
+  {
+    "id": "ex-binary-search-fill-002",
+    "title": "二分答案",
+    "tag": [
+      "binary-search"
+    ],
     "path": "data/exercises/binary-search.json"
   },
   {
     "id": "ex-merge-sort-001",
     "title": "P1908 逆序对",
-    "tag": ["merge-sort"],
+    "tag": [
+      "merge-sort"
+    ],
+    "path": "data/exercises/merge-sort.json"
+  },
+  {
+    "id": "ex-merge-sort-choice-001",
+    "title": "归并排序稳定性",
+    "tag": [
+      "merge-sort"
+    ],
+    "path": "data/exercises/merge-sort.json"
+  },
+  {
+    "id": "ex-merge-sort-choice-002",
+    "title": "归并复杂度",
+    "tag": [
+      "merge-sort"
+    ],
+    "path": "data/exercises/merge-sort.json"
+  },
+  {
+    "id": "ex-merge-sort-fill-001",
+    "title": "分治",
+    "tag": [
+      "merge-sort"
+    ],
+    "path": "data/exercises/merge-sort.json"
+  },
+  {
+    "id": "ex-merge-sort-fill-002",
+    "title": "逆序对",
+    "tag": [
+      "merge-sort"
+    ],
     "path": "data/exercises/merge-sort.json"
   }
 ]

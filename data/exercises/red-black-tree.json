@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/red-black-tree-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-red-black-tree-001",
-    "linkedNodeIds": ["red-black-tree"]
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-choice-001",
+    "nodeId": "red-black-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "红黑树性质",
+    "stem": "红黑树中，从任一结点到其每个叶子的所有路径上，黑色结点数量：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "可以不同"
+      },
+      {
+        "key": "B",
+        "text": "必须相同"
+      },
+      {
+        "key": "C",
+        "text": "必须为 0"
+      },
+      {
+        "key": "D",
+        "text": "必须为 1"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "黑高一致是红黑树重要性质。",
+    "ojRoute": "/oj/ex-red-black-tree-choice-001",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-choice-002",
+    "nodeId": "red-black-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "红黑树与 AVL",
+    "stem": "相比 AVL 树，红黑树通常：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "查找更快但插入更慢"
+      },
+      {
+        "key": "B",
+        "text": "插入删除更灵活，旋转次数更少"
+      },
+      {
+        "key": "C",
+        "text": "严格平衡"
+      },
+      {
+        "key": "D",
+        "text": "不能用于关联容器"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "红黑树是近似平衡，插入删除代价较低。",
+    "ojRoute": "/oj/ex-red-black-tree-choice-002",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-fill-001",
+    "nodeId": "red-black-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "红黑树颜色",
+    "fillStem": "红黑树结点颜色为 {{1}} 或 {{2}} ，根结点为黑色。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "红"
+      },
+      {
+        "id": 2,
+        "answer": "黑"
+      }
+    ],
+    "answer": "红;黑",
+    "analysis": "结点非红即黑。",
+    "ojRoute": "/oj/ex-red-black-tree-fill-001",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-fill-002",
+    "nodeId": "red-black-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "红黑树应用",
+    "fillStem": "C++ STL 中 {{1}} 与 {{2}} 的底层常采用红黑树实现。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "map"
+      },
+      {
+        "id": 2,
+        "answer": "set"
+      }
+    ],
+    "answer": "map;set",
+    "analysis": "关联容器多用红黑树。",
+    "ojRoute": "/oj/ex-red-black-tree-fill-002",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
   }
 ]

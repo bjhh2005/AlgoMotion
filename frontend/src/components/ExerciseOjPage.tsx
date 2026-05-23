@@ -6,7 +6,6 @@ import { ChoiceView } from "./oj/ChoiceView";
 import { CodeView } from "./oj/CodeView";
 import { ProblemList } from "./oj/ProblemList";
 import {
-  applyRecommendations,
   catalogItemToExercise,
   fetchCatalogTags,
   fetchProblemCatalog,
@@ -119,10 +118,6 @@ export function ExerciseOjPage({
     if (next) openProblem(next);
   }
 
-  function refreshRecommendations() {
-    setCatalog((current) => applyRecommendations(current, progress, nodeById));
-  }
-
   const typeName = activeItem?.type ? typeLabel[activeItem.type] : "题目";
 
   return (
@@ -162,7 +157,6 @@ export function ExerciseOjPage({
           error={catalogError}
           nodeById={nodeById}
           onOpen={openProblem}
-          onRefreshRecommendations={refreshRecommendations}
         />
       ) : activeItem.type === "choice" ? (
         <div className="oj-mode-body">

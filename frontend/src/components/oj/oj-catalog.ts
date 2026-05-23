@@ -16,7 +16,6 @@ export interface OjCatalogItem extends TagProblemIndex {
   ojRoute?: string;
   ojProblemId?: string;
   status?: OjPracticeStatus;
-  recommended?: boolean;
   knowledge?: string;
 }
 
@@ -76,51 +75,12 @@ export async function fetchProblemCatalog(
         ojRoute: meta && !isProblemApiError(meta) ? meta.ojRoute : `/oj/${item.id}`,
         ojProblemId: meta && !isProblemApiError(meta) ? meta.ojProblemId : undefined,
         status: progressToStatus(progressStatus),
-        knowledge: nodeId ? tagLabel(nodeId, nodeById) : tagLabel(item.tag[0] ?? "", nodeById),
-        recommended: false
+        knowledge: nodeId ? tagLabel(nodeId, nodeById) : tagLabel(item.tag[0] ?? "", nodeById)
       } satisfies OjCatalogItem;
     })
   );
 
-  return applyRecommendations(enriched, progress, nodeById);
-}
-
-export function applyRecommendations(
-  items: OjCatalogItem[],
-  progress: ProgressMap,
-  nodeById: Record<string, KnowledgeNode>
-) {
-  const focusNodeIds = Object.entries(progress)
-    .filter(([, record]) => record.status === "learning" || record.status === "weak")
-    .map(([nodeId]) => nodeId)
-    .slice(0, 4);
-
-  const focusTags = new Set(
-    focusNodeIds.flatMap((nodeId) => {
-      const node = nodeById[nodeId];
-      return node ? [nodeId, ...(node.tags ?? [])] : [nodeId];
-    })
-  );
-
-  const recommendedIds = new Set<string>();
-  for (const item of items) {
-    if (item.tag.some((t) => focusTags.has(t)) || (item.nodeId && focusTags.has(item.nodeId))) {
-      recommendedIds.add(item.id);
-      if (recommendedIds.size >= 4) break;
-    }
-  }
-
-  if (recommendedIds.size < 3) {
-    for (const item of items) {
-      recommendedIds.add(item.id);
-      if (recommendedIds.size >= 4) break;
-    }
-  }
-
-  return items.map((item) => ({
-    ...item,
-    recommended: recommendedIds.has(item.id)
-  }));
+  return enriched;
 }
 
 export function filterCatalog(

@@ -10,6 +10,137 @@
     "starterCode": "data/oj-data/shortest-path-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-shortest-path-001",
-    "linkedNodeIds": ["shortest-path"]
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-002",
+    "ojProblemId": "1001",
+    "title": "A + B（两整数求和）",
+    "path": "data/oj-data/1001/problem.md",
+    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x, y;\n    cin >> x >> y;\n    cout << x + y;\n    return 0;\n}",
+    "answer": "读入 x、y 后输出 x+y",
+    "ojRoute": "/oj/ex-shortest-path-002",
+    "nodeId": "shortest-path",
+    "type": "programming",
+    "difficulty": "basic",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-choice-001",
+    "nodeId": "shortest-path",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "Dijkstra 适用条件",
+    "stem": "Dijkstra 算法要求边权：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "可为任意实数"
+      },
+      {
+        "key": "B",
+        "text": "非负"
+      },
+      {
+        "key": "C",
+        "text": "必须为 0 或 1"
+      },
+      {
+        "key": "D",
+        "text": "必须相等"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "负权边会导致 Dijkstra 失效。",
+    "ojRoute": "/oj/ex-shortest-path-choice-001",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-choice-002",
+    "nodeId": "shortest-path",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "单源最短路",
+    "stem": "单源最短路径问题是指：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "求任意两点间最短路"
+      },
+      {
+        "key": "B",
+        "text": "求源点到其余各点最短路"
+      },
+      {
+        "key": "C",
+        "text": "求最小生成树"
+      },
+      {
+        "key": "D",
+        "text": "判断连通性"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "单源即从固定源点出发。",
+    "ojRoute": "/oj/ex-shortest-path-choice-002",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-fill-001",
+    "nodeId": "shortest-path",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "最短路算法",
+    "fillStem": "含负权边时常用 {{1}} 算法；边权非负时可用 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "Bellman-Ford"
+      },
+      {
+        "id": 2,
+        "answer": "Dijkstra"
+      }
+    ],
+    "answer": "Bellman-Ford;Dijkstra",
+    "analysis": "Bellman-Ford 可处理负权。",
+    "ojRoute": "/oj/ex-shortest-path-fill-001",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-fill-002",
+    "nodeId": "shortest-path",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "松弛操作",
+    "fillStem": "最短路松弛：若 dist[u]+w(u,v)<dist[v]，则更新 dist[v]，称为对边 (u,v) 进行 {{1}} ；Dijkstra 每次取出 {{2}} 未确定顶点。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "松弛"
+      },
+      {
+        "id": 2,
+        "answer": "距离最小"
+      }
+    ],
+    "answer": "松弛;距离最小",
+    "analysis": "松弛是更新最短路估计的核心。",
+    "ojRoute": "/oj/ex-shortest-path-fill-002",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
   }
 ]

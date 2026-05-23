@@ -1,69 +1,1823 @@
 [
   {
+    "id": "ex-dsu-001",
+    "ojProblemId": "dsu-001",
+    "nodeId": "union-find",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[模板]并查集",
+    "path": "data/oj-data/dsu-001/problem.md",
+    "starterCode": "data/oj-data/dsu-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-dsu-001",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
     "id": "ex-stack-001",
+    "ojProblemId": "stack-001",
+    "nodeId": "stack",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[NOIP 2003 普及组] 栈",
+    "path": "data/oj-data/stack-001/problem.md",
+    "starterCode": "data/oj-data/stack-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-stack-001",
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-queue-001",
+    "ojProblemId": "queue-001",
+    "nodeId": "queue",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】队列",
+    "path": "data/oj-data/queue-001/problem.md",
+    "starterCode": "data/oj-data/queue-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-queue-001",
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-kmp-001",
+    "ojProblemId": "kmp-001",
+    "nodeId": "kmp",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】KMP",
+    "path": "data/oj-data/kmp-001/problem.md",
+    "starterCode": "data/oj-data/kmp-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-kmp-001",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-linked-list-001",
+    "ojProblemId": "linked-list-001",
+    "nodeId": "linked-list",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "单向链表",
+    "path": "data/oj-data/linked-list-001/problem.md",
+    "starterCode": "data/oj-data/linked-list-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-linked-list-001",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-001",
+    "ojProblemId": "avl-tree-001",
+    "nodeId": "avl-tree",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "单向链表",
+    "path": "data/oj-data/avl-tree-001/problem.md",
+    "starterCode": "data/oj-data/avl-tree-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-avl-tree-001",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-001",
+    "ojProblemId": "red-black-tree-001",
+    "nodeId": "red-black-tree",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[SDOI2008] 红黑树",
+    "path": "data/oj-data/red-black-tree-001/problem.md",
+    "starterCode": "data/oj-data/red-black-tree-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-red-black-tree-001",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-heap-001",
+    "ojProblemId": "heap-001",
+    "nodeId": "heap",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】堆",
+    "path": "data/oj-data/heap-001/problem.md",
+    "starterCode": "data/oj-data/heap-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-heap-001",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-001",
+    "ojProblemId": "huffman-tree-001",
+    "nodeId": "huffman-tree",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "[NOI2015] 荷马史诗",
+    "path": "data/oj-data/huffman-tree-001/problem.md",
+    "starterCode": "data/oj-data/huffman-tree-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-huffman-tree-001",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-001",
+    "ojProblemId": "topological-sort-001",
+    "nodeId": "topological-sort",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "最大食物链计数",
+    "path": "data/oj-data/topological-sort-001/problem.md",
+    "starterCode": "data/oj-data/topological-sort-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-topological-sort-001",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-mst-001",
+    "ojProblemId": "mst-001",
+    "nodeId": "mst",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】最小生成树",
+    "path": "data/oj-data/mst-001/problem.md",
+    "starterCode": "data/oj-data/mst-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-mst-001",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-001",
+    "ojProblemId": "shortest-path-001",
+    "nodeId": "shortest-path",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】单源最短路径（标准版）",
+    "path": "data/oj-data/shortest-path-001/problem.md",
+    "starterCode": "data/oj-data/shortest-path-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-shortest-path-001",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-002",
+    "ojProblemId": "1001",
+    "title": "A + B（两整数求和）",
+    "path": "data/oj-data/1001/problem.md",
+    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x, y;\n    cin >> x >> y;\n    cout << x + y;\n    return 0;\n}",
+    "answer": "读入 x、y 后输出 x+y",
+    "ojRoute": "/oj/ex-shortest-path-002",
+    "nodeId": "shortest-path",
+    "type": "programming",
+    "difficulty": "basic",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-binary-search-001",
+    "ojProblemId": "binary-search-001",
+    "nodeId": "binary-search",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【深基13.例1】查找",
+    "path": "data/oj-data/binary-search-001/problem.md",
+    "starterCode": "data/oj-data/binary-search-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-binary-search-001",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-001",
+    "ojProblemId": "merge-sort-001",
+    "nodeId": "merge-sort",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "P1908 逆序对",
+    "path": "data/oj-data/merge-sort-001/problem.md",
+    "starterCode": "data/oj-data/merge-sort-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-merge-sort-001",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-dsu-choice-001",
+    "nodeId": "union-find",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "并查集路径压缩的作用",
+    "stem": "在并查集的 find 操作中引入路径压缩后，主要效果是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "降低单次 find 均摊时间复杂度"
+      },
+      {
+        "key": "B",
+        "text": "保证树高恒为 O(1)"
+      },
+      {
+        "key": "C",
+        "text": "只能用于无向图"
+      },
+      {
+        "key": "D",
+        "text": "必须配合堆结构使用"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "路径压缩将查找路径上的结点直接挂到根上，降低后续查询成本。",
+    "ojRoute": "/oj/ex-dsu-choice-001",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-dsu-choice-002",
+    "nodeId": "union-find",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "按秩合并的策略",
+    "stem": "并查集按秩（rank）合并时，通常将：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "秩大的树合并到秩小的树下"
+      },
+      {
+        "key": "B",
+        "text": "秩小的树合并到秩大的树下"
+      },
+      {
+        "key": "C",
+        "text": "随机选一棵作为子树"
+      },
+      {
+        "key": "D",
+        "text": "总是合并深度更深的树"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "按秩合并令浅树挂到深树下，有助于控制树高。",
+    "ojRoute": "/oj/ex-dsu-choice-002",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-dsu-fill-001",
+    "nodeId": "union-find",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "并查集基础",
+    "fillStem": "并查集支持两种核心操作：{{1}} 与 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "查找"
+      },
+      {
+        "id": 2,
+        "answer": "合并"
+      }
+    ],
+    "answer": "查找;合并",
+    "analysis": "find/union 是并查集的基本操作。",
+    "ojRoute": "/oj/ex-dsu-fill-001",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-dsu-fill-002",
+    "nodeId": "union-find",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "并查集应用",
+    "fillStem": "判断无向图是否连通、求连通块个数等问题，常用 {{1}} 维护元素所属集合，均摊时间接近 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "并查集"
+      },
+      {
+        "id": 2,
+        "answer": "O(α(n))"
+      }
+    ],
+    "answer": "并查集;O(α(n))",
+    "analysis": "并查集在连通性判定中非常高效。",
+    "ojRoute": "/oj/ex-dsu-fill-002",
+    "linkedNodeIds": [
+      "union-find"
+    ]
+  },
+  {
+    "id": "ex-stack-choice-001",
     "nodeId": "stack",
     "type": "choice",
     "difficulty": "basic",
     "title": "栈的删除操作发生在哪一端？",
     "stem": "对于一个顺序栈 S，其 top 指针指向栈顶元素。下列关于栈的删除（pop）操作的描述，正确的是：",
     "choiceOptions": [
-      { "key": "A", "text": "在栈底进行删除，时间复杂度 O(n)" },
-      { "key": "B", "text": "在栈顶进行删除，时间复杂度 O(1)" },
-      { "key": "C", "text": "在任意位置删除，时间复杂度 O(n)" },
-      { "key": "D", "text": "栈不支持删除操作" }
+      {
+        "key": "A",
+        "text": "在栈底进行删除，时间复杂度 O(n)"
+      },
+      {
+        "key": "B",
+        "text": "在栈顶进行删除，时间复杂度 O(1)"
+      },
+      {
+        "key": "C",
+        "text": "在任意位置删除，时间复杂度 O(n)"
+      },
+      {
+        "key": "D",
+        "text": "栈不支持删除操作"
+      }
     ],
     "choiceAnswer": "B",
     "answer": "B",
-    "analysis": "栈是后进先出（LIFO）的线性结构，插入与删除均在栈顶进行。顺序栈通过 top 指针定位，pop 操作只需 top-- 并返回元素，时间复杂度 O(1)。",
-    "ojRoute": "/oj/ex-stack-001",
-    "linkedNodeIds": ["stack", "linear-list"]
+    "analysis": "栈是后进先出（LIFO）的线性结构，插入与删除均在栈顶进行。",
+    "ojRoute": "/oj/ex-stack-choice-001",
+    "linkedNodeIds": [
+      "stack"
+    ]
   },
   {
-    "id": "ex-queue-002",
+    "id": "ex-stack-choice-002",
+    "nodeId": "stack",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "栈的应用场景",
+    "stem": "下列哪项最适合用栈实现？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "广度优先搜索 frontier"
+      },
+      {
+        "key": "B",
+        "text": "括号匹配检验"
+      },
+      {
+        "key": "C",
+        "text": "多源最短路径"
+      },
+      {
+        "key": "D",
+        "text": "哈希查找"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "括号匹配、表达式求值等是栈的经典应用。",
+    "ojRoute": "/oj/ex-stack-choice-002",
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-stack-fill-001",
+    "nodeId": "stack",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "顺序栈操作",
+    "fillStem": "顺序栈在栈顶进行 push/pop，均摊时间复杂度为 {{1}} ；空栈判断条件通常为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(1)"
+      },
+      {
+        "id": 2,
+        "answer": "top==-1"
+      }
+    ],
+    "answer": "O(1);top==-1",
+    "analysis": "栈顶操作常数时间；空栈可用 top 指针判断。",
+    "ojRoute": "/oj/ex-stack-fill-001",
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-stack-fill-002",
+    "nodeId": "stack",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "栈与递归",
+    "fillStem": "函数调用时系统往往用 {{1}} 保存返回地址与局部变量；深度过大可能导致 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "栈"
+      },
+      {
+        "id": 2,
+        "answer": "栈溢出"
+      }
+    ],
+    "answer": "栈;栈溢出",
+    "analysis": "调用栈是栈结构的典型体现。",
+    "ojRoute": "/oj/ex-stack-fill-002",
+    "linkedNodeIds": [
+      "stack"
+    ]
+  },
+  {
+    "id": "ex-queue-choice-001",
     "nodeId": "queue",
     "type": "choice",
     "difficulty": "basic",
     "title": "循环队列判空条件",
     "stem": "采用 front、rear 双指针实现的循环队列（牺牲一个存储空间），队空的判断条件是：",
     "choiceOptions": [
-      { "key": "A", "text": "front == rear" },
-      { "key": "B", "text": "(rear + 1) % MAXSIZE == front" },
-      { "key": "C", "text": "front == 0" },
-      { "key": "D", "text": "rear == MAXSIZE - 1" }
+      {
+        "key": "A",
+        "text": "front == rear"
+      },
+      {
+        "key": "B",
+        "text": "(rear + 1) % MAXSIZE == front"
+      },
+      {
+        "key": "C",
+        "text": "front == 0"
+      },
+      {
+        "key": "D",
+        "text": "rear == MAXSIZE - 1"
+      }
     ],
     "choiceAnswer": "A",
     "answer": "A",
-    "analysis": "循环队列中，front 指向队头元素，rear 指向队尾元素的下一个位置。队空：front == rear；队满：(rear+1)%MAXSIZE == front。",
-    "ojRoute": "/oj/ex-queue-002",
-    "linkedNodeIds": ["queue", "linear-list"]
+    "analysis": "队空：front == rear；队满：(rear+1)%MAXSIZE == front。",
+    "ojRoute": "/oj/ex-queue-choice-001",
+    "linkedNodeIds": [
+      "queue"
+    ]
   },
   {
-    "id": "ex-binary-search-001",
+    "id": "ex-queue-choice-002",
+    "nodeId": "queue",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "队列的应用",
+    "stem": "广度优先搜索（BFS）中，通常用哪种结构维护待访问结点？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "栈"
+      },
+      {
+        "key": "B",
+        "text": "队列"
+      },
+      {
+        "key": "C",
+        "text": "堆"
+      },
+      {
+        "key": "D",
+        "text": "并查集"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "BFS 按层扩展，使用队列。",
+    "ojRoute": "/oj/ex-queue-choice-002",
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-queue-fill-001",
+    "nodeId": "queue",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "循环队列",
+    "fillStem": "循环队列通过取模运算将数组视为 {{1}} 结构；牺牲一个单元时，队满条件常为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "环状"
+      },
+      {
+        "id": 2,
+        "answer": "(rear+1)%n==front"
+      }
+    ],
+    "answer": "环状;(rear+1)%n==front",
+    "analysis": "循环队列复用数组空间。",
+    "ojRoute": "/oj/ex-queue-fill-001",
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-queue-fill-002",
+    "nodeId": "queue",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "双端队列",
+    "fillStem": "双端队列（deque）允许在 {{1}} 和 {{2}} 两端进行插入与删除。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "队头"
+      },
+      {
+        "id": 2,
+        "answer": "队尾"
+      }
+    ],
+    "answer": "队头;队尾",
+    "analysis": "deque 两端均可操作。",
+    "ojRoute": "/oj/ex-queue-fill-002",
+    "linkedNodeIds": [
+      "queue"
+    ]
+  },
+  {
+    "id": "ex-kmp-choice-001",
+    "nodeId": "kmp",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "KMP 算法核心",
+    "stem": "KMP 字符串匹配相比暴力匹配的主要改进是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "利用已匹配信息避免模式串指针回退"
+      },
+      {
+        "key": "B",
+        "text": "将模式串排序后再匹配"
+      },
+      {
+        "key": "C",
+        "text": "必须使用哈希函数"
+      },
+      {
+        "key": "D",
+        "text": "只适用于单字符字母表"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "KMP 通过 next 数组避免无效回溯。",
+    "ojRoute": "/oj/ex-kmp-choice-001",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-kmp-choice-002",
+    "nodeId": "kmp",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "next 数组含义",
+    "stem": "KMP 中 next[j] 通常表示：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "模式串前 j 个字符的最长相同前后缀长度"
+      },
+      {
+        "key": "B",
+        "text": "主串第 j 个字符的 ASCII 码"
+      },
+      {
+        "key": "C",
+        "text": "匹配失败时主串回退步数"
+      },
+      {
+        "key": "D",
+        "text": "模式串长度"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "next 记录 border 信息。",
+    "ojRoute": "/oj/ex-kmp-choice-002",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-kmp-fill-001",
+    "nodeId": "kmp",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "KMP 复杂度",
+    "fillStem": "KMP 在主串长度 n、模式串长度 m 时，时间复杂度为 {{1}} ；预处理 next 数组复杂度为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(n+m)"
+      },
+      {
+        "id": 2,
+        "answer": "O(m)"
+      }
+    ],
+    "answer": "O(n+m);O(m)",
+    "analysis": "KMP 线性时间完成匹配。",
+    "ojRoute": "/oj/ex-kmp-fill-001",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-kmp-fill-002",
+    "nodeId": "kmp",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "字符串匹配",
+    "fillStem": "暴力字符串匹配最坏时间复杂度为 {{1}} ；KMP 通过维护 {{2}} 数组优化。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(nm)"
+      },
+      {
+        "id": 2,
+        "answer": "next"
+      }
+    ],
+    "answer": "O(nm);next",
+    "analysis": "暴力匹配二次方；KMP 用 next。",
+    "ojRoute": "/oj/ex-kmp-fill-002",
+    "linkedNodeIds": [
+      "kmp"
+    ]
+  },
+  {
+    "id": "ex-linked-list-choice-001",
+    "nodeId": "linked-list",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "单链表插入",
+    "stem": "在单链表已知结点 p 之后插入结点 s，时间复杂度为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "O(1)"
+      },
+      {
+        "key": "B",
+        "text": "O(n)"
+      },
+      {
+        "key": "C",
+        "text": "O(log n)"
+      },
+      {
+        "key": "D",
+        "text": "O(n log n)"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "已知前驱时插入为 O(1)。",
+    "ojRoute": "/oj/ex-linked-list-choice-001",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-linked-list-choice-002",
+    "nodeId": "linked-list",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "链表与数组",
+    "stem": "与顺序表相比，链表的典型优点是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "随机访问更快"
+      },
+      {
+        "key": "B",
+        "text": "插入删除更灵活，无需大规模移动元素"
+      },
+      {
+        "key": "C",
+        "text": "缓存局部性更好"
+      },
+      {
+        "key": "D",
+        "text": "存储密度更高"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "链表在动态插入删除上更灵活。",
+    "ojRoute": "/oj/ex-linked-list-choice-002",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-linked-list-fill-001",
+    "nodeId": "linked-list",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "链表结构",
+    "fillStem": "单链表中每个结点除数据域外，还包含指向下一个结点的 {{1}} ；访问第 i 个元素最坏需 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "指针"
+      },
+      {
+        "id": 2,
+        "answer": "O(n)"
+      }
+    ],
+    "answer": "指针;O(n)",
+    "analysis": "链表通过指针链接；不支持随机访问。",
+    "ojRoute": "/oj/ex-linked-list-fill-001",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-linked-list-fill-002",
+    "nodeId": "linked-list",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "双向链表",
+    "fillStem": "双向链表结点含有 {{1}} 与 {{2}} 两个指针，便于双向遍历。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "前驱"
+      },
+      {
+        "id": 2,
+        "answer": "后继"
+      }
+    ],
+    "answer": "前驱;后继",
+    "analysis": "双向链表可前后移动。",
+    "ojRoute": "/oj/ex-linked-list-fill-002",
+    "linkedNodeIds": [
+      "linked-list"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-choice-001",
+    "nodeId": "avl-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "AVL 平衡条件",
+    "stem": "AVL 树中任意结点的平衡因子绝对值不超过：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "0"
+      },
+      {
+        "key": "B",
+        "text": "1"
+      },
+      {
+        "key": "C",
+        "text": "2"
+      },
+      {
+        "key": "D",
+        "text": "log n"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "AVL 要求 |BF|≤1。",
+    "ojRoute": "/oj/ex-avl-tree-choice-001",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-choice-002",
+    "nodeId": "avl-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "旋转操作",
+    "stem": "AVL 树在插入后不平衡时，通常通过什么恢复平衡？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "左旋/右旋等旋转"
+      },
+      {
+        "key": "B",
+        "text": "重新排序所有关键字"
+      },
+      {
+        "key": "C",
+        "text": "分裂结点"
+      },
+      {
+        "key": "D",
+        "text": "染色为红或黑"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "AVL 用旋转维持平衡。",
+    "ojRoute": "/oj/ex-avl-tree-choice-002",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-fill-001",
+    "nodeId": "avl-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "AVL 高度",
+    "fillStem": "含 n 个结点的 AVL 树高度为 {{1}} 量级；查找时间复杂度为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "O(log n)"
+      },
+      {
+        "id": 2,
+        "answer": "O(log n)"
+      }
+    ],
+    "answer": "O(log n);O(log n)",
+    "analysis": "AVL 保持对数高度。",
+    "ojRoute": "/oj/ex-avl-tree-fill-001",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-avl-tree-fill-002",
+    "nodeId": "avl-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "平衡因子",
+    "fillStem": "平衡因子 BF 等于左子树高度减 {{1}} ；当 |BF|>1 时需 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "右子树高度"
+      },
+      {
+        "id": 2,
+        "answer": "旋转"
+      }
+    ],
+    "answer": "右子树高度;旋转",
+    "analysis": "BF 衡量左右子树高度差。",
+    "ojRoute": "/oj/ex-avl-tree-fill-002",
+    "linkedNodeIds": [
+      "avl-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-choice-001",
+    "nodeId": "red-black-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "红黑树性质",
+    "stem": "红黑树中，从任一结点到其每个叶子的所有路径上，黑色结点数量：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "可以不同"
+      },
+      {
+        "key": "B",
+        "text": "必须相同"
+      },
+      {
+        "key": "C",
+        "text": "必须为 0"
+      },
+      {
+        "key": "D",
+        "text": "必须为 1"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "黑高一致是红黑树重要性质。",
+    "ojRoute": "/oj/ex-red-black-tree-choice-001",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-choice-002",
+    "nodeId": "red-black-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "红黑树与 AVL",
+    "stem": "相比 AVL 树，红黑树通常：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "查找更快但插入更慢"
+      },
+      {
+        "key": "B",
+        "text": "插入删除更灵活，旋转次数更少"
+      },
+      {
+        "key": "C",
+        "text": "严格平衡"
+      },
+      {
+        "key": "D",
+        "text": "不能用于关联容器"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "红黑树是近似平衡，插入删除代价较低。",
+    "ojRoute": "/oj/ex-red-black-tree-choice-002",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-fill-001",
+    "nodeId": "red-black-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "红黑树颜色",
+    "fillStem": "红黑树结点颜色为 {{1}} 或 {{2}} ，根结点为黑色。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "红"
+      },
+      {
+        "id": 2,
+        "answer": "黑"
+      }
+    ],
+    "answer": "红;黑",
+    "analysis": "结点非红即黑。",
+    "ojRoute": "/oj/ex-red-black-tree-fill-001",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-red-black-tree-fill-002",
+    "nodeId": "red-black-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "红黑树应用",
+    "fillStem": "C++ STL 中 {{1}} 与 {{2}} 的底层常采用红黑树实现。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "map"
+      },
+      {
+        "id": 2,
+        "answer": "set"
+      }
+    ],
+    "answer": "map;set",
+    "analysis": "关联容器多用红黑树。",
+    "ojRoute": "/oj/ex-red-black-tree-fill-002",
+    "linkedNodeIds": [
+      "red-black-tree"
+    ]
+  },
+  {
+    "id": "ex-heap-choice-001",
+    "nodeId": "heap",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "堆的性质",
+    "stem": "大根堆（最大堆）满足：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "父结点关键字不大于子结点"
+      },
+      {
+        "key": "B",
+        "text": "父结点关键字不小于子结点"
+      },
+      {
+        "key": "C",
+        "text": "中序遍历有序"
+      },
+      {
+        "key": "D",
+        "text": "所有叶子在同一层"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "大根堆父≥子。",
+    "ojRoute": "/oj/ex-heap-choice-001",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-heap-choice-002",
+    "nodeId": "heap",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "堆排序",
+    "stem": "建堆时间复杂度通常为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "O(n)"
+      },
+      {
+        "key": "B",
+        "text": "O(n log n)"
+      },
+      {
+        "key": "C",
+        "text": "O(n²)"
+      },
+      {
+        "key": "D",
+        "text": "O(log n)"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "Floyd 建堆为 O(n)。",
+    "ojRoute": "/oj/ex-heap-choice-002",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-heap-fill-001",
+    "nodeId": "heap",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "堆存储",
+    "fillStem": "完全二叉树常用 {{1}} 存储，父结点 i 的左孩子下标为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "数组"
+      },
+      {
+        "id": 2,
+        "answer": "2i"
+      }
+    ],
+    "answer": "数组;2i",
+    "analysis": "堆用数组下标表示父子关系。",
+    "ojRoute": "/oj/ex-heap-fill-001",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-heap-fill-002",
+    "nodeId": "heap",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "优先队列",
+    "fillStem": "优先队列可用 {{1}} 实现，取最值时间复杂度为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "堆"
+      },
+      {
+        "id": 2,
+        "answer": "O(log n)"
+      }
+    ],
+    "answer": "堆;O(log n)",
+    "analysis": "二叉堆支持高效取极值。",
+    "ojRoute": "/oj/ex-heap-fill-002",
+    "linkedNodeIds": [
+      "heap"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-choice-001",
+    "nodeId": "huffman-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "哈夫曼编码",
+    "stem": "哈夫曼树用于构造：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "等长编码"
+      },
+      {
+        "key": "B",
+        "text": "最优前缀无歧义变长编码"
+      },
+      {
+        "key": "C",
+        "text": "哈希表"
+      },
+      {
+        "key": "D",
+        "text": "平衡 BST"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "哈夫曼得到最优前缀码。",
+    "ojRoute": "/oj/ex-huffman-tree-choice-001",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-choice-002",
+    "nodeId": "huffman-tree",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "哈夫曼构建",
+    "stem": "构建哈夫曼树时，每次合并：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "权值最大的两个结点"
+      },
+      {
+        "key": "B",
+        "text": "权值最小的两个结点"
+      },
+      {
+        "key": "C",
+        "text": "深度最大的两个结点"
+      },
+      {
+        "key": "D",
+        "text": "随机两个结点"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "贪心合并最小权。",
+    "ojRoute": "/oj/ex-huffman-tree-choice-002",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-fill-001",
+    "nodeId": "huffman-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "前缀码",
+    "fillStem": "哈夫曼编码中任一字符编码都不是另一字符编码的 {{1}} ，因此可 {{2}} 解码。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "前缀"
+      },
+      {
+        "id": 2,
+        "answer": "唯一"
+      }
+    ],
+    "answer": "前缀;唯一",
+    "analysis": "前缀码保证无歧义。",
+    "ojRoute": "/oj/ex-huffman-tree-fill-001",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-huffman-tree-fill-002",
+    "nodeId": "huffman-tree",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "带权路径长度",
+    "fillStem": "树的带权路径长度 WPL 为各叶子权值乘 {{1}} 之和；哈夫曼树使 WPL {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "路径长度"
+      },
+      {
+        "id": 2,
+        "answer": "最小"
+      }
+    ],
+    "answer": "路径长度;最小",
+    "analysis": "哈夫曼最小化 WPL。",
+    "ojRoute": "/oj/ex-huffman-tree-fill-002",
+    "linkedNodeIds": [
+      "huffman-tree"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-choice-001",
+    "nodeId": "topological-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "拓扑排序前提",
+    "stem": "对有向图进行拓扑排序，图必须：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "连通"
+      },
+      {
+        "key": "B",
+        "text": "无环（DAG）"
+      },
+      {
+        "key": "C",
+        "text": "完全图"
+      },
+      {
+        "key": "D",
+        "text": "无向"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "拓扑排序仅适用于 DAG。",
+    "ojRoute": "/oj/ex-topological-sort-choice-001",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-choice-002",
+    "nodeId": "topological-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "拓扑排序算法",
+    "stem": "Kahn 算法求拓扑序使用的主要辅助结构是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "栈"
+      },
+      {
+        "key": "B",
+        "text": "队列"
+      },
+      {
+        "key": "C",
+        "text": "并查集"
+      },
+      {
+        "key": "D",
+        "text": "堆"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "Kahn 将入度为 0 的点入队。",
+    "ojRoute": "/oj/ex-topological-sort-choice-002",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-fill-001",
+    "nodeId": "topological-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "入度",
+    "fillStem": "Kahn 算法反复取出 {{1}} 为 0 的顶点；若最终输出顶点数小于 n，则图中存在 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "入度"
+      },
+      {
+        "id": 2,
+        "answer": "环"
+      }
+    ],
+    "answer": "入度;环",
+    "analysis": "无法输出完整拓扑序说明有环。",
+    "ojRoute": "/oj/ex-topological-sort-fill-001",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-fill-002",
+    "nodeId": "topological-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "拓扑应用",
+    "fillStem": "课程先修关系、任务调度等可建模为 {{1}} ，用 {{2}} 排序得到可行顺序。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "DAG"
+      },
+      {
+        "id": 2,
+        "answer": "拓扑"
+      }
+    ],
+    "answer": "DAG;拓扑",
+    "analysis": "依赖关系常用拓扑排序。",
+    "ojRoute": "/oj/ex-topological-sort-fill-002",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-mst-choice-001",
+    "nodeId": "mst",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "最小生成树",
+    "stem": "最小生成树（MST）连接图中所有顶点且：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "边权之和最大"
+      },
+      {
+        "key": "B",
+        "text": "边权之和最小"
+      },
+      {
+        "key": "C",
+        "text": "边数最多"
+      },
+      {
+        "key": "D",
+        "text": "必为完全图"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "MST 最小化总权值。",
+    "ojRoute": "/oj/ex-mst-choice-001",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-mst-choice-002",
+    "nodeId": "mst",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "MST 算法",
+    "stem": "下列哪项不是经典 MST 算法？",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "Prim"
+      },
+      {
+        "key": "B",
+        "text": "Kruskal"
+      },
+      {
+        "key": "C",
+        "text": "Dijkstra"
+      },
+      {
+        "key": "D",
+        "text": "Borůvka"
+      }
+    ],
+    "choiceAnswer": "C",
+    "answer": "C",
+    "analysis": "Dijkstra 求单源最短路，不是 MST。",
+    "ojRoute": "/oj/ex-mst-choice-002",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-mst-fill-001",
+    "nodeId": "mst",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "Kruskal",
+    "fillStem": "Kruskal 按边权 {{1}} 选边，并用 {{2}} 判断是否成环。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "升序"
+      },
+      {
+        "id": 2,
+        "answer": "并查集"
+      }
+    ],
+    "answer": "升序;并查集",
+    "analysis": "Kruskal 贪心+并查集。",
+    "ojRoute": "/oj/ex-mst-fill-001",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-mst-fill-002",
+    "nodeId": "mst",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "Prim",
+    "fillStem": "Prim 从某顶点扩展，每次加入连接树内外且权值 {{1}} 的边；常用 {{2}} 优化选边。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "最小"
+      },
+      {
+        "id": 2,
+        "answer": "堆"
+      }
+    ],
+    "answer": "最小;堆",
+    "analysis": "Prim 类似扩展最短路思想。",
+    "ojRoute": "/oj/ex-mst-fill-002",
+    "linkedNodeIds": [
+      "mst"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-choice-001",
+    "nodeId": "shortest-path",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "Dijkstra 适用条件",
+    "stem": "Dijkstra 算法要求边权：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "可为任意实数"
+      },
+      {
+        "key": "B",
+        "text": "非负"
+      },
+      {
+        "key": "C",
+        "text": "必须为 0 或 1"
+      },
+      {
+        "key": "D",
+        "text": "必须相等"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "负权边会导致 Dijkstra 失效。",
+    "ojRoute": "/oj/ex-shortest-path-choice-001",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-choice-002",
+    "nodeId": "shortest-path",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "单源最短路",
+    "stem": "单源最短路径问题是指：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "求任意两点间最短路"
+      },
+      {
+        "key": "B",
+        "text": "求源点到其余各点最短路"
+      },
+      {
+        "key": "C",
+        "text": "求最小生成树"
+      },
+      {
+        "key": "D",
+        "text": "判断连通性"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "单源即从固定源点出发。",
+    "ojRoute": "/oj/ex-shortest-path-choice-002",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-fill-001",
+    "nodeId": "shortest-path",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "最短路算法",
+    "fillStem": "含负权边时常用 {{1}} 算法；边权非负时可用 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "Bellman-Ford"
+      },
+      {
+        "id": 2,
+        "answer": "Dijkstra"
+      }
+    ],
+    "answer": "Bellman-Ford;Dijkstra",
+    "analysis": "Bellman-Ford 可处理负权。",
+    "ojRoute": "/oj/ex-shortest-path-fill-001",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-shortest-path-fill-002",
+    "nodeId": "shortest-path",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "松弛操作",
+    "fillStem": "最短路松弛：若 dist[u]+w(u,v)<dist[v]，则更新 dist[v]，称为对边 (u,v) 进行 {{1}} ；Dijkstra 每次取出 {{2}} 未确定顶点。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "松弛"
+      },
+      {
+        "id": 2,
+        "answer": "距离最小"
+      }
+    ],
+    "answer": "松弛;距离最小",
+    "analysis": "松弛是更新最短路估计的核心。",
+    "ojRoute": "/oj/ex-shortest-path-fill-002",
+    "linkedNodeIds": [
+      "shortest-path"
+    ]
+  },
+  {
+    "id": "ex-binary-search-choice-001",
+    "nodeId": "binary-search",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "二分查找前提",
+    "stem": "二分查找要求序列：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "无序"
+      },
+      {
+        "key": "B",
+        "text": "有序"
+      },
+      {
+        "key": "C",
+        "text": "必须为链表"
+      },
+      {
+        "key": "D",
+        "text": "元素互异且为质数"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "二分需要有序性。",
+    "ojRoute": "/oj/ex-binary-search-choice-001",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-binary-search-choice-002",
+    "nodeId": "binary-search",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "二分边界",
+    "stem": "写二分查找时，循环条件 `while (left < right)` 常用于：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "查找左边界/第一个满足条件的位置"
+      },
+      {
+        "key": "B",
+        "text": "只能用于递归"
+      },
+      {
+        "key": "C",
+        "text": "无序数组"
+      },
+      {
+        "key": "D",
+        "text": "链表查找"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "常见模板求第一个/最后一个位置。",
+    "ojRoute": "/oj/ex-binary-search-choice-002",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-binary-search-fill-001",
     "nodeId": "binary-search",
     "type": "fill",
     "difficulty": "basic",
     "title": "二分查找的前提条件",
     "fillStem": "二分查找要求待查找序列必须是 {{1}} 的；在长度为 n 的有序表中进行二分查找，最坏情况下的时间复杂度为 {{2}} 。",
     "blanks": [
-      { "id": 1, "answer": "有序" },
-      { "id": 2, "answer": "O(log n)" }
+      {
+        "id": 1,
+        "answer": "有序"
+      },
+      {
+        "id": 2,
+        "answer": "O(log n)"
+      }
     ],
     "answer": "有序;O(log n)",
-    "analysis": "二分查找通过不断折半缩小区间，每次比较中间元素，前提是序列有序（升序或降序）。每次区间长度减半，因此最坏比较次数为 ⌈log₂(n+1)⌉，渐近复杂度 O(log n)。",
-    "ojRoute": "/oj/ex-binary-search-001",
-    "linkedNodeIds": ["binary-search", "array"]
+    "analysis": "二分查找前提是序列有序，最坏时间复杂度 O(log n)。",
+    "ojRoute": "/oj/ex-binary-search-fill-001",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
   },
   {
-    "id": "ex-dijkstra-001",
-    "ojProblemId": "1001",
-    "nodeId": "shortest-path",
-    "type": "programming",
+    "id": "ex-binary-search-fill-002",
+    "nodeId": "binary-search",
+    "type": "fill",
     "difficulty": "basic",
-    "title": "A + B（两整数求和）",
-    "path": "data/oj-data/1001/problem.md",
-    "starterCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x, y;\n    cin >> x >> y;\n    cout << x + y;\n    return 0;\n}",
-    "answer": "读入 x、y 后输出 x+y",
-    "ojRoute": "/oj/1001",
-    "linkedNodeIds": ["shortest-path", "graph-storage", "graph-traversal"]
+    "title": "二分答案",
+    "fillStem": "当答案具有 {{1}} 性时，可对答案空间二分并配合 check 函数，称为二分 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "单调"
+      },
+      {
+        "id": 2,
+        "answer": "答案"
+      }
+    ],
+    "answer": "单调;答案",
+    "analysis": "二分答案是常见技巧。",
+    "ojRoute": "/oj/ex-binary-search-fill-002",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-choice-001",
+    "nodeId": "merge-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "归并排序稳定性",
+    "stem": "归并排序是稳定排序，因为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "合并时相等元素保持相对次序"
+      },
+      {
+        "key": "B",
+        "text": "不需要额外空间"
+      },
+      {
+        "key": "C",
+        "text": "原地交换相邻元素"
+      },
+      {
+        "key": "D",
+        "text": "只适用于链表"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "稳定合并保证相等元素顺序。",
+    "ojRoute": "/oj/ex-merge-sort-choice-001",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-choice-002",
+    "nodeId": "merge-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "归并复杂度",
+    "stem": "归并排序的时间复杂度为：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "O(n)"
+      },
+      {
+        "key": "B",
+        "text": "O(n log n)"
+      },
+      {
+        "key": "C",
+        "text": "O(n²)"
+      },
+      {
+        "key": "D",
+        "text": "O(log n)"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "归并排序 O(n log n)。",
+    "ojRoute": "/oj/ex-merge-sort-choice-002",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-fill-001",
+    "nodeId": "merge-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "分治",
+    "fillStem": "归并排序采用 {{1}} 思想：先递归排序左右两半，再 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "分治"
+      },
+      {
+        "id": 2,
+        "answer": "合并"
+      }
+    ],
+    "answer": "分治;合并",
+    "analysis": "分治+合并是归并核心。",
+    "ojRoute": "/oj/ex-merge-sort-fill-001",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
+  },
+  {
+    "id": "ex-merge-sort-fill-002",
+    "nodeId": "merge-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "逆序对",
+    "fillStem": "归并排序合并时可统计 {{1}} ；序列逆序对个数可用归并在 {{2}} 时间内求解。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "逆序对"
+      },
+      {
+        "id": 2,
+        "answer": "O(n log n)"
+      }
+    ],
+    "answer": "逆序对;O(n log n)",
+    "analysis": "P1908 逆序对经典题。",
+    "ojRoute": "/oj/ex-merge-sort-fill-002",
+    "linkedNodeIds": [
+      "merge-sort"
+    ]
   }
 ]

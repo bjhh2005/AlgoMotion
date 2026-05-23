@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/topological-sort-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-topological-sort-001",
-    "linkedNodeIds": ["topological-sort"]
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-choice-001",
+    "nodeId": "topological-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "拓扑排序前提",
+    "stem": "对有向图进行拓扑排序，图必须：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "连通"
+      },
+      {
+        "key": "B",
+        "text": "无环（DAG）"
+      },
+      {
+        "key": "C",
+        "text": "完全图"
+      },
+      {
+        "key": "D",
+        "text": "无向"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "拓扑排序仅适用于 DAG。",
+    "ojRoute": "/oj/ex-topological-sort-choice-001",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-choice-002",
+    "nodeId": "topological-sort",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "拓扑排序算法",
+    "stem": "Kahn 算法求拓扑序使用的主要辅助结构是：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "栈"
+      },
+      {
+        "key": "B",
+        "text": "队列"
+      },
+      {
+        "key": "C",
+        "text": "并查集"
+      },
+      {
+        "key": "D",
+        "text": "堆"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "Kahn 将入度为 0 的点入队。",
+    "ojRoute": "/oj/ex-topological-sort-choice-002",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-fill-001",
+    "nodeId": "topological-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "入度",
+    "fillStem": "Kahn 算法反复取出 {{1}} 为 0 的顶点；若最终输出顶点数小于 n，则图中存在 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "入度"
+      },
+      {
+        "id": 2,
+        "answer": "环"
+      }
+    ],
+    "answer": "入度;环",
+    "analysis": "无法输出完整拓扑序说明有环。",
+    "ojRoute": "/oj/ex-topological-sort-fill-001",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
+  },
+  {
+    "id": "ex-topological-sort-fill-002",
+    "nodeId": "topological-sort",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "拓扑应用",
+    "fillStem": "课程先修关系、任务调度等可建模为 {{1}} ，用 {{2}} 排序得到可行顺序。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "DAG"
+      },
+      {
+        "id": 2,
+        "answer": "拓扑"
+      }
+    ],
+    "answer": "DAG;拓扑",
+    "analysis": "依赖关系常用拓扑排序。",
+    "ojRoute": "/oj/ex-topological-sort-fill-002",
+    "linkedNodeIds": [
+      "topological-sort"
+    ]
   }
 ]

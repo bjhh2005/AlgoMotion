@@ -10,6 +10,122 @@
     "starterCode": "data/oj-data/binary-search-001/code.cpp",
     "answer": "参考知识点详情中的模板代码。",
     "ojRoute": "/oj/ex-binary-search-001",
-    "linkedNodeIds": ["binary-search"]
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-binary-search-choice-001",
+    "nodeId": "binary-search",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "二分查找前提",
+    "stem": "二分查找要求序列：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "无序"
+      },
+      {
+        "key": "B",
+        "text": "有序"
+      },
+      {
+        "key": "C",
+        "text": "必须为链表"
+      },
+      {
+        "key": "D",
+        "text": "元素互异且为质数"
+      }
+    ],
+    "choiceAnswer": "B",
+    "answer": "B",
+    "analysis": "二分需要有序性。",
+    "ojRoute": "/oj/ex-binary-search-choice-001",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-binary-search-choice-002",
+    "nodeId": "binary-search",
+    "type": "choice",
+    "difficulty": "basic",
+    "title": "二分边界",
+    "stem": "写二分查找时，循环条件 `while (left < right)` 常用于：",
+    "choiceOptions": [
+      {
+        "key": "A",
+        "text": "查找左边界/第一个满足条件的位置"
+      },
+      {
+        "key": "B",
+        "text": "只能用于递归"
+      },
+      {
+        "key": "C",
+        "text": "无序数组"
+      },
+      {
+        "key": "D",
+        "text": "链表查找"
+      }
+    ],
+    "choiceAnswer": "A",
+    "answer": "A",
+    "analysis": "常见模板求第一个/最后一个位置。",
+    "ojRoute": "/oj/ex-binary-search-choice-002",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-binary-search-fill-001",
+    "nodeId": "binary-search",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "二分查找的前提条件",
+    "fillStem": "二分查找要求待查找序列必须是 {{1}} 的；在长度为 n 的有序表中进行二分查找，最坏情况下的时间复杂度为 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "有序"
+      },
+      {
+        "id": 2,
+        "answer": "O(log n)"
+      }
+    ],
+    "answer": "有序;O(log n)",
+    "analysis": "二分查找前提是序列有序，最坏时间复杂度 O(log n)。",
+    "ojRoute": "/oj/ex-binary-search-fill-001",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
+  },
+  {
+    "id": "ex-binary-search-fill-002",
+    "nodeId": "binary-search",
+    "type": "fill",
+    "difficulty": "basic",
+    "title": "二分答案",
+    "fillStem": "当答案具有 {{1}} 性时，可对答案空间二分并配合 check 函数，称为二分 {{2}} 。",
+    "blanks": [
+      {
+        "id": 1,
+        "answer": "单调"
+      },
+      {
+        "id": 2,
+        "answer": "答案"
+      }
+    ],
+    "answer": "单调;答案",
+    "analysis": "二分答案是常见技巧。",
+    "ojRoute": "/oj/ex-binary-search-fill-002",
+    "linkedNodeIds": [
+      "binary-search"
+    ]
   }
 ]
