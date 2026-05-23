@@ -369,7 +369,7 @@ export interface AiGraphRelation {
 
 export interface AiQuizItem {
   id: string;
-  type: "choice" | "fill" | "short";
+  type: "choice" | "judge" | "fill" | "short";
   question: string;
   options?: string[];
   answer: string;
@@ -383,6 +383,7 @@ export interface AiKnowledgeCard {
   back: string;
   bullets: string[];
   mistake: string;
+  cppExample?: string;
 }
 
 export interface AiRecommendedExercise {

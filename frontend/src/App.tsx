@@ -452,7 +452,14 @@ export function App() {
           />
         )}
 
-        {page === "ai" && <AiPanel selectedNode={selectedNode} nodeById={currentNodeById} onSelect={openKnowledge} />}
+        {page === "ai" && (
+          <AiPanel
+            selectedNode={selectedNode}
+            nodeById={currentNodeById}
+            onSelect={openKnowledge}
+            onQuizResult={handleJudgeComplete}
+          />
+        )}
       </section>
     </main>
   );

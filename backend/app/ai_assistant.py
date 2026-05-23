@@ -14,6 +14,9 @@ from .data_access import code_analysis_rules, code_examples, content_by_node_id,
 
 router = APIRouter(prefix="/api/ai", tags=["AI"])
 
+GENERIC_FALLBACK_NODES = ["data-structure", "algorithm-complexity", "linear-list"]
+GENERIC_NODE_IDS = {"data-structure"}
+
 
 def trim_text(value: str, limit: int = 900) -> str:
     text = value.strip()
@@ -148,10 +151,11 @@ def quiz_for_node(node_id: str) -> list[dict[str, Any]]:
         },
         {
             "id": f"quiz-{node_id}-mistake",
-            "type": "fill",
-            "question": f"学习「{node['name']}」时需要特别避免的一个常见错误是：______。",
-            "answer": common_mistake,
-            "explanation": "该题用于把 AI 分析中的错误线索回连到知识图谱节点。",
+            "type": "judge",
+            "question": f"判断：学习「{node['name']}」时可以忽略边界条件和空结构访问。",
+            "options": ["正确", "错误"],
+            "answer": "错误",
+            "explanation": f"错误。需要特别避免：{common_mistake}",
             "linkedNodeIds": [node_id]
         },
         {
@@ -174,6 +178,7 @@ def knowledge_cards_for_nodes(node_ids: list[str]) -> list[dict[str, Any]]:
         content = known_contents.get(node_id)
         if not node:
             continue
+        example = next((item for item in code_examples() if item.get("nodeId") == node_id), None)
         cards.append({
             "nodeId": node_id,
             "front": node["name"],
@@ -182,7 +187,8 @@ def knowledge_cards_for_nodes(node_ids: list[str]) -> list[dict[str, Any]]:
                 *((content or {}).get("properties", [])[:2]),
                 (content or {}).get("complexity", {}).get("time", "")
             ],
-            "mistake": ((content or {}).get("commonMistakes") or [""])[0]
+            "mistake": ((content or {}).get("commonMistakes") or [""])[0],
+            "cppExample": (example or {}).get("code", "")
         })
     return cards
 
@@ -255,37 +261,123 @@ def fallback_cpp_code(node_ids: list[str], prompt: str) -> str:
     )
 
 
-def find_relevant_node_ids(message: str, node_id: str | None = None, limit: int = 6) -> list[str]:
+def node_depth_map() -> dict[str, int]:
+    depths = {"data-structure": 0}
+    changed = True
+    graph_edges = edges()
+    while changed:
+        changed = False
+        for edge in graph_edges:
+            if edge.get("type") != "contains":
+                continue
+            source = edge["source"]
+            target = edge["target"]
+            if source not in depths:
+                continue
+            next_depth = depths[source] + 1
+            if target not in depths or depths[target] > next_depth:
+                depths[target] = next_depth
+                changed = True
+    return depths
+
+
+def score_nodes_from_text(text: str) -> dict[str, int]:
     known_nodes = node_by_id()
-    normalized = message.lower()
+    normalized = text.lower()
+    depths = node_depth_map()
     scored: dict[str, int] = {}
 
-    if node_id and node_id in known_nodes:
-        scored[node_id] = 100
-
     for item in known_nodes.values():
-        terms = [item["id"], item["name"], item["category"], *item.get("tags", [])]
         score = 0
-        for term in terms:
+        primary_terms = [item["id"], item["name"]]
+        secondary_terms = [item["category"], *item.get("tags", [])]
+
+        for term in primary_terms:
             value = str(term).strip().lower()
             if value and value in normalized:
-                score += 5 if value in {item["id"].lower(), item["name"].lower()} else 2
+                # One-character Chinese node names such as "树" are useful hints,
+                # but should not outrank a more explicit hit like "二叉树".
+                score += 24 if len(value) == 1 else 80 + len(value) * 4
+
+        for term in secondary_terms:
+            value = str(term).strip().lower()
+            if value and len(value) > 1 and value in normalized:
+                score += 12 + len(value) * 2
+
         if score:
-            scored[item["id"]] = scored.get(item["id"], 0) + score
+            score += depths.get(item["id"], 0) * 6 + int(item.get("difficulty", 1))
+            if item["id"] in GENERIC_NODE_IDS:
+                score -= 36
+            scored[item["id"]] = score
 
-    ranked = [node for node, _ in sorted(scored.items(), key=lambda item: item[1], reverse=True)]
+    return scored
 
-    if node_id and node_id in known_nodes:
+
+def ranked_node_ids_from_scores(scored: dict[str, int]) -> list[str]:
+    known_nodes = node_by_id()
+    depths = node_depth_map()
+
+    def sort_key(item: tuple[str, int]) -> tuple[int, int, int]:
+        node_id, score = item
+        node = known_nodes.get(node_id, {})
+        name_length = len(str(node.get("name", "")))
+        depth = depths.get(node_id, 0)
+        return score, depth, name_length
+
+    return [node for node, _ in sorted(scored.items(), key=sort_key, reverse=True)]
+
+
+def append_graph_neighbors(ranked: list[str], seed_ids: list[str]) -> list[str]:
+    result = list(ranked)
+    for seed_id in seed_ids:
         for edge in edges():
-            if edge["source"] == node_id:
-                ranked.append(edge["target"])
-            elif edge["target"] == node_id:
-                ranked.append(edge["source"])
+            if edge["source"] == seed_id:
+                result.append(edge["target"])
+            elif edge["target"] == seed_id:
+                result.append(edge["source"])
+    return result
 
-    if not ranked:
-        ranked = ["data-structure", "algorithm-complexity", "linear-list"]
+
+def find_relevant_node_ids(
+    message: str,
+    node_id: str | None = None,
+    limit: int = 6,
+    include_fallback: bool = True
+) -> list[str]:
+    known_nodes = node_by_id()
+    ranked = ranked_node_ids_from_scores(score_nodes_from_text(message))
+
+    if not ranked and node_id and node_id in known_nodes:
+        ranked = [node_id]
+
+    ranked = append_graph_neighbors(ranked, ranked[:3])
+
+    if ranked and node_id and node_id in known_nodes:
+        selected_is_generic = node_id in GENERIC_NODE_IDS or known_nodes[node_id].get("category") == "root"
+        if not selected_is_generic:
+            ranked.append(node_id)
+
+    if not ranked and include_fallback:
+        ranked = GENERIC_FALLBACK_NODES
 
     return unique_node_ids(ranked, known_nodes)[:limit]
+
+
+def focus_node_ids(node_ids: list[str], limit: int = 3) -> list[str]:
+    known_nodes = node_by_id()
+    concrete = [
+        node_id
+        for node_id in node_ids
+        if node_id in known_nodes and known_nodes[node_id].get("category") != "root"
+    ]
+    return (concrete or node_ids)[:limit]
+
+
+def quiz_for_nodes(node_ids: list[str], max_nodes: int = 2) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
+    for node_id in focus_node_ids(node_ids, max_nodes):
+        result.extend(quiz_for_node(node_id))
+    return result
 
 
 def build_knowledge_context(node_ids: list[str]) -> str:
@@ -574,7 +666,19 @@ def chat(payload: ChatRequest):
     history_text = "\n".join(
         f"{item.role}: {item.content}" for item in payload.history[-8:]
     )
-    linked_nodes = find_relevant_node_ids(f"{history_text}\n{message}", payload.nodeId)
+    current_nodes = find_relevant_node_ids(message, payload.nodeId, include_fallback=False)
+    history_nodes = find_relevant_node_ids(history_text, None, limit=4, include_fallback=False) if history_text.strip() else []
+    selected_nodes = [payload.nodeId] if payload.nodeId else []
+    linked_nodes = unique_node_ids(
+        [
+            *current_nodes,
+            *history_nodes,
+            *selected_nodes,
+            *GENERIC_FALLBACK_NODES
+        ],
+        node_by_id()
+    )[:6]
+    primary_focus_nodes = focus_node_ids(current_nodes or linked_nodes, 3)
     context = build_knowledge_context(linked_nodes)
     system_prompt = (
         "你是 AlgoMotion 数据结构课程平台的 AI 助教。"
@@ -614,15 +718,15 @@ def chat(payload: ChatRequest):
         "linkedNodes": linked_nodes,
         "nodeCards": build_node_cards(linked_nodes, "ai-analysis"),
         "graphRelations": relation_summary_for_nodes(linked_nodes),
-        "quiz": quiz_for_node(linked_nodes[0]) if linked_nodes else [],
-        "knowledgeCards": knowledge_cards_for_nodes(linked_nodes),
-        "recommendedExercises": related_exercises_for_nodes(linked_nodes),
-        "learningActions": build_learning_actions(linked_nodes),
+        "quiz": quiz_for_nodes((primary_focus_nodes or linked_nodes)[:1], max_nodes=1),
+        "knowledgeCards": knowledge_cards_for_nodes(primary_focus_nodes or linked_nodes),
+        "recommendedExercises": related_exercises_for_nodes(primary_focus_nodes or linked_nodes),
+        "learningActions": build_learning_actions(primary_focus_nodes or linked_nodes),
         "loop": {
             "stage": "发现问题-讲解-练习-推荐",
             "problem": message,
-            "explainNodeId": linked_nodes[0] if linked_nodes else None,
-            "practiceCount": len(related_exercises_for_nodes(linked_nodes)),
+            "explainNodeId": (primary_focus_nodes or linked_nodes)[0] if linked_nodes else None,
+            "practiceCount": len(related_exercises_for_nodes(primary_focus_nodes or linked_nodes)),
             "recommendation": "先查看跳转卡片中的核心知识点，再完成推荐练习，把错误代码继续交给 AI 分析。"
         }
     }
@@ -733,9 +837,7 @@ def generate_study_artifacts(payload: StudyArtifactRequest):
         except RuntimeError:
             pass
 
-    quiz = []
-    for node_id in linked_nodes[:3]:
-        quiz.extend(quiz_for_node(node_id))
+    quiz = quiz_for_nodes(linked_nodes, max_nodes=3)
 
     return {
         "title": title,

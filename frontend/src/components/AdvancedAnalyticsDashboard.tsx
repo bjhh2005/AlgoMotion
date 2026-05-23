@@ -8,6 +8,7 @@ import type {
   DiscriminationAnalysis,
   InvestmentEffectivenessAnalysis,
   MotivationIndex,
+  ProgressMap,
 } from "../types";
 import { CognitiveRadarChart } from "./CognitiveRadarChart";
 import { KnowledgePropagationGraph } from "./KnowledgePropagationGraph";
@@ -25,7 +26,7 @@ interface Props {
   motivationIndex: MotivationIndex | null;
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string) => void;
-  progress?: Record<string, { metrics?: { mastery?: number; attemptCount?: number; studyMinutes?: number }; status?: string }>;
+  progress?: ProgressMap;
 }
 
 // 高级学习分析综合面板 - 整合三个维度的分析
