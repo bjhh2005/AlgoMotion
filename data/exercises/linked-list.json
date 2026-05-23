@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-linked-list-001",
+    "ojProblemId": "linked-list-001",
+    "nodeId": "linked-list",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "单向链表",
+    "path": "data/oj-data/linked-list-001/problem.md",
+    "starterCode": "data/oj-data/linked-list-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-linked-list-001",
+    "linkedNodeIds": ["linked-list"]
+  }
+]

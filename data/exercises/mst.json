@@ -1,0 +1,15 @@
+[
+  {
+    "id": "ex-mst-001",
+    "ojProblemId": "mst-001",
+    "nodeId": "mst",
+    "type": "programming",
+    "difficulty": "interview",
+    "title": "【模板】最小生成树",
+    "path": "data/oj-data/mst-001/problem.md",
+    "starterCode": "data/oj-data/mst-001/code.cpp",
+    "answer": "参考知识点详情中的模板代码。",
+    "ojRoute": "/oj/ex-mst-001",
+    "linkedNodeIds": ["mst"]
+  }
+]

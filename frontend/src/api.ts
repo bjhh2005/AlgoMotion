@@ -1,4 +1,6 @@
 import type {
+  AiChatMessage,
+  AiLearningBundle,
   CodeAnalysisRule,
   CodeExample,
   Exercise,
@@ -7,9 +9,9 @@ import type {
   KnowledgeNode,
   ProgressMap,
   ProgressRecord,
+  RecommendationItem,
   RecommendationSeeds,
-  AiChatMessage,
-  AiLearningBundle
+  RecommendationType
 } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
@@ -46,6 +48,59 @@ export interface CodeGenerationResponse extends AiLearningBundle {
   explanation: string;
 }
 
+export interface JudgeCaseDetail {
+  status: string;
+  time: number;
+  input?: string;
+  expected?: string;
+  actual?: string;
+}
+
+export interface JudgeResponse {
+  status: string;
+  total_cases: number;
+  passed_cases: number;
+  details: JudgeCaseDetail[];
+  error_log?: string;
+  compile_log?: string;
+  message?: string;
+}
+
+export function normalizeJudgeResponse(raw: Partial<JudgeResponse> | null | undefined): JudgeResponse {
+  const details = Array.isArray(raw?.details)
+    ? raw!.details.map((item) => ({
+        status: item?.status ?? "Unknown",
+        time: Number(item?.time ?? 0) || 0,
+        input: item?.input ?? "",
+        expected: item?.expected ?? "",
+        actual: item?.actual ?? ""
+      }))
+    : [];
+
+  const passed_cases = Number(
+    raw?.passed_cases ?? details.filter((item) => item.status === "Accepted").length
+  );
+  const total_cases = Number(raw?.total_cases ?? details.length);
+
+  return {
+    status: raw?.status ?? "System Error",
+    total_cases,
+    passed_cases,
+    details,
+    error_log: raw?.error_log,
+    compile_log: raw?.compile_log,
+    message: raw?.message
+  };
+}
+
+export interface JudgeRequestPayload {
+  submission_id: string;
+  problem_id: string;
+  code: string;
+  time_limit: number;
+  mem_limit: number;
+}
+
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
@@ -56,9 +111,7 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    const suffix = detail ? `: ${detail.slice(0, 240)}` : "";
-    throw new Error(`${response.status} ${response.statusText}${suffix}`);
+    throw new Error(`${response.status} ${response.statusText}`);
   }
 
   return response.json() as Promise<T>;
@@ -66,6 +119,25 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function fetchBootstrap() {
   return requestJson<BootstrapPayload>("/api/bootstrap");
+}
+
+export function fetchRecommendations(
+  type: RecommendationType = "next",
+  limit = 5,
+  nodeId?: string,
+  full = false
+) {
+  const params = new URLSearchParams({ type, limit: String(limit) });
+  if (nodeId) params.set("node_id", nodeId);
+  if (full) params.set("full", "true");
+  return requestJson<{ success: boolean; data: RecommendationItem[] }>(`/api/recommendations?${params}`).then(
+    (response) => {
+      if (!response.success || !Array.isArray(response.data)) {
+        throw new Error("推荐接口未返回有效数据");
+      }
+      return response.data;
+    }
+  );
 }
 
 export function updateProgress(nodeId: string, record: ProgressRecord) {
@@ -109,4 +181,354 @@ export function generateCode(prompt: string, nodeId: string, history: AiChatMess
       history: history.map(({ role, content }) => ({ role, content }))
     })
   });
+}
+
+export function submitJudge(payload: JudgeRequestPayload) {
+  return requestJson<JudgeResponse>("/api/judge", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function fetchExercises() {
+  return requestJson<Exercise[]>("/api/exercises");
+}
+
+export interface ProblemDataPayload extends Exercise {
+  content?: string;
+  details?: string;
+}
+
+export function isProblemApiError(
+  payload: ProblemDataPayload | null | undefined
+): payload is ProblemDataPayload & { id: "Error"; details?: string } {
+  return payload?.id === "Error";
+}
+
+export function fetchProblemData(exerciseId: string) {
+  return requestJson<ProblemDataPayload>(`/api/get_problem_data/${encodeURIComponent(exerciseId)}`);
+}
+
+export interface TagProblemIndex {
+  id: string;
+  title: string;
+  tag: string[];
+  path: string;
+}
+
+export interface SearchTagResponse {
+  problems: TagProblemIndex[];
+}
+
+export function searchProblemsByTag(tag: string) {
+  const params = new URLSearchParams({ tag });
+  return requestJson<SearchTagResponse>(`/api/search_tag?${params}`);
+}
+
+/** 题库全部标签（GET /api/git_tag，去重后用于筛选与拉取题目） */
+export function fetchGitTags() {
+  return requestJson<string[]>("/api/git_tag");
+}
+
+export interface SelectCompleteCheckPayload {
+  problem_id: string;
+  answer: string;
+}
+
+export interface SelectCompleteCheckResponse {
+  status?: boolean;
+  id?: "Error";
+  details?: string;
+}
+
+export function checkSelectCompleteAnswer(
+  exerciseId: string,
+  payload: SelectCompleteCheckPayload
+) {
+  return requestJson<SelectCompleteCheckResponse>(`/api/check_S&C_ans/${exerciseId}`, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+// ============================================
+// 学习分析 API
+// ============================================
+
+// 学习趋势数据
+export interface TrendPoint {
+  date: string;
+  mastery: number;
+  study_minutes: number;
+}
+
+export interface TrendSummary {
+  avg_mastery: number;
+  total_study_minutes: number;
+  peak_date: string;
+}
+
+export interface LearningTrend {
+  days: number;
+  trend: TrendPoint[];
+  summary: TrendSummary;
+}
+
+export function fetchLearningTrend(days: number = 7, nodeId?: string) {
+  const params = new URLSearchParams({ days: String(days) });
+  if (nodeId) params.append("node_id", nodeId);
+  return requestJson<{ success: boolean; data: LearningTrend }>(`/api/analytics/trend?${params}`);
+}
+
+// 薄弱知识点
+export interface WeakKnowledgePoint {
+  node_id: string;
+  name: string;
+  mastery: number;
+  status: string;
+  review_due_at?: string;
+  affected_nodes: string[];
+}
+
+export function fetchWeakKnowledge(threshold: number = 0.5) {
+  return requestJson<{ success: boolean; data: WeakKnowledgePoint[] }>(
+    `/api/analytics/weak?threshold=${threshold}`
+  );
+}
+
+// 认知层级分析
+export interface QuestionAttemptStats {
+  total: number;
+  correct: number;
+  avg_time_spent: number;
+  guess_rate: number;
+}
+
+export interface CognitiveMastery {
+  node_id: string;
+  level_mastery: Record<string, number>;
+  question_attempt_stats: Record<string, QuestionAttemptStats>;
+  bloom_weighted_mastery: number;
+}
+
+export function fetchCognitiveAnalysis(nodeId: string) {
+  return requestJson<{ success: boolean; data: CognitiveMastery }>(
+    `/api/analytics/cognitive/${nodeId}`
+  );
+}
+
+// 综合学习报告
+export interface LearningOverview {
+  total_nodes: number;
+  mastered: number;
+  learning: number;
+  weak: number;
+  not_started: number;
+  avg_mastery: number;
+  total_study_minutes: number;
+  total_attempts: number;
+  total_errors: number;
+}
+
+export interface PropagationNode {
+  node_id: string;
+  propagation_strength: number;
+  path_type: string;
+  root_cause: boolean;
+}
+
+export interface PropagationAnalysis {
+  source_node_id: string;
+  affected_nodes: PropagationNode[];
+  weakness_severity: number;
+  downstream_risk: string;
+}
+
+export interface BehaviorAnalysis {
+  node_id: string;
+  average_time_per_question: number;
+  time_variance: number;
+  rush_rate: number;
+  hesitation_rate: number;
+  guess_rate: number;
+  consistency: number;
+  suspicious_flag: boolean;
+  suspicious_reason?: string;
+}
+
+export interface MotivationIndex {
+  student_id: string;
+  consistency_score: number;
+  perseverance_index: number;
+  growth_mindset_score: number;
+  intrinsic_motivation_score: number;
+  effort_effectiveness_ratio: number;
+  fake_effort_suspicion: number;
+}
+
+export interface RawDiscriminationAnalysis {
+  exercise_id: string;
+  discrimination_index: number;
+  difficulty: number;
+  effectiveness: "excellent" | "good" | "acceptable" | "poor";
+}
+
+export interface RawLearningInvestment {
+  student_id: string;
+  node_id?: string | null;
+  study_time_minutes: number;
+  interaction_count: number;
+  practice_time_minutes: number;
+  note_count: number;
+  doubt_raised: number;
+  discussion_contribution: number;
+  engagement_depth: "surface" | "moderate" | "deep";
+}
+
+export interface RawInvestmentEffectivenessAnalysis {
+  student_id: string;
+  investment: RawLearningInvestment;
+  effectiveness: {
+    mastery_gain: number;
+    score_improvement: number;
+    skill_growth: number;
+  };
+  category: "efficient" | "inefficient" | "diving" | "dormant";
+  correlation_coefficient: number;
+  efficiency_score: number;
+  flags: {
+    suspected_fake_effort: boolean;
+    potential_method_issue: boolean;
+    under_utilized: boolean;
+  };
+  recommendations: string[];
+}
+
+export interface ComprehensiveReport {
+  student_id: string;
+  timestamp: string;
+  overview: LearningOverview;
+  cognitive_mastery: Record<string, CognitiveMastery>;
+  propagation_analyses: PropagationAnalysis[];
+  behavior_analyses: Record<string, BehaviorAnalysis>;
+  question_discriminations: RawDiscriminationAnalysis[];
+  investment_effectiveness: RawInvestmentEffectivenessAnalysis[];
+  motivation_index: MotivationIndex;
+}
+
+export function fetchComprehensiveReport() {
+  return requestJson<{ success: boolean; data: ComprehensiveReport }>(
+    "/api/analytics/report"
+  );
+}
+
+export async function downloadComprehensiveReport(format: "json" | "markdown" | "html" = "json") {
+  const response = await fetch(`${API_BASE_URL}/api/analytics/report/export?format=${format}`);
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+  return response.blob();
+}
+
+export async function clearAllLearningData() {
+  return requestJson<{ success: boolean; data: { message: string } }>("/api/analytics/data", {
+    method: "DELETE"
+  });
+}
+
+// 掌握度详细分析
+export interface DecayInfo {
+  base_decay_rate: number;
+  stability_factor: number;
+  retention_rate: number;
+}
+
+export interface MasteryAnalysis {
+  node_id: string;
+  node_name: string;
+  current_mastery: number;
+  mastery_after_decay: number;
+  days_since_last_study: number;
+  optimal_review_intervals: number[];
+  status: string;
+  score: number;
+  metrics: Record<string, unknown>;
+  decay_info: DecayInfo;
+  recommendations: string[];
+}
+
+export function fetchMasteryAnalysis(nodeId: string) {
+  return requestJson<{ success: boolean; data: MasteryAnalysis }>(
+    `/api/progress/analysis/${nodeId}`
+  );
+}
+
+// 练习提交
+export interface ExerciseResult {
+  correct: boolean;
+  difficulty: number;
+  time_spent: number;
+  cognitive_level: string;
+  guess?: boolean;
+}
+
+export interface MasteryBreakdown {
+  base_score: number;
+  correct_rate: number;
+  correct_rate_weighted: number;
+  stability_score: number;
+  time_score: number;
+  error_count: number;
+}
+
+export interface ExerciseSubmissionResponse {
+  node_id: string;
+  previous_mastery: number;
+  new_mastery: number;
+  status: string;
+  review_due_at: string;
+  breakdown: MasteryBreakdown;
+  message: string;
+  weighted_stats?: Record<string, unknown>;
+}
+
+export function submitExercises(
+  nodeId: string,
+  score: number,
+  exercises: ExerciseResult[]
+) {
+  return requestJson<{ success: boolean; data: ExerciseSubmissionResponse }>(
+    "/api/progress/submit",
+    {
+      method: "POST",
+      body: JSON.stringify({ node_id: nodeId, score, exercises })
+    }
+  );
+}
+
+// ============================================
+// 统一请求封装（支持默认状态）
+// ============================================
+
+export interface ApiResult<T> {
+  data: T | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export async function fetchWithFallback<T>(
+  fetcher: () => Promise<{ success: boolean; data: T }>,
+  fallbackData: T
+): Promise<ApiResult<T>> {
+  try {
+    const response = await fetcher();
+    if (response.success && response.data) {
+      return { data: response.data, loading: false, error: null };
+    }
+    return { data: fallbackData, loading: false, error: "No data returned" };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.warn(`API fallback triggered: ${message}`);
+    return { data: fallbackData, loading: false, error: message };
+  }
 }

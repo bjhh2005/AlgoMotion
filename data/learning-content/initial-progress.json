@@ -1,47 +1,92 @@
 {
   "linear-list": {
     "status": "mastered",
-    "score": 88,
+    "score": 93,
     "metrics": {
-      "mastery": 0.88,
-      "confidence": 0.82,
-      "studyMinutes": 95,
-      "attemptCount": 8,
-      "correctRate": 0.9,
-      "errorCount": 1,
-      "streakDays": 4,
-      "lastActivityAt": "2026-05-17T21:40:00+08:00",
-      "reviewDueAt": "2026-05-24T09:00:00+08:00"
+      "mastery": 0.94,
+      "confidence": 0.90,
+      "studyMinutes": 120,
+      "attemptCount": 10,
+      "correctRate": 0.95,
+      "errorCount": 0,
+      "streakDays": 8,
+      "lastActivityAt": "2026-05-20T22:40:00+08:00",
+      "reviewDueAt": "2026-06-03T09:00:00+08:00"
     }
   },
   "stack": {
     "status": "learning",
-    "score": 58,
+    "score": 72,
     "metrics": {
-      "mastery": 0.58,
-      "confidence": 0.48,
-      "studyMinutes": 42,
-      "attemptCount": 5,
-      "correctRate": 0.6,
+      "mastery": 0.72,
+      "confidence": 0.68,
+      "studyMinutes": 65,
+      "attemptCount": 7,
+      "correctRate": 0.75,
+      "errorCount": 1,
+      "streakDays": 5,
+      "lastActivityAt": "2026-05-20T18:30:00+08:00",
+      "reviewDueAt": "2026-05-24T09:00:00+08:00"
+    }
+  },
+  "queue": {
+    "status": "learning",
+    "score": 64,
+    "metrics": {
+      "mastery": 0.65,
+      "confidence": 0.60,
+      "studyMinutes": 50,
+      "attemptCount": 6,
+      "correctRate": 0.66,
       "errorCount": 2,
-      "streakDays": 2,
-      "lastActivityAt": "2026-05-18T09:15:00+08:00",
-      "reviewDueAt": "2026-05-19T09:00:00+08:00"
+      "streakDays": 4,
+      "lastActivityAt": "2026-05-19T16:20:00+08:00",
+      "reviewDueAt": "2026-05-22T09:00:00+08:00"
     }
   },
   "binary-search": {
     "status": "weak",
-    "score": 34,
+    "score": 38,
     "metrics": {
-      "mastery": 0.34,
-      "confidence": 0.36,
-      "studyMinutes": 28,
+      "mastery": 0.38,
+      "confidence": 0.32,
+      "studyMinutes": 45,
+      "attemptCount": 9,
+      "correctRate": 0.44,
+      "errorCount": 5,
+      "streakDays": 2,
+      "lastActivityAt": "2026-05-20T20:10:00+08:00",
+      "reviewDueAt": "2026-05-21T20:00:00+08:00"
+    }
+  },
+  "binary-tree": {
+    "status": "weak",
+    "score": 46,
+    "metrics": {
+      "mastery": 0.46,
+      "confidence": 0.40,
+      "studyMinutes": 38,
+      "attemptCount": 7,
+      "correctRate": 0.51,
+      "errorCount": 3,
+      "streakDays": 3,
+      "lastActivityAt": "2026-05-19T19:05:00+08:00",
+      "reviewDueAt": "2026-05-22T14:00:00+08:00"
+    }
+  },
+  "graph": {
+    "status": "weak",
+    "score": 29,
+    "metrics": {
+      "mastery": 0.29,
+      "confidence": 0.27,
+      "studyMinutes": 35,
       "attemptCount": 6,
-      "correctRate": 0.42,
+      "correctRate": 0.38,
       "errorCount": 4,
       "streakDays": 1,
-      "lastActivityAt": "2026-05-18T08:50:00+08:00",
-      "reviewDueAt": "2026-05-18T20:00:00+08:00"
+      "lastActivityAt": "2026-05-18T17:40:00+08:00",
+      "reviewDueAt": "2026-05-19T17:00:00+08:00"
     }
   }
 }

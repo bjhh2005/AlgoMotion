@@ -51,9 +51,71 @@
 
 ## 推荐
 
+`GET /api/recommendations`
+
+基于学习进度、图谱关系与 `data/learning-content/recommendation-seeds.json` 中的主线路径，返回推荐节点列表。
+
+### 查询参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `type` | string | `next` | 推荐类型，见下表 |
+| `limit` | int | `5` | 返回数量，范围 1–20 |
+| `node_id` | string | — | 当前选中的知识点 ID；传入后 `next` / `path` 会围绕该节点生成 |
+| `full` | bool | `false` | 仅 `type=path` 时有效；为 `true` 时返回完整路径而非截断窗口 |
+
+**`type` 取值**
+
+| 值 | 说明 |
+|----|------|
+| `next` | 推荐下一步：优先返回当前节点的一跳未掌握邻居；无结果时按全局「已掌握 → 未掌握」规则或主线路径兜底 |
+| `path` | 路径指导：按当前节点生成学习路径段 |
+| `weak` | 薄弱优先：返回状态为 `weak` 的知识点 |
+| `review` | 复习提醒：返回 `reviewDueAt` 已到期的知识点 |
+
+### `type=path` 生成规则
+
+- **节点在主线路径上**（`defaultPath`）：按主线顺序返回路径节点，并标注 `reason`（如「前置主线」「当前知识点」「主线路径后续」）。
+- **节点不在主线上**：前置回溯（`prerequisite` / `contains`，最多 2–5 层）→ 当前节点 → 出边邻居（`contains` / `prerequisite` / `used_in` / `related`）→ 回归主线。
+- **`full=true`**：返回完整路径；`full=false` 时按 `limit` 截断。
+
+### 响应
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "stack",
+      "name": "栈",
+      "difficulty": 3,
+      "estimated_minutes": 30,
+      "reason": "当前知识点",
+      "priority": 1
+    }
+  ]
+}
+```
+
+### 示例
+
+推荐下一步（围绕当前选中节点）：
+
+```
+GET /api/recommendations?type=next&node_id=stack&limit=5
+```
+
+路径指导（完整主线路径）：
+
+```
+GET /api/recommendations?type=path&node_id=stack&full=true&limit=10
+```
+
+### 兼容接口（旧版）
+
 `GET /api/recommendations/me`
 
-基于已掌握节点、薄弱节点和前置关系返回推荐路径。
+返回 `{ recommended, weak, reason }` 格式的规则推荐，供旧版前端使用。新功能请使用 `GET /api/recommendations`。
 
 ## AI
 
@@ -134,4 +196,42 @@ AI_BASE_URL=https://api.openai.com/v1
 ```
 
 生成规范 C++ 代码，并返回关联知识图谱节点和推荐练习。
+
+## OJ 判题
+
+`POST /api/judge`
+
+提交 OJ 时触发，请求体：
+
+```json
+{
+  "submission_id": "sub-1710000000000-abc123",
+  "problem_id": "ex-stack-001",
+  "code": "栈顶",
+  "time_limit": 2,
+  "mem_limit": 256
+}
+```
+
+返回：
+
+```json
+{
+  "status": "Accepted",
+  "total_cases": 1,
+  "passed_cases": 1,
+  "details": [
+    {
+      "status": "Accepted",
+      "time": 0.001
+    }
+  ]
+}
+```
+
+`status` 常见取值：`Accepted`、`Wrong Answer`、`Compile Error`。
+
+`GET /api/exercises`
+
+返回全部 OJ 练习题（与 `/api/bootstrap` 中的 `exercises` 字段一致）。
 

@@ -35,6 +35,9 @@ env/
 .env.*
 !.env.example
 
+# Runtime learning progress
+data/learning-content/progress.json
+
 # Editor and OS files
 .DS_Store
 Thumbs.db

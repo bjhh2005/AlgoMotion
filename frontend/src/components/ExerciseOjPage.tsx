@@ -1,161 +1,199 @@
-import { useState } from "react";
-import { analyzeCode } from "../api";
-import type { CodeAnalysisRule, Exercise, KnowledgeContent, KnowledgeNode } from "../types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
+import { fetchBootstrap } from "../api";
+import { BlankView } from "./oj/BlankView";
+import { ChoiceView } from "./oj/ChoiceView";
+import { CodeView } from "./oj/CodeView";
+import { ProblemList } from "./oj/ProblemList";
+import {
+  applyRecommendations,
+  catalogItemToExercise,
+  fetchCatalogTags,
+  fetchProblemCatalog,
+  type OjCatalogItem
+} from "./oj/oj-catalog";
+import { mergeProgrammingExercise } from "./oj/programming-1001";
+import type { CodeAnalysisRule, KnowledgeContent, KnowledgeNode, ProgressMap, ProgressRecord } from "../types";
+import { typeLabel } from "./oj/oj-utils";
 
 interface Props {
-  exercises: Exercise[];
-  selectedExerciseId: string;
+  /** 仅知识库跳转时传入；为 null 时显示题库检索页 */
+  openProblemId: string | null;
   onSelectExercise: (exerciseId: string) => void;
   onOpenKnowledge: (nodeId: string) => void;
+  onJudgeComplete?: (nodeId: string, accepted: boolean, previous?: ProgressRecord) => void;
   nodeById: Record<string, KnowledgeNode>;
   contentByNodeId: Record<string, KnowledgeContent>;
   analysisRules: CodeAnalysisRule[];
 }
 
-const typeText = {
-  choice: "选择题",
-  fill: "填空题",
-  programming: "编程题"
-};
-
-const difficultyText = {
-  basic: "基础",
-  postgraduate: "考研",
-  interview: "面试"
-};
+function indexInList(list: OjCatalogItem[], id: string) {
+  const index = list.findIndex((item) => item.id === id);
+  return index >= 0 ? index : 0;
+}
 
 export function ExerciseOjPage({
-  exercises,
-  selectedExerciseId,
+  openProblemId,
   onSelectExercise,
   onOpenKnowledge,
+  onJudgeComplete,
   nodeById,
   contentByNodeId,
   analysisRules
 }: Props) {
-  const selected = exercises.find((exercise) => exercise.id === selectedExerciseId) ?? exercises[0];
-  const [submission, setSubmission] = useState("");
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [apiSuggestions, setApiSuggestions] = useState<string[]>([]);
-  const [apiLinkedNodeIds, setApiLinkedNodeIds] = useState<string[]>([]);
-  const [analysisStatus, setAnalysisStatus] = useState("等待提交分析");
-  const normalizedSubmission = submission.toLowerCase();
+  const [progress, setProgress] = useState<ProgressMap>({});
+  const [catalog, setCatalog] = useState<OjCatalogItem[]>([]);
+  const [catalogTags, setCatalogTags] = useState<string[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState("");
+  const [activeId, setActiveId] = useState<string | null>(null);
 
-  if (!selected) {
-    return (
-      <section className="page-panel oj-page">
-        <p className="muted">暂无题目，后端或题库数据未返回练习记录。</p>
-      </section>
-    );
+  useEffect(() => {
+    fetchBootstrap()
+      .then((payload) => setProgress(payload.progress))
+      .catch(() => setProgress({}));
+  }, []);
+
+  const loadCatalog = useCallback(async () => {
+    setCatalogLoading(true);
+    setCatalogError("");
+    try {
+      const tags = await fetchCatalogTags();
+      setCatalogTags(tags);
+      const items = await fetchProblemCatalog(nodeById, progress, tags);
+      setCatalog(items);
+    } catch (error) {
+      setCatalogError(error instanceof Error ? error.message : "题库加载失败");
+      setCatalog([]);
+      setCatalogTags([]);
+    } finally {
+      setCatalogLoading(false);
+    }
+  }, [nodeById, progress]);
+
+  useEffect(() => {
+    void loadCatalog();
+  }, [loadCatalog]);
+
+  useEffect(() => {
+    if (!openProblemId) {
+      setActiveId(null);
+      return;
+    }
+    if (catalog.length === 0) return;
+    if (catalog.some((item) => item.id === openProblemId)) {
+      setActiveId(openProblemId);
+    }
+  }, [openProblemId, catalog]);
+
+  const activeItem = useMemo(
+    () => catalog.find((item) => item.id === activeId) ?? null,
+    [catalog, activeId]
+  );
+
+  const siblings = useMemo(() => {
+    if (!activeItem?.type) return activeItem ? [activeItem] : [];
+    return catalog.filter((item) => item.type === activeItem.type);
+  }, [catalog, activeItem]);
+
+  const siblingIndex = activeItem ? indexInList(siblings, activeItem.id) : 0;
+
+  const activeProgrammingExercise = useMemo(() => {
+    if (!activeItem) return null;
+    const type = activeItem.type ?? "programming";
+    if (type !== "programming") return null;
+    return mergeProgrammingExercise(catalogItemToExercise({ ...activeItem, type }));
+  }, [activeItem]);
+
+  function openProblem(item: OjCatalogItem) {
+    setActiveId(item.id);
+    onSelectExercise(item.id);
   }
 
-  const matchedRules = analysisRules.filter((rule) =>
-    rule.keywords.some((keyword) => normalizedSubmission.includes(keyword.toLowerCase()))
-  );
-  const linkedNodeIds = Array.from(
-    new Set([
-      selected.nodeId,
-      ...(selected.linkedNodeIds ?? []),
-      ...matchedRules.flatMap((rule) => rule.linkedNodes),
-      ...apiLinkedNodeIds
-    ])
-  );
-  const mistakeHints = linkedNodeIds.flatMap((nodeId) => contentByNodeId[nodeId]?.commonMistakes ?? []);
-  const suggestions = apiSuggestions.length > 0
-    ? apiSuggestions
-    : matchedRules.length > 0
-      ? matchedRules.map((rule) => rule.suggestion)
-      : ["提交后会根据代码结构、关键字和错题节点生成知识绑定。"];
-
-  function handleAnalyzeSubmission() {
-    setAnalysisStatus("正在请求 /api/ai/code-analysis");
-    analyzeCode(submission || selected.title, selected.title)
-      .then((result) => {
-        setApiLinkedNodeIds(result.linkedNodes);
-        setApiSuggestions(result.suggestions);
-        setAnalysisStatus("后端分析完成");
-      })
-      .catch((error: Error) => {
-        setAnalysisStatus(`后端分析失败：${error.message}`);
-      });
+  function backToList() {
+    setActiveId(null);
   }
+
+  function handleSiblingChange(index: number) {
+    const next = siblings[index];
+    if (next) openProblem(next);
+  }
+
+  function refreshRecommendations() {
+    setCatalog((current) => applyRecommendations(current, progress, nodeById));
+  }
+
+  const typeName = activeItem?.type ? typeLabel[activeItem.type] : "题目";
 
   return (
-    <section className="page-panel oj-page">
-      <div className="panel-title">
-        <div>
-          <span className="eyebrow">Online Judge</span>
-          <h3>练习题与错因分析</h3>
-        </div>
-        <strong>{exercises.length} 题</strong>
-      </div>
-
-      <div className="oj-layout">
-        <aside className="exercise-sidebar">
-          {exercises.map((exercise) => (
-            <button
-              key={exercise.id}
-              className={exercise.id === selected.id ? "active" : ""}
-              onClick={() => {
-                onSelectExercise(exercise.id);
-                setShowAnswer(false);
-              }}
-            >
-              <strong>{exercise.title}</strong>
-              <span>{typeText[exercise.type]} / {difficultyText[exercise.difficulty]}</span>
-            </button>
-          ))}
-        </aside>
-
-        <article className="oj-problem">
-          <div className="problem-meta">
-            <span>{selected.ojRoute ?? `/oj/${selected.id}`}</span>
-            <span>{typeText[selected.type]}</span>
-            <span>{difficultyText[selected.difficulty]}</span>
-          </div>
-          <h4>{selected.title}</h4>
-
-          {selected.options && (
-            <div className="option-grid">
-              {selected.options.map((option) => <button key={option}>{option}</button>)}
-            </div>
+    <section className="oj-shell">
+      <header className="oj-topbar">
+        <nav className="oj-breadcrumb">
+          <button type="button" className="oj-crumb-btn" onClick={backToList}>
+            OJ 练习
+          </button>
+          {activeItem && (
+            <>
+              <ChevronRight size={14} />
+              <button type="button" className="oj-crumb-btn" onClick={backToList}>
+                题库
+              </button>
+              <ChevronRight size={14} />
+              <span>{typeName}</span>
+              <ChevronRight size={14} />
+              <span className="oj-crumb-current">{activeItem.id}</span>
+            </>
           )}
+          {!activeItem && <span className="oj-crumb-current">题库 · 按标签 / ID 检索</span>}
+        </nav>
+        {activeItem && (
+          <button type="button" className="oj-btn-outline oj-back-btn" onClick={backToList}>
+            <ArrowLeft size={14} />
+            返回题库
+          </button>
+        )}
+      </header>
 
-          <label>
-            提交内容
-            <textarea
-              value={submission}
-              onChange={(event) => setSubmission(event.target.value)}
-              placeholder="在这里粘贴答案、思路或 C++ 代码，OJ 接口接入后可替换为真实提交。"
-              rows={8}
-            />
-          </label>
-
-          <div className="status-actions">
-            <button onClick={() => setShowAnswer(true)}>查看参考答案</button>
-            <button onClick={handleAnalyzeSubmission}>提交分析</button>
-            <button onClick={() => onOpenKnowledge(selected.nodeId)}>打开绑定知识点</button>
-            <span className="inline-status">{analysisStatus}</span>
-          </div>
-
-          {showAnswer && <p className="assistant-reply">参考答案：{selected.answer}</p>}
-
-          <section>
-            <h4>错因分析与知识库绑定</h4>
-            <div className="relation-list">
-              {linkedNodeIds.map((nodeId) => (
-                <button key={nodeId} onClick={() => onOpenKnowledge(nodeId)}>
-                  {nodeById[nodeId]?.name ?? nodeId}
-                </button>
-              ))}
-            </div>
-            <ul className="content-list">
-              {suggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
-              {mistakeHints.map((hint) => <li key={hint}>{hint}</li>)}
-            </ul>
-          </section>
-        </article>
-      </div>
+      {!activeItem ? (
+        <ProblemList
+          items={catalog}
+          tagSlugs={catalogTags}
+          loading={catalogLoading}
+          error={catalogError}
+          nodeById={nodeById}
+          onOpen={openProblem}
+          onRefreshRecommendations={refreshRecommendations}
+        />
+      ) : activeItem.type === "choice" ? (
+        <div className="oj-mode-body">
+          <ChoiceView
+            questions={siblings.map(catalogItemToExercise)}
+            index={siblingIndex}
+            onIndexChange={handleSiblingChange}
+            nodeById={nodeById}
+          />
+        </div>
+      ) : activeItem.type === "fill" ? (
+        <div className="oj-mode-body">
+          <BlankView
+            questions={siblings.map(catalogItemToExercise)}
+            index={siblingIndex}
+            onIndexChange={handleSiblingChange}
+            nodeById={nodeById}
+          />
+        </div>
+      ) : (
+        <div className="oj-mode-body code">
+          <CodeView
+            question={activeProgrammingExercise}
+            nodeById={nodeById}
+            contentByNodeId={contentByNodeId}
+            analysisRules={analysisRules}
+            onOpenKnowledge={onOpenKnowledge}
+            onJudgeComplete={onJudgeComplete}
+          />
+        </div>
+      )}
     </section>
   );
 }

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "ex-dsu-001",
+    "title": "[模板]并查集",
+    "tag": ["union-find"],
+    "path": "data/exercises/dsu.json"
+  },
+  {
+    "id": "ex-stack-001",
+    "title": "[NOIP 2003 普及组] 栈",
+    "tag": ["stack"],
+    "path": "data/exercises/stack.json"
+  },
+  {
+    "id": "ex-queue-001",
+    "title": "【模板】队列",
+    "tag": ["queue"],
+    "path": "data/exercises/queue.json"
+  },
+  {
+    "id":"ex-kmp-001",
+    "title": "【模板】KMP",
+    "tag": ["kmp"],
+    "path": "data/exercises/kmp.json"
+  },
+  {
+    "id":"ex-linked-list-001",
+    "title": "单向链表",
+    "tag": ["linked-list"],
+    "path": "data/exercises/linked-list.json"
+  },
+  {
+    "id": "ex-avl-tree-001",
+    "title": "【模板】普通平衡树",
+    "tag": ["avl-tree"],
+    "path": "data/exercises/avl-tree.json"
+  },
+  {
+    "id": "ex-red-black-tree-001",
+    "title": "[SDOI2008] 红黑树",
+    "tag": ["red-black-tree"],
+    "path": "data/exercises/red-black-tree.json"
+  },
+  {
+    "id": "ex-heap-001",
+    "title": "【模板】堆",
+    "tag": ["heap"],
+    "path": "data/exercises/heap.json"
+  },
+  {
+    "id": "ex-huffman-tree-001",
+    "title": "[NOI2015] 荷马史诗",
+    "tag": ["huffman-tree"],
+    "path": "data/exercises/huffman-tree.json"
+  },
+  {
+    "id": "ex-topological-sort-001",
+    "title": "最大食物链计数",
+    "tag": ["topological-sort"],
+    "path": "data/exercises/topological-sort.json"
+  },
+  {
+    "id": "ex-mst-001",
+    "title": "【模板】最小生成树",
+    "tag": ["mst"],
+    "path": "data/exercises/mst.json"
+  },
+  {
+    "id": "ex-shortest-path-001",
+    "title": "【模板】单源最短路径（标准版）",
+    "tag": ["shortest-path"],
+    "path": "data/exercises/shortest-path.json"
+  },
+    {
+    "id": "ex-binary-search-001",
+    "title": "【深基13.例1】查找",
+    "tag": ["binary-search"],
+    "path": "data/exercises/binary-search.json"
+  },
+  {
+    "id": "ex-merge-sort-001",
+    "title": "P1908 逆序对",
+    "tag": ["merge-sort"],
+    "path": "data/exercises/merge-sort.json"
+  }
+]

@@ -1,0 +1,5 @@
+n_tests 20
+input_suf in
+output_suf out
+use_builtin_judger on
+use_builtin_checker icmp
