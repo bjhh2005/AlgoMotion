@@ -707,6 +707,9 @@ tr:hover td {{ background: #f8f9fb; }}
 </div>
 </body>
 </html>"""
+
+
+def _report_to_markdown(report: ComprehensiveReport) -> str:
     lines = []
     lines.append("# AlgoMotion 学习分析报告")
     lines.append("")

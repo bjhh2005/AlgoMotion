@@ -1,191 +1,229 @@
 """
-V2 推荐引擎仿真学生测试
+V2 recommendation engine tests.
 
-用法: python -m backend.tests.test_recommendation_engine
-或:   python backend/tests/test_recommendation_engine.py
+Run from the repository root:
+    python -m unittest backend.tests.test_recommendation_engine
 """
-import sys
+from __future__ import annotations
+
 import json
+import sys
+import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = BACKEND_DIR.parent
+sys.path.insert(0, str(BACKEND_DIR))
 
-from app.recommendation_engine import (
-    recommend, StrategyType, StudentProfile, determine_strategy,
-    build_cognitive_states, NodeCognitiveState, BetaBelief, KnowledgeState,
+from app.recommendation_engine import (  # noqa: E402
+    BetaBelief,
+    KnowledgeState,
+    NodeCognitiveState,
+    StrategyType,
+    StudentProfile,
+    build_cognitive_states,
+    determine_strategy,
+    recommend,
 )
 
 
 def load_graph_data():
-    root = Path(__file__).resolve().parent.parent.parent
-    nodes_path = root / "data" / "knowledge-graph" / "nodes.json"
-    edges_path = root / "data" / "knowledge-graph" / "edges.json"
-    with open(nodes_path, encoding="utf-8") as f:
-        nodes = json.load(f)
-    with open(edges_path, encoding="utf-8") as f:
-        edges = json.load(f)
+    nodes_path = ROOT_DIR / "data" / "knowledge-graph" / "nodes.json"
+    edges_path = ROOT_DIR / "data" / "knowledge-graph" / "edges.json"
+    with nodes_path.open(encoding="utf-8") as file:
+        nodes = json.load(file)
+    with edges_path.open(encoding="utf-8") as file:
+        edges = json.load(file)
     return nodes, edges
 
 
 def make_progress(nodes, mastery_map: dict[str, dict]):
     progress = {}
-    for n in nodes:
-        nid = n["id"]
-        if nid in mastery_map:
-            m = mastery_map[nid]
-            progress[nid] = {
-                "status": m.get("status", "learning"),
-                "metrics": {
-                    "mastery": m.get("mastery", 0.0),
-                    "correctRate": m.get("correctRate", 0.0),
-                    "attemptCount": m.get("attemptCount", 0),
-                    "studyMinutes": m.get("studyMinutes", 0),
-                    "errorCount": m.get("errorCount", 0),
-                },
-            }
+    for node in nodes:
+        node_id = node["id"]
+        if node_id not in mastery_map:
+            continue
+        metrics = mastery_map[node_id]
+        progress[node_id] = {
+            "status": metrics.get("status", "learning"),
+            "metrics": {
+                "mastery": metrics.get("mastery", 0.0),
+                "confidence": metrics.get("confidence", metrics.get("mastery", 0.0)),
+                "correctRate": metrics.get("correctRate", 0.0),
+                "attemptCount": metrics.get("attemptCount", 0),
+                "studyMinutes": metrics.get("studyMinutes", 0),
+                "errorCount": metrics.get("errorCount", 0),
+            },
+        }
     return progress
 
 
-def print_result(label: str, result: dict):
-    print(f"\n{'='*60}")
-    print(f"  {label}")
-    print(f"{'='*60}")
-    print(f"  策略: {result['strategy']}")
-    print(f"  策略原因: {result['strategy_reason']}")
-    for r in result["recommendations"]:
-        fb = r["factor_breakdown"]
-        print(f"  #{r['rank']} {r['node_name']} (score={r['score']:.3f}) "
-              f"[{r['knowledge_state']}]")
-        print(f"      gap={fb['gap']:.2f} unc={fb['uncertainty']:.2f} "
-              f"risk={fb['risk']:.2f} cen={fb['centrality']:.2f} "
-              f"eff={fb['efficiency']:.2f}")
-        print(f"      → {r['reason']}")
+class RecommendationEngineTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.nodes, cls.edges = load_graph_data()
+        cls.node_ids = {node["id"] for node in cls.nodes}
+        cls.target = "stack" if "stack" in cls.node_ids else cls.nodes[0]["id"]
 
+    def test_beta_belief_and_knowledge_state_classification(self):
+        belief = BetaBelief(alpha=9, beta=3)
+        self.assertAlmostEqual(belief.expected, 0.75)
+        self.assertGreater(belief.variance, 0)
 
-def test_1_fragile_vs_mastered():
-    """测试用例1：假懂型 vs 真掌握型"""
-    nodes, edges = load_graph_data()
-    node_ids = {n["id"] for n in nodes}
-    target = "stack" if "stack" in node_ids else nodes[0]["id"]
-    fragile_map = {target: {"mastery": 0.58, "correctRate": 0.6, "attemptCount": 3, "status": "learning"}}
-    mastered_map = {target: {"mastery": 0.85, "correctRate": 0.85, "attemptCount": 20, "status": "mastered"}}
-    cognitive_mastery_fragile = {
-        target: {
-            "level_mastery": {"remember": 0.9, "understand": 0.85, "apply": 0.3,
-                              "analyze": 0.2, "evaluate": 0.1, "create": 0.1},
+        fragile = NodeCognitiveState()
+        fragile.bloom_beliefs["understand"] = BetaBelief(alpha=11, beta=1)
+        fragile.bloom_beliefs["apply"] = BetaBelief(alpha=2, beta=10)
+        self.assertEqual(fragile.classify(), KnowledgeState.FRAGILE)
+
+        mastered = NodeCognitiveState()
+        mastered.bloom_beliefs["apply"] = BetaBelief(alpha=18, beta=2)
+        mastered.bloom_beliefs["analyze"] = BetaBelief(alpha=14, beta=4)
+        self.assertEqual(mastered.classify(), KnowledgeState.TRULY_MASTERED)
+
+    def test_build_cognitive_states_uses_bloom_mastery_when_available(self):
+        progress = make_progress(
+            self.nodes,
+            {self.target: {"mastery": 0.5, "correctRate": 0.5, "attemptCount": 4}},
+        )
+        cognitive_mastery = {
+            self.target: {
+                "level_mastery": {
+                    "remember": 0.9,
+                    "understand": 0.85,
+                    "apply": 0.25,
+                    "analyze": 0.2,
+                    "evaluate": 0.1,
+                    "create": 0.1,
+                }
+            }
         }
-    }
-    cognitive_mastery_mastered = {
-        target: {
-            "level_mastery": {"remember": 0.95, "understand": 0.9, "apply": 0.85,
-                              "analyze": 0.8, "evaluate": 0.7, "create": 0.6},
+
+        states = build_cognitive_states(progress, cognitive_mastery)
+        self.assertIn(self.target, states)
+        self.assertLess(states[self.target].apply_expected, states[self.target].understand_expected)
+        self.assertIn(states[self.target].classify(), {KnowledgeState.WEAK, KnowledgeState.FRAGILE})
+
+    def test_determine_strategy_rules_and_override(self):
+        self.assertEqual(
+            determine_strategy(StudentProfile(fake_effort_suspicion=0.8)),
+            StrategyType.CONSOLIDATION,
+        )
+        self.assertEqual(
+            determine_strategy(StudentProfile(rush_rate=0.8, correct_rate=0.4)),
+            StrategyType.SLOW_DOWN,
+        )
+        self.assertEqual(
+            determine_strategy(StudentProfile(hesitation_rate=0.7, correct_rate=0.8)),
+            StrategyType.ENCOURAGE,
+        )
+        self.assertEqual(
+            determine_strategy(StudentProfile(), override="consolidation"),
+            StrategyType.CONSOLIDATION,
+        )
+
+    def test_recommend_returns_ranked_items_with_expected_shape(self):
+        progress = make_progress(
+            self.nodes,
+            {
+                self.target: {
+                    "mastery": 0.58,
+                    "correctRate": 0.6,
+                    "attemptCount": 3,
+                    "status": "learning",
+                }
+            },
+        )
+        result = recommend(self.nodes, self.edges, progress, count=5)
+
+        self.assertEqual(result["strategy"], "balanced")
+        self.assertIn("student_profile", result)
+        self.assertIn("category_groups", result)
+        self.assertLessEqual(len(result["recommendations"]), 5)
+        self.assertGreater(len(result["recommendations"]), 0)
+
+        scores = [item["score"] for item in result["recommendations"]]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+        first = result["recommendations"][0]
+        for key in ["rank", "node_id", "node_name", "score", "factor_breakdown", "reason", "knowledge_state"]:
+            self.assertIn(key, first)
+
+    def test_recommend_strategy_inputs_change_strategy(self):
+        progress = make_progress(self.nodes, {})
+        behavior_rushing = {
+            node["id"]: {"rush_rate": 0.8, "hesitation_rate": 0.1, "guess_rate": 0.6, "consistency": 0.3}
+            for node in self.nodes
         }
-    }
-    p_fragile = make_progress(nodes, fragile_map)
-    p_mastered = make_progress(nodes, mastered_map)
-    r_fragile = recommend(nodes, edges, p_fragile, cognitive_mastery=cognitive_mastery_fragile)
-    r_mastered = recommend(nodes, edges, p_mastered, cognitive_mastery=cognitive_mastery_mastered)
-    print_result("测试1A: 假懂型学生 (stack apply=0.3)", r_fragile)
-    print_result("测试1B: 真掌握型学生 (stack apply=0.85)", r_mastered)
-    fragile_ids = {r["node_id"] for r in r_fragile["recommendations"]}
-    mastered_ids = {r["node_id"] for r in r_mastered["recommendations"]}
-    fragile_has_target = target in fragile_ids
-    mastered_has_target = target in mastered_ids
-    print(f"\n  ✓ 假懂型推荐含stack(巩固): {fragile_has_target}")
-    print(f"  ✓ 真掌握型推荐含stack(推进): {mastered_has_target is False or mastered_has_target}")
+        low_correct_progress = make_progress(
+            self.nodes,
+            {
+                node["id"]: {
+                    "mastery": 0.2,
+                    "correctRate": 0.4,
+                    "attemptCount": 5,
+                    "status": "weak",
+                }
+                for node in self.nodes[:3]
+            },
+        )
+        rushing = recommend(
+            self.nodes,
+            self.edges,
+            low_correct_progress,
+            behavior_analyses=behavior_rushing,
+        )
+        self.assertEqual(rushing["strategy"], "slow_down")
 
+        behavior_hesitating = {
+            node["id"]: {"rush_rate": 0.1, "hesitation_rate": 0.7, "guess_rate": 0.1, "consistency": 0.9}
+            for node in self.nodes
+        }
+        hesitating = recommend(
+            self.nodes,
+            self.edges,
+            progress,
+            behavior_analyses=behavior_hesitating,
+            motivation_index={"fake_effort_suspicion": 0.1},
+        )
+        self.assertEqual(hesitating["strategy"], "encourage")
 
-def test_2_rushing_vs_hesitating():
-    """测试用例2：仓促型 vs 犹豫型"""
-    nodes, edges = load_graph_data()
-    p = make_progress(nodes, {})
-    behavior_rushing = {
-        n["id"]: {"rush_rate": 0.8, "hesitation_rate": 0.1, "guess_rate": 0.6, "consistency": 0.3}
-        for n in nodes
-    }
-    behavior_hesitating = {
-        n["id"]: {"rush_rate": 0.1, "hesitation_rate": 0.7, "guess_rate": 0.1, "consistency": 0.9}
-        for n in nodes
-    }
-    motivation_normal = {"fake_effort_suspicion": 0.1}
-    r_rushing = recommend(nodes, edges, p, behavior_analyses=behavior_rushing, motivation_index=motivation_normal)
-    r_hesitating = recommend(nodes, edges, p, behavior_analyses=behavior_hesitating, motivation_index=motivation_normal)
-    print_result("测试2A: 仓促型学生 (rush=0.8, correct=0.4)", r_rushing)
-    print_result("测试2B: 犹豫型学生 (hesitation=0.7)", r_hesitating)
-    print(f"\n  ✓ 仓促型策略: {r_rushing['strategy']} (期望: slow_down)")
-    print(f"  ✓ 犹豫型策略: {r_hesitating['strategy']} (期望: encourage)")
+        fake_effort = recommend(
+            self.nodes,
+            self.edges,
+            progress,
+            motivation_index={"fake_effort_suspicion": 0.8},
+        )
+        self.assertEqual(fake_effort["strategy"], "consolidation")
 
+    def test_strategy_override_is_reflected_in_response(self):
+        progress = make_progress(self.nodes, {})
+        for strategy in ["balanced", "consolidation", "slow_down", "encourage"]:
+            result = recommend(self.nodes, self.edges, progress, strategy_override=strategy)
+            self.assertEqual(result["strategy"], strategy)
 
-def test_3_fake_effort():
-    """测试用例3：虚假努力检测"""
-    nodes, edges = load_graph_data()
-    p = make_progress(nodes, {})
-    motivation_fake = {"fake_effort_suspicion": 0.8}
-    motivation_real = {"fake_effort_suspicion": 0.1}
-    r_fake = recommend(nodes, edges, p, motivation_index=motivation_fake)
-    r_real = recommend(nodes, edges, p, motivation_index=motivation_real)
-    print_result("测试3A: 虚假努力学生 (fake_effort=0.8)", r_fake)
-    print_result("测试3B: 真实努力学生 (fake_effort=0.1)", r_real)
-    print(f"\n  ✓ 虚假努力策略: {r_fake['strategy']} (期望: consolidation)")
-    print(f"  ✓ 真实努力策略: {r_real['strategy']} (期望: balanced)")
+    def test_current_node_neighbors_can_be_recommended(self):
+        progress = make_progress(
+            self.nodes,
+            {
+                self.target: {
+                    "mastery": 0.85,
+                    "correctRate": 0.9,
+                    "attemptCount": 12,
+                    "status": "mastered",
+                }
+            },
+        )
+        outgoing_targets = [
+            edge["target"]
+            for edge in self.edges
+            if edge.get("source") == self.target and edge.get("target") in self.node_ids
+        ]
+        if not outgoing_targets:
+            self.skipTest(f"{self.target} has no outgoing graph neighbors")
 
-
-def test_4_propagation_risk():
-    """测试用例4：传播风险阻断"""
-    nodes, edges = load_graph_data()
-    node_ids = {n["id"] for n in nodes}
-    prereq_targets = [e["target"] for e in edges if e.get("type") == "prerequisite"]
-    hub_node = None
-    if prereq_targets:
-        from collections import Counter
-        cnt = Counter(prereq_targets)
-        hub_node = cnt.most_common(1)[0][0]
-    if not hub_node:
-        hub_node = nodes[0]["id"] if nodes else "stack"
-    leaf_candidates = [n["id"] for n in nodes if n["id"] != hub_node]
-    leaf_node = leaf_candidates[-1] if leaf_candidates else nodes[-1]["id"]
-    mastery_map = {
-        hub_node: {"mastery": 0.2, "correctRate": 0.3, "attemptCount": 5, "status": "weak"},
-        leaf_node: {"mastery": 0.2, "correctRate": 0.3, "attemptCount": 5, "status": "weak"},
-    }
-    p = make_progress(nodes, mastery_map)
-    result = recommend(nodes, edges, p)
-    print_result("测试4: 传播风险阻断", result)
-    rec_ids = [r["node_id"] for r in result["recommendations"]]
-    hub_rank = rec_ids.index(hub_node) + 1 if hub_node in rec_ids else 999
-    leaf_rank = rec_ids.index(leaf_node) + 1 if leaf_node in rec_ids else 999
-    hub_name = next((n["name"] for n in nodes if n["id"] == hub_node), hub_node)
-    leaf_name = next((n["name"] for n in nodes if n["id"] == leaf_node), leaf_node)
-    print(f"\n  ✓ 枢纽节点 {hub_name} 排名: #{hub_rank}")
-    print(f"  ✓ 叶子节点 {leaf_name} 排名: #{leaf_rank}")
-    print(f"  ✓ 枢纽应优先于叶子: {hub_rank < leaf_rank}")
-
-
-def test_5_strategy_override():
-    """测试用例5：策略覆盖与对比"""
-    nodes, edges = load_graph_data()
-    p = make_progress(nodes, {})
-    for s in ["balanced", "consolidation", "slow_down", "encourage"]:
-        r = recommend(nodes, edges, p, strategy_override=s)
-        print(f"\n  策略={s}: Top3 = {[r['node_name'] for r in r['recommendations'][:3]]}")
-
-
-def run_all():
-    print("=" * 60)
-    print("  AlgoMotion V2 推荐引擎 - 仿真学生测试")
-    print("=" * 60)
-    test_1_fragile_vs_mastered()
-    test_2_rushing_vs_hesitating()
-    test_3_fake_effort()
-    test_4_propagation_risk()
-    print("\n" + "=" * 60)
-    print("  策略覆盖对比")
-    print("=" * 60)
-    test_5_strategy_override()
-    print("\n" + "=" * 60)
-    print("  全部测试完成")
-    print("=" * 60)
+        result = recommend(self.nodes, self.edges, progress, current_node_id=self.target, count=10)
+        recommended_ids = {item["node_id"] for item in result["recommendations"]}
+        self.assertTrue(recommended_ids & set(outgoing_targets))
 
 
 if __name__ == "__main__":
-    run_all()
+    unittest.main(verbosity=2)
