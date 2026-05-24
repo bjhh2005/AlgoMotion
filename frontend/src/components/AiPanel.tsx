@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactElement } from "react";
-import { BookOpen, Bot, ClipboardList, Code2, FileText, GitBranch, Loader2, MessageSquareText, Send, Sparkles, Trash2 } from "lucide-react";
+import { BookOpen, Bot, CheckCircle2, ChevronDown, ClipboardList, Code2, FileText, GitBranch, Layers3, Loader2, MessageSquareText, RotateCcw, Send, Sparkles, Trash2, XCircle } from "lucide-react";
 import { analyzeCode, askAi, generateCode, generateStudyArtifacts } from "../api";
 import type {
   AiChatMessage,
@@ -17,6 +17,7 @@ interface Props {
   selectedNode: KnowledgeNode;
   nodeById: Record<string, KnowledgeNode>;
   onSelect: (nodeId: string) => void;
+  onQuizResult?: (nodeId: string, correct: boolean) => void;
 }
 
 type AiMode = "chat" | "artifact" | "code";
@@ -33,6 +34,7 @@ interface AiWorkspace {
 }
 
 type PendingAction = "chat" | "artifact" | "analysis" | "code" | null;
+type StudioSectionKey = "quiz" | "cards" | "actions" | "code" | "links";
 
 interface AiSessionSnapshot {
   mode: AiMode;
@@ -41,6 +43,10 @@ interface AiSessionSnapshot {
   sourceText: string;
   messages: AiChatMessage[];
   workspace: AiWorkspace;
+  pendingAction: PendingAction;
+  quizAnswers: Record<string, string>;
+  flippedCards: Record<string, boolean>;
+  studioCollapsed: Record<StudioSectionKey, boolean>;
 }
 
 const initialWorkspace: AiWorkspace = {
@@ -107,6 +113,23 @@ function loadSessionSnapshot(): AiSessionSnapshot | null {
       code: typeof parsed.code === "string" ? parsed.code : defaultCode,
       sourceText: typeof parsed.sourceText === "string" ? parsed.sourceText : defaultSourceText,
       messages: withoutWaitingMessage(parsed.messages),
+      quizAnswers: typeof parsed.quizAnswers === "object" && parsed.quizAnswers ? parsed.quizAnswers as Record<string, string> : {},
+      flippedCards: typeof parsed.flippedCards === "object" && parsed.flippedCards ? parsed.flippedCards as Record<string, boolean> : {},
+      studioCollapsed: {
+        quiz: false,
+        cards: true,
+        actions: true,
+        code: true,
+        links: true,
+        ...(typeof parsed.studioCollapsed === "object" && parsed.studioCollapsed ? parsed.studioCollapsed as Partial<Record<StudioSectionKey, boolean>> : {})
+      },
+      pendingAction:
+        parsed.pendingAction === "chat" ||
+        parsed.pendingAction === "artifact" ||
+        parsed.pendingAction === "analysis" ||
+        parsed.pendingAction === "code"
+          ? parsed.pendingAction
+          : null,
       workspace: {
         ...initialWorkspace,
         ...parsed.workspace
@@ -115,6 +138,10 @@ function loadSessionSnapshot(): AiSessionSnapshot | null {
   } catch {
     return null;
   }
+}
+
+function normalizeAnswer(value: string) {
+  return value.trim().replace(/\s+/g, "").toLowerCase();
 }
 
 function renderInlineMarkdown(text: string) {
@@ -171,7 +198,7 @@ function mergeWorkspace(current: AiWorkspace, next: Partial<AiWorkspace>): AiWor
   };
 }
 
-export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
+export function AiPanel({ selectedNode, nodeById, onSelect, onQuizResult }: Props) {
   const initialSession = useRef<AiSessionSnapshot | null>(null);
   if (initialSession.current === null) {
     initialSession.current = loadSessionSnapshot();
@@ -187,9 +214,27 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
   const [workspace, setWorkspace] = useState<AiWorkspace>(
     initialSession.current?.workspace ?? initialWorkspaceForNode(selectedNode)
   );
-  const [status, setStatus] = useState(initialSession.current ? "已恢复上次 AI 对话" : "等待输入");
-  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [status, setStatus] = useState(
+    initialSession.current?.pendingAction
+      ? "正在恢复上次未完成的 AI 回复"
+      : initialSession.current
+        ? "已恢复上次 AI 对话"
+        : "等待输入"
+  );
+  const [pendingAction, setPendingAction] = useState<PendingAction>(initialSession.current?.pendingAction ?? null);
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>(initialSession.current?.quizAnswers ?? {});
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>(initialSession.current?.flippedCards ?? {});
+  const [studioCollapsed, setStudioCollapsed] = useState<Record<StudioSectionKey, boolean>>(
+    initialSession.current?.studioCollapsed ?? {
+      quiz: false,
+      cards: true,
+      actions: true,
+      code: true,
+      links: true
+    }
+  );
   const chatStreamRef = useRef<HTMLDivElement | null>(null);
+  const restoredPendingRef = useRef(false);
 
   const linkedNodes = useMemo(() => {
     return Array.from(new Set([
@@ -200,7 +245,12 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
 
   const isPending = pendingAction !== null;
   const sourceCount = workspace.nodeCards.length;
-  const studioCount = workspace.quiz.length + workspace.knowledgeCards.length + workspace.recommendedExercises.length + workspace.learningActions.length;
+  const actionCount = workspace.recommendedExercises.length + workspace.learningActions.length;
+  const linkCount = linkedNodes.length;
+  const codeCount = workspace.generatedCode ? 1 : 0;
+  const answeredQuizCount = workspace.quiz.filter((item) => quizAnswers[item.id]).length;
+  const flippedCardCount = workspace.knowledgeCards.filter((card) => flippedCards[card.nodeId]).length;
+  const studioCount = workspace.quiz.length + workspace.knowledgeCards.length + actionCount + codeCount + linkCount;
 
   useEffect(() => {
     const snapshot: AiSessionSnapshot = {
@@ -209,10 +259,14 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
       code,
       sourceText,
       messages: withoutWaitingMessage(messages),
-      workspace
+      workspace,
+      pendingAction,
+      quizAnswers,
+      flippedCards,
+      studioCollapsed
     };
     window.localStorage.setItem(AI_SESSION_STORAGE_KEY, JSON.stringify(snapshot));
-  }, [mode, message, code, sourceText, messages, workspace]);
+  }, [mode, message, code, sourceText, messages, workspace, pendingAction, quizAnswers, flippedCards, studioCollapsed]);
 
   useEffect(() => {
     chatStreamRef.current?.scrollTo({
@@ -226,6 +280,49 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
     setMessages([welcomeMessage(selectedNode)]);
     setWorkspace(initialWorkspaceForNode(selectedNode));
   }, [selectedNode]);
+
+  useEffect(() => {
+    if (restoredPendingRef.current) return;
+    const snapshot = initialSession.current;
+    const history = withoutWaitingMessage(snapshot?.messages ?? []);
+    const lastMessage = history[history.length - 1];
+    const shouldResumeChat = snapshot?.pendingAction === "chat" || lastMessage?.role === "user";
+    if (!shouldResumeChat) return;
+    restoredPendingRef.current = true;
+
+    if (shouldResumeChat) {
+      const lastUserMessage = [...history].reverse().find((item) => item.role === "user");
+      if (!lastUserMessage) {
+        setPendingAction(null);
+        setStatus("已恢复对话，但没有找到上次提问");
+        return;
+      }
+      setPendingAction("chat");
+      setStatus("正在恢复上次未完成的 AI 回复");
+      pushWaitingMessage("正在恢复上次未完成的回复，请稍候。");
+      askAi(lastUserMessage.content, selectedNode.id, history)
+        .then((result) => {
+          syncFocusFromAi(result.linkedNodes);
+          setMessages((current) => [...withoutWaitingMessage(current), result.message]);
+          setWorkspace((current) => mergeWorkspace(current, {
+            nodeCards: result.nodeCards,
+            graphRelations: result.graphRelations,
+            quiz: result.quiz ?? current.quiz,
+            knowledgeCards: result.knowledgeCards ?? current.knowledgeCards,
+            recommendedExercises: result.recommendedExercises ?? current.recommendedExercises,
+            learningActions: result.learningActions ?? current.learningActions
+          }));
+          finishPending("已恢复并生成讲解、跳转卡片、Quiz 和推荐练习");
+        })
+        .catch((error: Error) => {
+          pushAssistant(`恢复上次 AI 回复失败：${error.message}`, [selectedNode.id]);
+          finishPending("恢复上次 AI 回复失败");
+        });
+    } else {
+      pushWaitingMessage("上次操作尚未完成，请重新提交一次。");
+      setStatus("已恢复上次操作，但需要重新提交");
+    }
+  }, [selectedNode.id]);
 
   function pushAssistant(content: string, linkedNodeIds: string[] = []) {
     setMessages((current) => [
@@ -251,6 +348,13 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
     ]);
   }
 
+  function syncFocusFromAi(linkedNodeIds: string[] = []) {
+    const nextFocusId = linkedNodeIds.find((nodeId) => nodeById[nodeId]);
+    if (nextFocusId && nextFocusId !== selectedNode.id) {
+      onSelect(nextFocusId);
+    }
+  }
+
   function finishPending(nextStatus: string) {
     setPendingAction(null);
     setStatus(nextStatus);
@@ -265,9 +369,41 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
     setSourceText(defaultSourceText);
     setMessages(resetMessages);
     setWorkspace(resetWorkspace);
+    setQuizAnswers({});
+    setFlippedCards({});
     setStatus("已清空 AI 对话");
     setPendingAction(null);
     window.localStorage.removeItem(AI_SESSION_STORAGE_KEY);
+  }
+
+  function answerQuiz(item: AiQuizItem, answer: string) {
+    setQuizAnswers((current) => ({ ...current, [item.id]: answer }));
+    const correct = normalizeAnswer(answer) === normalizeAnswer(item.answer);
+    const nodeId = item.linkedNodeIds[0] ?? selectedNode.id;
+    onQuizResult?.(nodeId, correct);
+    setStatus(correct ? "Quiz 回答正确，已同步学习追踪" : "Quiz 回答错误，已记录为待巩固知识点");
+  }
+
+  function toggleCard(nodeId: string) {
+    setFlippedCards((current) => ({ ...current, [nodeId]: !current[nodeId] }));
+  }
+
+  function toggleStudioSection(section: StudioSectionKey) {
+    setStudioCollapsed((current) => ({ ...current, [section]: !current[section] }));
+  }
+
+  function sectionHeader(section: StudioSectionKey, title: string, count: number, detail?: string) {
+    const collapsed = studioCollapsed[section];
+    return (
+      <button className="studio-section-toggle" onClick={() => toggleStudioSection(section)} aria-expanded={!collapsed}>
+        <span>
+          <strong>{title}</strong>
+          {detail && <em>{detail}</em>}
+        </span>
+        <b>{count}</b>
+        <ChevronDown size={16} className={collapsed ? "" : "open"} />
+      </button>
+    );
   }
 
   function handleChat() {
@@ -278,7 +414,7 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
       id: `user-${Date.now()}`,
       role: "user",
       content: text,
-      linkedNodeIds: [selectedNode.id]
+      linkedNodeIds: []
     };
     const nextMessages = [...messages, userMessage];
     setMessages(nextMessages);
@@ -289,6 +425,7 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
 
     askAi(text, selectedNode.id, withoutWaitingMessage(messages))
       .then((result) => {
+        syncFocusFromAi(result.linkedNodes);
         setMessages((current) => [...withoutWaitingMessage(current), result.message]);
         setWorkspace((current) => mergeWorkspace(current, {
           nodeCards: result.nodeCards,
@@ -471,12 +608,19 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
                   )}
                   {item.id === waitingMessageId && <div className="typing-dots" aria-label="正在等待模型回复"><i /><i /><i /></div>}
                   {(item.linkedNodeIds ?? []).length > 0 && (
-                    <div className="mini-link-row">
-                      {(item.linkedNodeIds ?? []).map((nodeId) => (
-                        <button key={nodeId} onClick={() => onSelect(nodeId)}>
-                          {nodeById[nodeId]?.name ?? nodeId}
-                        </button>
-                      ))}
+                    <div className="inline-node-card-grid">
+                      {(item.linkedNodeIds ?? []).slice(0, 4).map((nodeId) => {
+                        const node = nodeById[nodeId];
+                        return (
+                          <button key={nodeId} onClick={() => onSelect(nodeId)}>
+                            <BookOpen size={15} />
+                            <span>
+                              <strong>{node?.name ?? nodeId}</strong>
+                              <small>{node?.description ?? "点击跳转到知识图谱节点"}</small>
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -548,53 +692,110 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
           </div>
 
           <section className="studio-section">
-            <h4>Quiz</h4>
-            <div className="quiz-list">
-              {workspace.quiz.map((item) => (
-                <article key={item.id}>
-                  <strong>{item.question}</strong>
-                  {item.options && <p>{item.options.join(" / ")}</p>}
-                  <em>答案：{item.answer}</em>
-                  <span>{item.explanation}</span>
-                </article>
-              ))}
-              {workspace.quiz.length === 0 && <p className="muted">生成学习包或完成问答后会出现在这里。</p>}
-            </div>
+            {sectionHeader("quiz", "Quiz", workspace.quiz.length, `${answeredQuizCount}/${workspace.quiz.length} 已作答`)}
+            {!studioCollapsed.quiz && (
+              <div className="quiz-list">
+                {workspace.quiz.map((item) => (
+                  <article key={item.id} className={`quiz-card ${quizAnswers[item.id] ? (normalizeAnswer(quizAnswers[item.id]) === normalizeAnswer(item.answer) ? "correct" : "wrong") : ""}`}>
+                    <strong>{item.question}</strong>
+                    {item.options ? (
+                      <div className="quiz-option-grid">
+                        {item.options.map((option) => (
+                          <button
+                            key={option}
+                            className={quizAnswers[item.id] === option ? "selected" : ""}
+                            onClick={() => answerQuiz(item, option)}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="quiz-short-answer">
+                        <input
+                          value={quizAnswers[item.id] ?? ""}
+                          onChange={(event) => setQuizAnswers((current) => ({ ...current, [item.id]: event.target.value }))}
+                          placeholder="输入答案后点击判分"
+                        />
+                        <button onClick={() => answerQuiz(item, quizAnswers[item.id] ?? "")}>判分</button>
+                      </div>
+                    )}
+                    {quizAnswers[item.id] && (
+                      <div className="quiz-feedback">
+                        {normalizeAnswer(quizAnswers[item.id]) === normalizeAnswer(item.answer) ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                        <span>答案：{item.answer}。{item.explanation}</span>
+                      </div>
+                    )}
+                    <div className="quiz-linked-row">
+                      {item.linkedNodeIds.map((nodeId) => (
+                        <button key={nodeId} onClick={() => onSelect(nodeId)}>跳转 {nodeById[nodeId]?.name ?? nodeId}</button>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+                {workspace.quiz.length === 0 && <p className="muted">生成学习包或完成问答后会出现在这里。</p>}
+              </div>
+            )}
           </section>
 
           <section className="studio-section">
-            <h4>知识卡片</h4>
-            <div className="flashcard-grid">
-              {workspace.knowledgeCards.map((card) => (
-                <article key={card.nodeId}>
-                  <strong>{card.front}</strong>
-                  <p>{card.back}</p>
-                  <em>{card.mistake}</em>
-                </article>
-              ))}
-              {workspace.knowledgeCards.length === 0 && <p className="muted">还没有生成知识卡片。</p>}
-            </div>
+            {sectionHeader("cards", "知识卡片", workspace.knowledgeCards.length, `${flippedCardCount}/${workspace.knowledgeCards.length} 已翻看`)}
+            {!studioCollapsed.cards && (
+              <div className="flashcard-grid">
+                {workspace.knowledgeCards.map((card) => (
+                  <button
+                    key={card.nodeId}
+                    className={`flashcard ${flippedCards[card.nodeId] ? "flipped" : ""}`}
+                    onClick={() => toggleCard(card.nodeId)}
+                  >
+                    <span className="flashcard-toolbar">
+                      <Layers3 size={15} />
+                      <em>{flippedCards[card.nodeId] ? "反面" : "正面"}</em>
+                      <RotateCcw size={14} />
+                    </span>
+                    {!flippedCards[card.nodeId] ? (
+                      <>
+                        <strong>{card.front}</strong>
+                        <p>{card.back}</p>
+                      </>
+                    ) : (
+                      <>
+                        <strong>关键性质与常见错误</strong>
+                        <ul>
+                          {card.bullets.filter(Boolean).map((bullet) => <li key={bullet}>{bullet}</li>)}
+                        </ul>
+                        {card.mistake && <p>常见错误：{card.mistake}</p>}
+                        {card.cppExample && <pre><code>{card.cppExample}</code></pre>}
+                      </>
+                    )}
+                  </button>
+                ))}
+                {workspace.knowledgeCards.length === 0 && <p className="muted">还没有生成知识卡片。</p>}
+              </div>
+            )}
           </section>
 
           <section className="studio-section">
-            <h4>推荐行动</h4>
-            <div className="ai-action-list">
-              {workspace.recommendedExercises.map((exercise) => (
-                <button key={exercise.exerciseId} onClick={() => onSelect(exercise.nodeId)}>
-                  {exercise.title}
-                  <span>{exercise.reason}</span>
-                </button>
-              ))}
-              {workspace.learningActions.map((action) => (
-                <button key={`${action.type}-${action.nodeId}`} onClick={() => onSelect(action.nodeId)}>
-                  {action.label}
-                  <span>{action.description}</span>
-                </button>
-              ))}
-              {workspace.recommendedExercises.length === 0 && workspace.learningActions.length === 0 && (
-                <p className="muted">AI 会把薄弱点转换成复习和练习建议。</p>
-              )}
-            </div>
+            {sectionHeader("actions", "推荐行动", actionCount, `${workspace.recommendedExercises.length} 练习 / ${workspace.learningActions.length} 动作`)}
+            {!studioCollapsed.actions && (
+              <div className="ai-action-list">
+                {workspace.recommendedExercises.map((exercise) => (
+                  <button key={exercise.exerciseId} onClick={() => onSelect(exercise.nodeId)}>
+                    {exercise.title}
+                    <span>{exercise.reason}</span>
+                  </button>
+                ))}
+                {workspace.learningActions.map((action) => (
+                  <button key={`${action.type}-${action.nodeId}`} onClick={() => onSelect(action.nodeId)}>
+                    {action.label}
+                    <span>{action.description}</span>
+                  </button>
+                ))}
+                {workspace.recommendedExercises.length === 0 && workspace.learningActions.length === 0 && (
+                  <p className="muted">AI 会把薄弱点转换成复习和练习建议。</p>
+                )}
+              </div>
+            )}
           </section>
 
           {studioCount === 0 && (
@@ -607,19 +808,28 @@ export function AiPanel({ selectedNode, nodeById, onSelect }: Props) {
 
           {workspace.generatedCode && (
             <section className="studio-section generated-code-panel">
-              <h4>生成的 C++ 代码</h4>
-              <p>{workspace.generatedExplanation}</p>
-              <pre><code>{workspace.generatedCode}</code></pre>
+              {sectionHeader("code", "生成的 C++ 代码", codeCount, "点击展开代码")}
+              {!studioCollapsed.code && (
+                <>
+                  <p>{workspace.generatedExplanation}</p>
+                  <pre><code>{workspace.generatedCode}</code></pre>
+                </>
+              )}
             </section>
           )}
 
-          <div className="relation-list">
-            {linkedNodes.map((nodeId) => (
-              <button key={nodeId} onClick={() => onSelect(nodeId)}>
-                跳转: {nodeById[nodeId]?.name ?? nodeId}
-              </button>
-            ))}
-          </div>
+          <section className="studio-section">
+            {sectionHeader("links", "图谱跳转", linkCount, "相关节点")}
+            {!studioCollapsed.links && (
+              <div className="relation-list">
+                {linkedNodes.map((nodeId) => (
+                  <button key={nodeId} onClick={() => onSelect(nodeId)}>
+                    跳转: {nodeById[nodeId]?.name ?? nodeId}
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
         </aside>
       </div>
     </section>
