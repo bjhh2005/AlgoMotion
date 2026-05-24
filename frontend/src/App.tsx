@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { BarChart3, BookOpen, Bot, ClipboardList, Code2, Database, GitFork, LayoutList, Search, ShieldCheck } from "lucide-react";
 import { fetchBootstrap, fetchRecommendations, updateProgress as postProgress } from "./api";
 import {
@@ -95,6 +95,7 @@ export function App() {
   const [recommendationItems, setRecommendationItems] = useState<RecommendationItem[]>([]);
   const [pathItems, setPathItems] = useState<RecommendationItem[]>([]);
   const [splitRatio, setSplitRatio] = useState(readStoredSplitRatio);
+  const workspaceRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -178,6 +179,24 @@ export function App() {
     if (nodes.length === 0 || !selectedId) return;
     void refreshPathGuide(selectedId);
   }, [selectedId, nodes.length, recommendationsConfig.maxRecommendations, recommendationsConfig.defaultPath.length]);
+
+  useEffect(() => {
+    workspaceRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [page]);
+
+  useEffect(() => {
+    const scrollTargets = [
+      workspaceRef.current,
+      ...Array.from(document.querySelectorAll<HTMLElement>(
+        ".detail-panel, .oj-bank, .oj-mode-body, .oj-code-desc, .oj-editor-area, .oj-console-body, .ai-chat-stream"
+      ))
+    ];
+
+    scrollTargets.forEach((target) => {
+      target?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }, [page, selectedId, selectedExerciseId, ojOpenProblemId, view]);
 
   const recommendations = useMemo(
     () =>
@@ -355,7 +374,7 @@ export function App() {
         />
       </aside>
 
-      <section className="workspace">
+      <section className="workspace" ref={workspaceRef}>
         <header className="topbar">
           <div>
             <span className="eyebrow">{pageMeta[page][0]}</span>
